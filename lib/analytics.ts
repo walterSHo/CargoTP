@@ -33,6 +33,7 @@ export type ClientGroupGapRow = {
   missingPlanShare: number;
   coveredGroups: number;
   missingGroups: number;
+  coveredGroupNames: string[];
   missingGroupNames: string[];
 };
 
@@ -152,7 +153,7 @@ export function dailySalesSeries(sales: SalesRecord[]): DailySalesPoint[] {
     }));
 }
 
-export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: SalesRecord[], limit = 12): ClientGroupGapRow[] {
+export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: SalesRecord[], limit?: number): ClientGroupGapRow[] {
   const relevantPlans = groupPlans
     .filter((row) => row.planAmount > 0 && planRelevantGroup(row.productGroup))
     .map((row) => ({ ...row, normalizedGroup: normalizeProductGroup(row.productGroup) }));
@@ -160,23 +161,21 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
   if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
   const salesByClient = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; groups: Set<string> }>();
-  sales
-    .filter((row) => planRelevantGroup(row.productGroup))
-    .forEach((row) => {
-      const key = clientKey(row);
-      const entry = salesByClient.get(key) ?? {
-        unifiedClientCode: row.unifiedClientCode,
-        clientCode: row.clientCode,
-        clientName: row.clientName,
-        turnover: 0,
-        groups: new Set<string>()
-      };
-      entry.turnover += row.amountEur;
-      entry.groups.add(normalizeProductGroup(row.productGroup));
-      salesByClient.set(key, entry);
-    });
+  sales.forEach((row) => {
+    const key = clientKey(row);
+    const entry = salesByClient.get(key) ?? {
+      unifiedClientCode: row.unifiedClientCode,
+      clientCode: row.clientCode,
+      clientName: row.clientName,
+      turnover: 0,
+      groups: new Set<string>()
+    };
+    entry.turnover += row.amountEur;
+    if (planRelevantGroup(row.productGroup)) entry.groups.add(normalizeProductGroup(row.productGroup));
+    salesByClient.set(key, entry);
+  });
 
-  return [...salesByClient.values()]
+  const rows = [...salesByClient.values()]
     .map((client) => {
       const coveredPlans = relevantPlans.filter((plan) => client.groups.has(plan.normalizedGroup));
       const missingPlans = relevantPlans.filter((plan) => !client.groups.has(plan.normalizedGroup));
@@ -194,12 +193,14 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
         missingPlanShare: totalPlanAmount > 0 ? (missingPlanAmount / totalPlanAmount) * 100 : 0,
         coveredGroups: coveredPlans.length,
         missingGroups: missingPlans.length,
+        coveredGroupNames: coveredPlans.map((plan) => plan.productGroup),
         missingGroupNames: missingPlans.map((plan) => plan.productGroup)
       };
     })
-    .filter((row) => row.turnover > 0 && row.missingGroups > 0)
-    .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover || a.clientCode.localeCompare(b.clientCode) || a.clientName.localeCompare(b.clientName))
-    .slice(0, limit);
+    .filter((row) => row.turnover > 0)
+    .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover || a.clientCode.localeCompare(b.clientCode) || a.clientName.localeCompare(b.clientName));
+
+  return typeof limit === 'number' ? rows.slice(0, limit) : rows;
 }
 
 export function groupPlanAudit(groupPlans: GroupPlanRecord[], sales: SalesRecord[]) {

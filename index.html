@@ -145,6 +145,7 @@
       .table-wrap.tall { max-height: 30rem; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      th { position: relative; }
       th { background: rgba(16, 28, 51, 0.95); font-weight: 750; color: var(--ink); }
       td { color: var(--ink); }
       .table-wrap.tall th { position: sticky; top: 0; z-index: 1; }
@@ -161,6 +162,93 @@
         color: inherit;
       }
       .sort-mark { font-size: 12px; color: var(--muted); }
+      .th-wrap { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .filter-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(8, 15, 28, 0.72);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .filter-trigger.active {
+        border-color: rgba(78, 161, 255, 0.45);
+        background: rgba(78, 161, 255, 0.16);
+        color: white;
+      }
+      .filter-menu {
+        position: absolute;
+        right: 10px;
+        top: calc(100% + 10px);
+        z-index: 20;
+        width: 260px;
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(8, 15, 28, 0.98);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      }
+      .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--blue); }
+      .filter-clear {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .filter-options { display: grid; gap: 6px; max-height: 260px; overflow: auto; }
+      .filter-option {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(12, 20, 36, 0.95);
+        color: var(--ink);
+        padding: 9px 10px;
+        text-align: left;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .filter-option.active {
+        border-color: rgba(78, 161, 255, 0.45);
+        background: rgba(78, 161, 255, 0.16);
+      }
+      .filter-summary { display: flex; flex-wrap: wrap; gap: 8px; }
+      .filter-summary-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(78, 161, 255, 0.38);
+        background: rgba(78, 161, 255, 0.14);
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .table-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .table-count {
+        padding: 10px 14px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(8, 15, 28, 0.72);
+        color: white;
+        font-size: 13px;
+      }
       .hint-inline { display: inline-flex; align-items: center; gap: 8px; }
       .hint-dot {
         display: inline-flex;
@@ -255,6 +343,8 @@
         nav, main { padding: 14px 14px; }
         .toolbar { gap: 10px; }
         .toolbar-grid { grid-template-columns: 1fr; }
+        .table-meta { align-items: stretch; }
+        .filter-menu { left: 10px; right: 10px; width: auto; }
         th, td { padding: 10px 10px; }
       }
     </style>
@@ -321,7 +411,11 @@
           receivables: { key: 'totalDebt', dir: 'desc' },
           tires: { key: 'clientCode', dir: 'asc' }
         },
-        expandedRows: {}
+        expandedRows: {},
+        tableFilters: {
+          sales: {}
+        },
+        openFilterPanel: null
       };
 
       const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -463,21 +557,19 @@
         if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
         const map = new Map();
-        rows
-          .filter((row) => isGrossPlanGroup(row.productGroup))
-          .forEach((row) => {
-            const key = clientKey(row);
-            const entry = map.get(key) || {
-              unifiedClientCode: row.unifiedClientCode,
-              clientCode: row.clientCode,
-              clientName: row.clientName,
-              turnover: 0,
-              groups: new Set()
-            };
-            entry.turnover += Number(row.amountEur || 0);
-            entry.groups.add(normalizeProductGroup(row.productGroup));
-            map.set(key, entry);
-          });
+        rows.forEach((row) => {
+          const key = clientKey(row);
+          const entry = map.get(key) || {
+            unifiedClientCode: row.unifiedClientCode,
+            clientCode: row.clientCode,
+            clientName: row.clientName,
+            turnover: 0,
+            groups: new Set()
+          };
+          entry.turnover += Number(row.amountEur || 0);
+          if (isGrossPlanGroup(row.productGroup)) entry.groups.add(normalizeProductGroup(row.productGroup));
+          map.set(key, entry);
+        });
 
         return [...map.values()]
           .map((client) => {
@@ -490,15 +582,16 @@
               clientCode: client.clientCode,
               clientName: client.clientName,
               turnover: client.turnover,
+              coveredGroups: coveredPlans.length,
               coveredPlanShare: totalPlanAmount ? coveredPlanAmount / totalPlanAmount * 100 : 0,
               missingPlanShare: totalPlanAmount ? missingPlanAmount / totalPlanAmount * 100 : 0,
               missingGroups: missingPlans.length,
+              coveredGroupNames: coveredPlans.map((plan) => plan.productGroup),
               missingGroupNames: missingPlans.map((plan) => plan.productGroup)
             };
           })
-          .filter((row) => row.turnover > 0 && row.missingGroups > 0)
-          .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover)
-          .slice(0, 12);
+          .filter((row) => row.turnover > 0)
+          .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover);
       }
 
       function groupPlanRows(rows) {
@@ -540,6 +633,32 @@
         });
       }
 
+      function filterValue(column, row) {
+        if (typeof column.filterValue === 'function') return String(column.filterValue(row) ?? '');
+        return String((column.key ? row[column.key] : '') ?? '');
+      }
+
+      function filteredTableRows(tableId, rows, columns) {
+        const activeFilters = state.tableFilters[tableId] || {};
+        const entries = Object.entries(activeFilters).filter(([, values]) => Array.isArray(values) && values.length);
+        if (!entries.length) return rows;
+        return rows.filter((row) => entries.every(([filterKey, values]) => {
+          const column = columns.find((item) => (item.filterKey || item.key) === filterKey);
+          if (!column) return true;
+          return values.includes(filterValue(column, row));
+        }));
+      }
+
+      function uniqueFilterOptions(rows, columns, filterKeys) {
+        return Object.fromEntries(filterKeys.map((filterKey) => {
+          const column = columns.find((item) => (item.filterKey || item.key) === filterKey);
+          const values = column
+            ? [...new Set(rows.map((row) => filterValue(column, row)).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' }))
+            : [];
+          return [filterKey, values];
+        }));
+      }
+
       function infoLabel(label, explanation) {
         return `<span class="hint-inline">${escapeHtml(label)}<span class="hint-dot" title="${escapeHtml(explanation)}">i</span></span>`;
       }
@@ -549,9 +668,10 @@
       }
 
       function table(tableId, rows, columns, options = {}) {
-        if (!rows.length) return empty();
+        const filtered = filteredTableRows(tableId, rows, columns);
+        if (!filtered.length) return empty('Немає рядків за активними фільтрами.');
         const currentSort = state.tableSorts[tableId] || {};
-        const sorted = sortedRows(tableId, rows, columns);
+        const sorted = sortedRows(tableId, filtered, columns);
         const expandable = typeof options.expandContent === 'function';
         return `
           <div class="table-wrap ${options.maxHeight ? 'tall' : ''}">
@@ -563,7 +683,30 @@
                     const sortable = Boolean(sortKey);
                     const mark = currentSort.key === sortKey ? (currentSort.dir === 'asc' ? '▲' : '▼') : '↕';
                     const titleHtml = column.titleHtml || escapeHtml(column.title);
-                    return `<th>${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}</th>`;
+                    const filterKey = column.filterKey || column.key;
+                    const filterOptions = options.filterOptions?.[filterKey] || [];
+                    const selectedCount = (state.tableFilters[tableId]?.[filterKey] || []).length;
+                    const filterButton = filterOptions.length ? `
+                      <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">
+                        <span>Фільтр</span>
+                        <span>${selectedCount || '▾'}</span>
+                      </button>
+                    ` : '';
+                    const filterMenu = state.openFilterPanel?.tableId === tableId && state.openFilterPanel?.filterKey === filterKey ? `
+                      <div class="filter-menu" data-table-filter-root="true">
+                        <div class="filter-menu-head">
+                          <span>Вибір значень</span>
+                          <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${filterKey}" type="button">Очистити</button>
+                        </div>
+                        <div class="filter-options">
+                          ${filterOptions.map((option) => {
+                            const active = (state.tableFilters[tableId]?.[filterKey] || []).includes(option);
+                            return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
+                          }).join('') || '<div class="empty">Немає значень</div>'}
+                        </div>
+                      </div>
+                    ` : '';
+                    return `<th><div class="th-wrap">${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}${filterButton}</div>${filterMenu}</th>`;
                   }).join('')}
                 </tr>
               </thead>
@@ -769,12 +912,13 @@
 
             <div class="section-head">
               <h2>Клієнти, які не закривають планові групи</h2>
-              <p class="muted">Рейтинг побудовано за втраченою часткою планових груп у поточному місяці. Натисніть на рядок, щоб побачити повний список груп.</p>
+              <p class="muted">У таблиці показані всі клієнти поточного місяця. Натисніть на рядок, щоб побачити, які групи клієнт вже робить і яких саме не вистачає до повного покриття плану.</p>
             </div>
             ${table('groupGaps', groupGaps, [
               { title: 'Код клієнта', key: 'clientCode' },
               { title: 'Клієнт', key: 'clientName' },
               { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
+              { title: 'Робить груп', key: 'coveredGroups', sortValue: (row) => row.coveredGroups },
               { title: 'Втрачена частка', key: 'missingPlanShare', sortValue: (row) => row.missingPlanShare, render: (row) => `<span class="pill">${escapeHtml(pct(row.missingPlanShare))}</span>` },
               { title: 'Відсутніх груп', key: 'missingGroups', sortValue: (row) => row.missingGroups },
               {
@@ -783,8 +927,8 @@
                 sortValue: (row) => row.missingGroupNames.join(', '),
                 render: (row) => {
                   const value = row.missingGroupNames.join(', ');
-                  const preview = value.length > 70 ? `${value.slice(0, 67)}...` : value;
-                  return `<span title="${escapeHtml(value)}">${escapeHtml(preview || '—')}</span>`;
+                  const preview = value.length > 52 ? `${value.slice(0, 49)}...` : value;
+                  return `<span title="${escapeHtml(value)}">${escapeHtml(preview || 'Все закрито')}</span>`;
                 }
               }
             ], {
@@ -794,7 +938,10 @@
                 <div class="expand-card">
                   <div><strong>${escapeHtml(row.clientName)}</strong> (${escapeHtml(row.clientCode || row.unifiedClientCode || 'без коду')})</div>
                   <div class="small">Покрита частка плану: <strong>${escapeHtml(pct(row.coveredPlanShare))}</strong>. Втрачена частка: <strong>${escapeHtml(pct(row.missingPlanShare))}</strong>.</div>
-                  <div class="chips">${row.missingGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">—</span>'}</div>
+                  <div class="small">Групи, які клієнт вже робить:</div>
+                  <div class="chips">${row.coveredGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">поки немає планових груп</span>'}</div>
+                  <div class="small">Групи, яких не вистачає:</div>
+                  <div class="chips">${row.missingGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">усі планові групи вже закриті</span>'}</div>
                 </div>
               `
             })}
@@ -804,25 +951,57 @@
 
       function renderSales() {
         const rows = filteredSales();
+        const salesColumns = [
+          { title: 'Дата', key: 'date' },
+          { title: 'Єдиний код', key: 'unifiedClientCode' },
+          { title: 'Код клієнта', key: 'clientCode' },
+          { title: 'Клієнт', key: 'clientName' },
+          { title: 'Бренд', key: 'brand' },
+          { title: 'Група', key: 'productGroup' },
+          { title: 'Товар', key: 'productCode' },
+          { title: 'Сума', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+          { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+          { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+        ];
+        const filterOptions = uniqueFilterOptions(rows, salesColumns, ['date', 'unifiedClientCode', 'clientCode', 'clientName', 'brand', 'productGroup']);
+        const tableRows = filteredTableRows('sales', rows, salesColumns);
+        const activeFilters = Object.entries(state.tableFilters.sales || {}).flatMap(([filterKey, values]) => values.map((value) => ({ filterKey, value })));
+        const filterLabels = {
+          date: 'Дата',
+          unifiedClientCode: 'Єдиний код',
+          clientCode: 'Код клієнта',
+          clientName: 'Клієнт',
+          brand: 'Бренд',
+          productGroup: 'Група'
+        };
+
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
-            <div class="three-up">
-              <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(byTop(rows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
-              <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(byTop(rows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
-              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(byTop(rows, (row) => row.productGroup, (row) => row.amountEur, 8))}</div>
+            <div class="card">
+              <div class="table-meta">
+                <div>
+                  <div class="chart-title">Фільтри таблиці продажів</div>
+                  <div class="small">Натисніть <strong>Фільтр</strong> у заголовку колонки, щоб швидко відібрати потрібні дати, клієнтів, бренди або групи.</div>
+                </div>
+                <div class="table-count">Показано рядків: <strong>${escapeHtml(String(tableRows.length))}</strong> з ${escapeHtml(String(rows.length))}</div>
+              </div>
+              ${activeFilters.length ? `
+                <div class="filter-summary" style="margin-top:12px;">
+                  ${activeFilters.map(({ filterKey, value }) => `<button class="filter-summary-chip" data-filter-chip-remove="sales" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(value)}" type="button">${escapeHtml(filterLabels[filterKey] || filterKey)}: ${escapeHtml(value)}</button>`).join('')}
+                  <button class="filter-summary-chip" data-table-filter-clear-all="sales" type="button">Очистити все</button>
+                </div>
+              ` : ''}
             </div>
-            ${table('sales', rows, [
-              { title: 'Дата', key: 'date' },
-              { title: 'Єдиний код', key: 'unifiedClientCode' },
-              { title: 'Код клієнта', key: 'clientCode' },
-              { title: 'Клієнт', key: 'clientName' },
-              { title: 'Бренд', key: 'brand' },
-              { title: 'Група', key: 'productGroup' },
-              { title: 'Товар', key: 'productCode' },
-              { title: 'Сума', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
-              { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
-              { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
-            ], { rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}` })}
+            <div class="three-up">
+              <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(byTop(tableRows, (row) => row.productGroup, (row) => row.amountEur, 8))}</div>
+            </div>
+            ${table('sales', rows, salesColumns, {
+              filterOptions,
+              maxHeight: true,
+              rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
+            })}
           </div>
         `;
       }
@@ -974,6 +1153,67 @@
       }
 
       document.addEventListener('click', (event) => {
+        const filterOpen = event.target.closest('[data-table-filter-open]');
+        if (filterOpen) {
+          const tableId = filterOpen.dataset.tableFilterOpen;
+          const filterKey = filterOpen.dataset.filterKey;
+          state.openFilterPanel = state.openFilterPanel?.tableId === tableId && state.openFilterPanel?.filterKey === filterKey
+            ? null
+            : { tableId, filterKey };
+          renderAll();
+          return;
+        }
+
+        const filterOption = event.target.closest('[data-table-filter-option]');
+        if (filterOption) {
+          const tableId = filterOption.dataset.tableFilterOption;
+          const filterKey = filterOption.dataset.filterKey;
+          const filterValue = filterOption.dataset.filterValue;
+          const current = new Set(state.tableFilters[tableId]?.[filterKey] || []);
+          if (current.has(filterValue)) current.delete(filterValue);
+          else current.add(filterValue);
+          state.tableFilters[tableId] = { ...(state.tableFilters[tableId] || {}), [filterKey]: [...current] };
+          renderAll();
+          return;
+        }
+
+        const filterClear = event.target.closest('[data-table-filter-clear]');
+        if (filterClear) {
+          const tableId = filterClear.dataset.tableFilterClear;
+          const filterKey = filterClear.dataset.filterKey;
+          state.tableFilters[tableId] = { ...(state.tableFilters[tableId] || {}), [filterKey]: [] };
+          renderAll();
+          return;
+        }
+
+        const filterClearAll = event.target.closest('[data-table-filter-clear-all]');
+        if (filterClearAll) {
+          const tableId = filterClearAll.dataset.tableFilterClearAll;
+          state.tableFilters[tableId] = {};
+          state.openFilterPanel = null;
+          renderAll();
+          return;
+        }
+
+        const filterChipRemove = event.target.closest('[data-filter-chip-remove]');
+        if (filterChipRemove) {
+          const tableId = filterChipRemove.dataset.filterChipRemove;
+          const filterKey = filterChipRemove.dataset.filterKey;
+          const filterValue = filterChipRemove.dataset.filterValue;
+          state.tableFilters[tableId] = {
+            ...(state.tableFilters[tableId] || {}),
+            [filterKey]: (state.tableFilters[tableId]?.[filterKey] || []).filter((value) => value !== filterValue)
+          };
+          renderAll();
+          return;
+        }
+
+        if (state.openFilterPanel && !event.target.closest('[data-table-filter-root="true"]')) {
+          state.openFilterPanel = null;
+          renderAll();
+          return;
+        }
+
         const sortButton = event.target.closest('[data-table-sort]');
         if (!sortButton) return;
         const tableId = sortButton.dataset.tableSort;

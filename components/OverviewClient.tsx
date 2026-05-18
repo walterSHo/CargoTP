@@ -38,6 +38,7 @@ function gapColumns(): ColumnDef<ClientGroupGapRow>[] {
     { accessorKey: 'clientCode', header: 'Код клієнта' },
     { accessorKey: 'clientName', header: 'Клієнт' },
     { accessorKey: 'turnover', header: 'Оборот', cell: (info) => money(Number(info.getValue())) },
+    { accessorKey: 'coveredGroups', header: 'Робить груп', cell: (info) => String(info.getValue() ?? 0) },
     { accessorKey: 'missingPlanShare', header: 'Втрачена частка плану', cell: (info) => percent(Number(info.getValue())) },
     { accessorKey: 'missingGroups', header: 'Відсутніх груп' },
     {
@@ -46,8 +47,8 @@ function gapColumns(): ColumnDef<ClientGroupGapRow>[] {
       header: 'Яких груп не вистачає',
       cell: (info) => {
         const value = String(info.getValue() ?? '');
-        const preview = value.length > 70 ? `${value.slice(0, 67)}...` : value;
-        return <span title={value}>{preview || '—'}</span>;
+        const preview = value.length > 52 ? `${value.slice(0, 49)}...` : value;
+        return <span title={value}>{preview || 'Все закрито'}</span>;
       }
     }
   ];
@@ -107,7 +108,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const topClientsChart = topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover }));
   const groupMix = byTop(monthSales, (row) => row.productGroup, (row) => row.amountEur, 8);
   const daily = dailySalesSeries(monthSales);
-  const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales, 12);
+  const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales);
   const groupShareTargets = groupPlanAudit(data.groupPlans, monthSales)
     .sort((a, b) => b.shareOfGrossPlan - a.shareOfGrossPlan)
     .map((row) => ({ name: row.productGroup, value: row.shareOfGrossPlan }))
@@ -231,7 +232,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       <section className="space-y-3">
         <div>
           <h2 className="section-title text-white">Клієнти, які не закривають планові групи</h2>
-          <p className="section-copy text-sm">Рейтинг побудований за втраченою часткою планових груп у поточному місяці. Натисніть на рядок, щоб побачити повний список груп.</p>
+          <p className="section-copy text-sm">У таблиці показані всі клієнти поточного місяця. Натисніть на рядок, щоб побачити, які групи клієнт вже робить і яких саме не вистачає до повного покриття плану.</p>
         </div>
         <DataTable
           columns={gapColumns()}
@@ -245,7 +246,10 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 Покрита частка плану: <strong className="text-white">{percent(row.coveredPlanShare)}</strong>. Втрачена частка: <strong className="text-white">{percent(row.missingPlanShare)}</strong>.
               </div>
               <div className="text-sm text-muted">
-                Повний список відсутніх груп: <span className="text-white">{row.missingGroupNames.join(', ') || '—'}</span>
+                Групи, які клієнт вже робить: <span className="text-white">{row.coveredGroupNames.join(', ') || 'поки немає планових груп'}</span>
+              </div>
+              <div className="text-sm text-muted">
+                Повний список відсутніх груп: <span className="text-white">{row.missingGroupNames.join(', ') || 'усі планові групи вже закриті'}</span>
               </div>
             </div>
           )}
