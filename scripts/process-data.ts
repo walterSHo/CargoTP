@@ -7,6 +7,8 @@ const root = process.cwd();
 const rawDir = path.join(root, 'data/raw');
 const processedDir = path.join(root, 'data/processed');
 const monthlyPlansPath = path.join(processedDir, 'monthly-plans.json');
+const canonicalSource = path.join(rawDir, 'Олексієнко.xlsx');
+const expectedSourceFile = process.env.RAW_EXCEL_FILE ?? canonicalSource;
 
 type Meta = {
   updatedAt: string;
@@ -20,11 +22,19 @@ type Meta = {
   samples: { sales: SalesRecord[]; receivables: ReceivableRecord[]; groupPlans: GroupPlanRecord[] };
 };
 
-function rawFiles() {
+function sourceFile() {
   if (!fs.existsSync(rawDir)) throw new Error(`Папка raw не найдена: ${rawDir}`);
-  const files = fs.readdirSync(rawDir).filter((file) => /\.xlsx?$/i.test(file)).sort();
-  if (!files.length) throw new Error(`Не найден Excel-файл в ${rawDir}. Production UI не должен показывать demo data. Добавьте data/raw/Олексієнко.xlsx и запустите npm run process:data.`);
-  return files.map((file) => path.join(rawDir, file));
+  const explicit = path.isAbsolute(expectedSourceFile) ? expectedSourceFile : path.join(root, expectedSourceFile);
+  if (fs.existsSync(explicit)) return explicit;
+
+  const candidates = fs.readdirSync(rawDir)
+    .filter((file) => /^Олексієнко.*\.xlsx?$/i.test(file))
+    .map((file) => path.join(rawDir, file))
+    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  if (candidates[0]) return candidates[0];
+
+  const present = fs.readdirSync(rawDir).filter((file) => /\.xlsx?$/i.test(file));
+  throw new Error(`Источник правды не найден: data/raw/Олексієнко.xlsx. В data/raw сейчас: ${present.join(', ') || 'нет Excel-файлов'}. Dashboard не будет использовать demo данные.`);
 }
 
 function readMonthlyPlans(): MonthlyPlan[] {
@@ -54,10 +64,29 @@ function uniq(values: string[]) {
   return new Set(values.filter(Boolean)).size;
 }
 
-const parsed = rawFiles().map(parseWorkbook);
-const sales = dedupe(parsed.flatMap((file) => file.sales), salesKey).sort((a, b) => a.date.localeCompare(b.date));
-const groupPlans = dedupe(parsed.flatMap((file) => file.groupPlans), groupPlanKey);
-const receivables = dedupe(parsed.flatMap((file) => file.receivables), receivableKey);
+function periodName(dates: string[]) {
+  const from = dates[0];
+  const to = dates.at(-1);
+  if (!from || !to) return '';
+  return `${from.slice(8, 10)}.${from.slice(5, 7)}-${to.slice(8, 10)}.${to.slice(5, 7)}`;
+}
+
+function archiveSource(filePath: string, dates: string[]) {
+  const period = periodName(dates);
+  if (!period) return filePath;
+  const ext = path.extname(filePath) || '.xlsx';
+  const archived = path.join(rawDir, `Олексієнко_${period}${ext}`);
+  if (path.resolve(filePath) === path.resolve(archived)) return filePath;
+  if (fs.existsSync(archived)) fs.unlinkSync(archived);
+  fs.renameSync(filePath, archived);
+  return archived;
+}
+
+let source = sourceFile();
+const parsed = parseWorkbook(source);
+const sales = dedupe(parsed.sales, salesKey).sort((a, b) => a.date.localeCompare(b.date));
+const groupPlans = dedupe(parsed.groupPlans, groupPlanKey);
+const receivables = dedupe(parsed.receivables, receivableKey);
 const dates = sales.map((row) => row.date).filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)).sort();
 const months = [...new Set(dates.map((date) => date.slice(0, 7)))].sort();
 
@@ -67,11 +96,13 @@ if (!sales.length && !receivables.length && !groupPlans.length) {
 if (!sales.length) throw new Error('Не извлечены sales rows из Excel. Dashboard не будет подставлять demo data.');
 if (!months.length) throw new Error('В sales rows не найдено ни одной валидной даты YYYY-MM-DD. Month selector строится только из Excel-дат.');
 
+source = archiveSource(source, dates);
+const sourceRelative = path.relative(root, source);
 const meta: Meta = {
   updatedAt: new Date().toISOString(),
   status: 'ok',
-  sourceFiles: parsed.map((file) => path.relative(root, file.meta.sourceFile)),
-  sheets: parsed.flatMap((file) => file.meta.sheets.map((sheet) => ({ ...sheet, sourceFile: path.relative(root, file.meta.sourceFile) }))),
+  sourceFiles: [sourceRelative],
+  sheets: parsed.meta.sheets.map((sheet) => ({ ...sheet, sourceFile: sourceRelative })),
   counts: { sales: sales.length, groupPlans: groupPlans.length, receivables: receivables.length },
   dateRange: dates.length ? { from: dates[0], to: dates.at(-1)! } : null,
   months,

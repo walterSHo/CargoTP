@@ -175,6 +175,14 @@
         state.data.receivables = Array.isArray(state.data.receivables) ? state.data.receivables : [];
         state.data.monthlyPlans = Array.isArray(state.data.monthlyPlans) ? state.data.monthlyPlans : [];
         const months = [...new Set(state.data.sales.map(r => monthOf(r.date)).filter(m => /^\d{4}-\d{2}$/.test(m)))].sort().reverse();
+        const expectedSource = 'data/raw/Олексієнко.xlsx';
+        const sourcePattern = /^data\/raw\/Олексієнко(?:_\d{2}\.\d{2}-\d{2}\.\d{2})?\.xlsx?$/;
+        const sourceFiles = state.data.meta?.sourceFiles || [];
+        if (state.data.status === 'ok' && !sourceFiles.some(file => sourcePattern.test(file))) {
+          document.getElementById('updated').textContent = 'Ошибка источника данных';
+          document.querySelectorAll('.section').forEach(el => { el.innerHTML = `<div class="empty"><strong>Неверный source of truth.</strong><br>Processed JSON должен быть построен только из <code>${expectedSource}</code> или архивного <code>Олексієнко_DD.MM-DD.MM.xlsx</code>. Сейчас sourceFiles: <code>${sourceFiles.join(', ') || 'не указаны'}</code>.</div>`; });
+          return;
+        }
         if (!state.data.sales.length || !months.length) {
           const message = state.data.message || 'Нет sales rows, полученных из Excel. UI не показывает demo/fallback данные.';
           document.getElementById('updated').textContent = 'Нет обработанных Excel-данных';

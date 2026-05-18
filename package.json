@@ -13,7 +13,8 @@
     "bot": "tsx scripts/telegram-bot.ts",
     "commit:data": "tsx scripts/git-auto-commit.ts",
     "inspect:excel": "tsx scripts/inspect-workbook.ts",
-    "audit:data": "node scripts/audit-processed-data.mjs"
+    "audit:data": "node scripts/audit-processed-data.mjs",
+    "verify:source": "node scripts/verify-source-data.mjs"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.20.5",

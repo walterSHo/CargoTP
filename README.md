@@ -69,15 +69,16 @@ data/processed/              # normalized JSON for dashboard
 ```bash
 npm run process:data
 npm run audit:data
+npm run verify:source
 ```
 
-Источник правды для production UI — только JSON, сгенерированные из Excel в `data/raw/` через `npm run process:data`.
+Источник правды для production UI — только JSON, сгенерированные из `data/raw/Олексієнко.xlsx` через `npm run process:data`. Дополнительно можно выполнить `npm run verify:source`, чтобы проверить наличие файла и что processed JSON не построен из другого источника.
 
 ## Реальный Excel-файл
 
 Эталонный файл: `data/raw/Олексієнко.xlsx`.
 
-Pipeline не привязан к одному имени файла: он читает все `.xlsx/.xls` из `data/raw/`, определяет типы листов по реальным заголовкам и объединяет данные. Это поддерживает два сценария:
+Production pipeline теперь по умолчанию читает только `data/raw/Олексієнко.xlsx` как единственный source of truth. Другие Excel-файлы не попадут в UI случайно. Если нужно временно проверить другой файл, можно задать `RAW_EXCEL_FILE=...`, но для production GitHub Pages используйте `Олексієнко.xlsx`. Это поддерживает два сценария внутри этого рабочего файла:
 
 1. полный файл за период;
 2. короткая дозагрузка за 1–3 дня.
@@ -141,6 +142,15 @@ npm run inspect:excel -- data/raw/Олексієнко.xlsx
 
 Если обязательные колонки не найдены, parser падает с понятной ошибкой вида: `Лист "..." похож на sales, но нет обязательных колонок: ...`.
 
+
+### Автоматизация без ручного JSON
+
+JSON руками создавать не нужно:
+
+- локально: положить Excel в `data/raw/Олексієнко.xlsx` и выполнить `npm run process:data`;
+- через Telegram: отправить Excel боту, бот сам сохранит файл, сконвертирует JSON и при наличии GitHub env сделает push;
+- через GitHub: workflow `.github/workflows/process-data.yml` автоматически конвертирует Excel при push в `data/raw/`.
+
 ## Конвертация Excel → JSON
 
 ```bash
@@ -149,7 +159,7 @@ npm run process:data
 
 Скрипт:
 
-1. читает все Excel-файлы из `data/raw/`;
+1. читает `data/raw/Олексієнко.xlsx` как единственный production source of truth;
 2. распознает листы продаж, плана групп и дебиторки;
 3. нормализует даты в `YYYY-MM-DD`;
 4. дедуплицирует пересекающиеся строки при дозаливке;
@@ -201,17 +211,88 @@ npm run dev
 
 Если реального Excel-файла еще нет или pipeline не запускался, UI показывает явный статус «Нет данных» и не подставляет тестовые строки.
 
-## Telegram upload flow
+## Куда вводить команды
 
-Создайте `.env` по `.env.example`:
+Команды вводятся в терминале, открытом в папке проекта `CargoTP`.
+
+### Windows
+
+1. Откройте папку `CargoTP`.
+2. Кликните правой кнопкой по пустому месту в папке.
+3. Выберите **Open in Terminal** / **Открыть в Терминале**.
+4. Введите:
 
 ```bash
-TELEGRAM_BOT_TOKEN=...
-GITHUB_TOKEN=...
-GITHUB_REPO=owner/trade-rep-dashboard
-ALLOWED_TELEGRAM_USER_ID=123456789
+npm install
+npm run bot
+```
+
+### macOS / Linux
+
+```bash
+cd /path/to/CargoTP
+npm install
+npm run bot
+```
+
+### GitHub Codespaces / VS Code
+
+Откройте **Terminal → New Terminal** и выполните:
+
+```bash
+npm install
+npm run bot
+```
+
+После `npm run bot` терминал должен оставаться открытым. Потом напишите боту в Telegram `/start` и отправьте Excel-файл.
+
+## Telegram upload flow
+
+Важно: токен бота нельзя коммитить в репозиторий. Если токен был отправлен в чат/PR, лучше перевыпустить его в BotFather.
+
+Создайте локальный `.env` по `.env.example`. `.env` уже добавлен в `.gitignore`, поэтому токены не попадут в GitHub.
+
+```bash
+TELEGRAM_BOT_TOKEN=<ваш_новый_токен_бота>
+ALLOWED_TELEGRAM_USER_ID=6327034985
+GITHUB_TOKEN=<github_personal_access_token>
+GITHUB_REPO=walterSHo/CargoTP
 DEFAULT_BRANCH=main
 ```
+
+> Токены, отправленные в чат, нельзя коммитить. Telegram token лучше перевыпустить в BotFather, а GitHub token — удалить/перевыпустить в GitHub Developer settings. Старые токены считайте скомпрометированными.
+
+### Где взять `GITHUB_REPO`
+
+`GITHUB_REPO` — это владелец и имя репозитория без `https://github.com/`. Для текущего репозитория: `GITHUB_REPO=walterSHo/CargoTP`.
+
+Примеры:
+
+- URL: `https://github.com/ivan/CargoTP` → `GITHUB_REPO=ivan/CargoTP`
+- URL: `https://github.com/company/trade-dashboard` → `GITHUB_REPO=company/trade-dashboard`
+
+Если вы сейчас работаете в этом репозитории, можно посмотреть командой:
+
+```bash
+git remote -v
+```
+
+Берите часть после `github.com/` и без `.git`.
+
+### Где взять `GITHUB_TOKEN`
+
+Нужен GitHub Personal Access Token, чтобы бот мог сделать `git push` обработанных JSON в репозиторий.
+
+Рекомендуемый вариант — fine-grained token:
+
+1. GitHub → аватар справа сверху → **Settings**.
+2. **Developer settings** → **Personal access tokens** → **Fine-grained tokens**.
+3. **Generate new token**.
+4. Repository access: выбрать только репозиторий с дашбордом.
+5. Permissions → **Contents** → **Read and write**.
+6. Сгенерировать token и скопировать его **только в локальный `.env`** как `GITHUB_TOKEN=...`.
+
+Не коммитьте `.env` и не вставляйте GitHub token в README/код. В репозиторий добавлен только `GITHUB_REPO`, сам `GITHUB_TOKEN` хранится локально.
 
 Запуск:
 
@@ -222,8 +303,10 @@ npm run bot
 Flow:
 
 1. пользователь отправляет `/start`;
-2. загружает 3 Excel-файла или один workbook с несколькими нужными листами;
-3. бот сохраняет файлы в `data/raw/`;
-4. запускается `npm run process:data`;
-5. запускается `npm run commit:data`;
-6. GitHub/Vercel обновляет сайт после push.
+2. загружает Excel workbook;
+3. бот отвечает, что файл принят, и сохраняет его как `data/raw/Олексієнко.xlsx`;
+4. запускает `npm run process:data`, который конвертирует Excel → JSON и переименовывает raw-файл по периоду, например `Олексієнко_01.05-18.05.xlsx`;
+5. запускает `npm run audit:data`;
+6. присылает summary: источник, период, месяцы, counts;
+7. если заданы `GITHUB_TOKEN` и `GITHUB_REPO`, запускает `npm run commit:data`;
+8. GitHub Pages обновляет статический `index.html` после push.
