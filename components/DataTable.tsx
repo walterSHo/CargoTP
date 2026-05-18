@@ -167,7 +167,7 @@ export function DataTable<T>({
         </div>
       ) : null}
 
-      <div className={`overflow-auto rounded-[24px] border border-line bg-[linear-gradient(180deg,rgba(12,20,36,0.96),rgba(9,16,30,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.24)] ${maxHeightClassName ?? ''}`}>
+      <div className={`overflow-x-auto ${maxHeightClassName ? 'overflow-y-auto' : 'overflow-y-visible'} rounded-[24px] border border-line bg-[linear-gradient(180deg,rgba(12,20,36,0.96),rgba(9,16,30,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.24)] ${maxHeightClassName ?? ''}`}>
         <table className="min-w-full text-sm">
           <thead className="sticky top-0 z-[1] bg-[rgba(16,28,51,0.95)]">
             {table.getHeaderGroups().map((headerGroup) => (

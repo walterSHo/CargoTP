@@ -92,10 +92,10 @@
         text-align: left;
       }
       .tab.active {
-        background: linear-gradient(135deg, rgba(78,161,255,0.3), rgba(45,212,191,0.18));
+        background: rgba(78,161,255,0.16);
         border-color: rgba(78,161,255,0.4);
         color: white;
-        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.16);
+        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.12);
       }
       .page-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
       .page-header h1 { margin: 0; }
@@ -138,9 +138,9 @@
       }
       .mode-pill.active {
         border-color: rgba(78, 161, 255, 0.45);
-        background: linear-gradient(135deg, rgba(78,161,255,0.3), rgba(45,212,191,0.18));
+        background: rgba(78,161,255,0.16);
         color: white;
-        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.16);
+        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.12);
       }
       h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
       h2 { margin: 0; font-size: 24px; }
@@ -161,8 +161,8 @@
       }
       .kpi .label { color: var(--muted); font-size: 13px; }
       .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 900; color: white; }
-      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, rgba(12,20,36,0.96), rgba(9,16,30,0.96)); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24); }
-      .table-wrap.tall { max-height: 30rem; }
+      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, rgba(12,20,36,0.96), rgba(9,16,30,0.96)); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24); }
+      .table-wrap.tall { max-height: 30rem; overflow-y: auto; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { position: relative; }
@@ -1106,13 +1106,22 @@
         const rows = state.data.receivables.filter((row) => matchesReceivableSearch(row));
         const total = sum(rows, (row) => row.totalDebt);
         const overdue = sum(rows, (row) => row.overdueDebt);
+        const current = sum(rows, (row) => row.currentDebt);
+        const bucket0To10 = sum(rows, (row) => row.bucket0To10);
+        const bucket11To20 = sum(rows, (row) => row.bucket11To20);
+        const bucket21To30 = sum(rows, (row) => row.bucket21To30);
+        const bucket31Plus = sum(rows, (row) => row.bucket31Plus);
         document.getElementById('receivables').innerHTML = `
           <div class="section-stack">
             <div class="grid">
               ${kpi('Загальна дебіторка', money(total))}
               ${kpi('Прострочена', money(overdue))}
-              ${kpi('Непрострочена', money(sum(rows, (row) => row.currentDebt)))}
+              ${kpi('Непрострочена', money(current))}
               ${kpi('Частка прострочки', pct(total ? overdue / total * 100 : 0))}
+              ${kpi('0–10 днів', money(bucket0To10))}
+              ${kpi('11–20 днів', money(bucket11To20))}
+              ${kpi('21–30 днів', money(bucket21To30))}
+              ${kpi('31+ днів', money(bucket31Plus))}
             </div>
             <div class="chart-shell">
               <div class="chart-title">Клієнти з найбільшою дебіторкою</div>

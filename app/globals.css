@@ -151,10 +151,10 @@
   }
 
   .filter-pill-active {
-    border-color: rgba(78, 161, 255, 0.48);
+    border-color: rgba(78, 161, 255, 0.42);
     color: #f8fbff;
-    background: linear-gradient(135deg, rgba(78, 161, 255, 0.28), rgba(45, 212, 191, 0.2));
-    box-shadow: 0 10px 24px rgba(78, 161, 255, 0.18);
+    background: rgba(78, 161, 255, 0.16);
+    box-shadow: 0 10px 24px rgba(78, 161, 255, 0.12);
   }
 
   .section-title {

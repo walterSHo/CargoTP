@@ -28,7 +28,7 @@ export function Navigation() {
               <Link
                 className={`shrink-0 rounded-full border px-4 py-2 transition ${
                   pathname === href
-                    ? 'border-[rgba(78,161,255,0.42)] bg-[linear-gradient(135deg,rgba(78,161,255,0.24),rgba(45,212,191,0.16))] text-white shadow-[0_12px_28px_rgba(78,161,255,0.16)]'
+                    ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white shadow-[0_12px_28px_rgba(78,161,255,0.12)]'
                     : 'border-line bg-[rgba(10,18,33,0.72)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
                 }`}
                 href={href}
@@ -52,7 +52,7 @@ export function Navigation() {
             <Link
               className={`group flex items-center justify-between rounded-2xl border px-4 py-3 transition ${
                 pathname === href
-                  ? 'border-[rgba(78,161,255,0.42)] bg-[linear-gradient(135deg,rgba(78,161,255,0.24),rgba(45,212,191,0.16))] text-white shadow-[0_14px_28px_rgba(78,161,255,0.16)]'
+                  ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white shadow-[0_14px_28px_rgba(78,161,255,0.12)]'
                   : 'border-line bg-[rgba(10,18,33,0.62)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
               }`}
               href={href}
