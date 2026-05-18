@@ -447,6 +447,8 @@
 
     <script>
       const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
+      const AGGREGATE_PLAN_GROUP = 'Все';
+      const HIGHLIGHT_GROUP_GAP_BRANDS = ['PROFIT'];
       const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
       let state = {
         data: null,
@@ -508,7 +510,9 @@
         const normalized = normalizeProductGroup(value);
         return normalized.includes('шина') || normalized.includes('шины') || normalized.includes('шин') || normalized.includes('tire') || normalized.includes('tyre');
       };
-      const isGrossPlanGroup = (group) => !isTireGroup(group) && normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP);
+      const isGrossPlanGroup = (group) => !isTireGroup(group)
+        && normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP)
+        && normalizeProductGroup(group) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP);
       const filteredSales = () => state.data.sales.filter((row) => monthOf(row.date) === state.month && matchesSearch(row));
 
       const byTop = (rows, getKey, getValue, limit = 10) => {
@@ -614,6 +618,7 @@
         const totalPlanAmount = sum(relevantPlans, (plan) => plan.planAmount);
         if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
+        const highlightedBrands = new Set(HIGHLIGHT_GROUP_GAP_BRANDS.map((brand) => normalizeProductGroup(brand)));
         const map = new Map();
         rows.forEach((row) => {
           const key = clientKey(row);
@@ -622,10 +627,12 @@
             clientCode: row.clientCode,
             clientName: row.clientName,
             turnover: 0,
-            groups: new Set()
+            groups: new Set(),
+            brands: new Set()
           };
           entry.turnover += Number(row.amountEur || 0);
           if (isGrossPlanGroup(row.productGroup)) entry.groups.add(normalizeProductGroup(row.productGroup));
+          if (row.brand && highlightedBrands.has(normalizeProductGroup(row.brand))) entry.brands.add(String(row.brand).trim());
           map.set(key, entry);
         });
 
@@ -645,6 +652,7 @@
               missingPlanShare: totalPlanAmount ? missingPlanAmount / totalPlanAmount * 100 : 0,
               missingGroups: missingPlans.length,
               coveredGroupNames: coveredPlans.map((plan) => plan.productGroup),
+              coveredBrandNames: [...client.brands].sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })),
               missingGroupNames: missingPlans.map((plan) => plan.productGroup)
             };
           })
@@ -1039,7 +1047,7 @@
                   <div><strong>${escapeHtml(row.clientName)}</strong> (${escapeHtml(row.clientCode || row.unifiedClientCode || 'без коду')})</div>
                   <div class="small">Покрита частка плану: <strong>${escapeHtml(pct(row.coveredPlanShare))}</strong>. Втрачена частка: <strong>${escapeHtml(pct(row.missingPlanShare))}</strong>.</div>
                   <div class="small">Групи, які клієнт вже робить:</div>
-                  <div class="chips">${row.coveredGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">поки немає планових груп</span>'}</div>
+                  <div class="chips">${[...row.coveredGroupNames, ...row.coveredBrandNames].map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">поки немає планових груп</span>'}</div>
                   <div class="small">Групи, яких не вистачає:</div>
                   <div class="chips">${row.missingGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">усі планові групи вже закриті</span>'}</div>
                 </div>

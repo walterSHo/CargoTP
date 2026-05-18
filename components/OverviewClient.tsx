@@ -237,7 +237,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 Покрита частка плану: <strong className="text-white">{percent(row.coveredPlanShare)}</strong>. Втрачена частка: <strong className="text-white">{percent(row.missingPlanShare)}</strong>.
               </div>
               <div className="text-sm text-muted">
-                Групи, які клієнт вже робить: <span className="text-white">{row.coveredGroupNames.join(', ') || 'поки немає планових груп'}</span>
+                Групи, які клієнт вже робить: <span className="text-white">{[...row.coveredGroupNames, ...row.coveredBrandNames].join(', ') || 'поки немає планових груп'}</span>
               </div>
               <div className="text-sm text-muted">
                 Повний список відсутніх груп: <span className="text-white">{row.missingGroupNames.join(', ') || 'усі планові групи вже закриті'}</span>

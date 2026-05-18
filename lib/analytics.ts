@@ -1,4 +1,4 @@
-import { EXCLUDED_GROSS_PLAN_GROUP } from './constants';
+import { AGGREGATE_PLAN_GROUP, EXCLUDED_GROSS_PLAN_GROUP, HIGHLIGHT_GROUP_GAP_BRANDS } from './constants';
 import { isTireGroup, normalizeProductGroup } from './product-groups';
 import type { GroupPlanRecord, MonthlyPlan, ReceivableRecord, SalesRecord } from './types';
 
@@ -34,6 +34,7 @@ export type ClientGroupGapRow = {
   coveredGroups: number;
   missingGroups: number;
   coveredGroupNames: string[];
+  coveredBrandNames: string[];
   missingGroupNames: string[];
 };
 
@@ -71,7 +72,10 @@ function clientKey(row: Pick<SalesRecord, 'unifiedClientCode' | 'clientCode' | '
 }
 
 function planRelevantGroup(group: string) {
-  return normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP) && !isTireGroup(group);
+  const normalized = normalizeProductGroup(group);
+  return normalized !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP)
+    && normalized !== normalizeProductGroup(AGGREGATE_PLAN_GROUP)
+    && !isTireGroup(group);
 }
 
 export function dashboardKpis(sales: SalesRecord[], receivables: ReceivableRecord[], plans: MonthlyPlan[], month: string) {
@@ -160,7 +164,8 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
   const totalPlanAmount = sum(relevantPlans.map((row) => row.planAmount));
   if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
-  const salesByClient = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; groups: Set<string> }>();
+  const highlightedBrands = new Set(HIGHLIGHT_GROUP_GAP_BRANDS.map((brand) => normalizeProductGroup(brand)));
+  const salesByClient = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; groups: Set<string>; brands: Set<string> }>();
   sales.forEach((row) => {
     const key = clientKey(row);
     const entry = salesByClient.get(key) ?? {
@@ -168,10 +173,12 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
       clientCode: row.clientCode,
       clientName: row.clientName,
       turnover: 0,
-      groups: new Set<string>()
+      groups: new Set<string>(),
+      brands: new Set<string>()
     };
     entry.turnover += row.amountEur;
     if (planRelevantGroup(row.productGroup)) entry.groups.add(normalizeProductGroup(row.productGroup));
+    if (row.brand && highlightedBrands.has(normalizeProductGroup(row.brand))) entry.brands.add(row.brand.trim());
     salesByClient.set(key, entry);
   });
 
@@ -194,6 +201,7 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
         coveredGroups: coveredPlans.length,
         missingGroups: missingPlans.length,
         coveredGroupNames: coveredPlans.map((plan) => plan.productGroup),
+        coveredBrandNames: [...client.brands].sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })),
         missingGroupNames: missingPlans.map((plan) => plan.productGroup)
       };
     })
