@@ -1,312 +1,249 @@
 # Trade Rep Dashboard
 
-Отдельный веб-дашборд торгового представителя: продажи, планы групп, дебиторка, ручной валовый план и ежедневное обновление Excel через Telegram-бота.
+Дашборд торгового представителя с реальным Excel source of truth: продажи, план групп, дебиторка, шины и ручной валовый план. Новый production flow больше не требует локального `npm run process:data` на рабочем ПК: Excel загружается через приватный веб-интерфейс или приватный endpoint, дальше GitHub Actions сам обновляет `data/processed/*.json`, а Cloudflare Pages автоматически выкатывает свежий статический дашборд.
 
+## Новая схема
 
-## Как открыть дашборд
+1. Dashboard хостится на Cloudflare Pages.
+2. Публично раздается только `dist/`, а не весь корень репозитория.
+3. Приватная загрузка идет через Cloudflare Pages Function `POST /api/upload`.
+4. Upload flow кладет Excel в GitHub как `data/raw/Олексієнко.xlsx`.
+5. После загрузки Function отправляет `repository_dispatch` событие `excel-uploaded`.
+6. GitHub Actions запускает `npm run process:data`, `npm run audit:data`, `npm run verify:source`.
+7. Workflow коммитит обновленные `data/raw` и `data/processed`.
+8. Новый commit автоматически триггерит деплой Cloudflare Pages.
 
-Да, теперь можно просто открыть `index.html`: это обычный статический HTML-дашборд для GitHub Pages.
+Важно:
 
-### GitHub Pages
+- production source of truth только реальный Excel;
+- mock/demo/fallback data запрещены;
+- default month строится только из дат в sales rows;
+- шины остаются отдельной аналитикой;
+- шины не входят в KPI валового плана.
 
-1. В настройках репозитория откройте **Settings → Pages**.
-2. Source: **Deploy from a branch**.
-3. Branch: `main` / folder: `/root`.
-4. Откройте выданный GitHub Pages URL — загрузится `index.html`.
+## Production flow без локального запуска
 
-### Локально
+Пользовательский сценарий теперь такой:
 
-Самый простой вариант — открыть `index.html` двойным кликом.
+1. Открыть приватную страницу `https://<your-pages-domain>/upload.html`.
+2. Ввести пароль и выбрать `.xlsx` или `.xls`.
+3. Нажать кнопку загрузки.
+4. Дождаться ответа страницы о запуске pipeline.
+5. Через 1–2 минуты открыть дашборд: Cloudflare Pages уже отдаст свежие `data/processed/*.json`.
 
-Если браузер заблокирует чтение `data/processed/dashboard.json` из-за `file://`, запустите статический сервер из корня проекта:
-
-```bash
-python3 -m http.server 8000
-```
-
-И откройте:
-
-```text
-http://localhost:8000
-```
-
-Next.js-код в `app/` оставлен как расширяемая версия, но для GitHub Pages достаточно корневого `index.html` + `data/processed/*.json`.
-
-## Дерево проекта
-
-```text
-app/                         # Next.js pages and API routes
-components/                  # UI, charts, tables and page client components
-lib/                         # types, Excel parsing, normalization, analytics
-scripts/                     # inspect/process Excel, Telegram bot, git push
-data/raw/                    # uploaded Excel sources, e.g. Олексієнко.xlsx
-data/processed/              # normalized JSON for dashboard
-```
-
-## Стек
-
-- Next.js 14, React, TypeScript
-- Tailwind CSS
-- Recharts
-- TanStack Table
-- SheetJS/xlsx
-- grammY Telegram bot
-
-
-## Audit: защита от demo/fake данных
-
-Проблема была в том, что в production JSON лежали seed/demo строки (`Авто Плюс`, `Brand A`, тестовые коды и суммы), а UI читал их как реальные. Сейчас production-поток исправлен:
-
-- `data/processed/*.json` больше не содержит seed rows;
-- если Excel не обработан, `index.html` показывает «Нет данных из Excel», а не фальшивые KPI;
-- `scripts/process-data.ts` падает с ошибкой, если не найден Excel, sales rows или валидные даты;
-- месяц по умолчанию строится только из дат parsed sales rows;
-- `monthly-plans.json` не добавляет месяцы в month selector;
-- `npm run audit:data` печатает counts, месяцы, unique clients/codes/brands/groups и первые 20 строк каждого набора, а также падает, если в processed JSON найдены известные demo-сущности.
-
-Проверка после загрузки реального файла:
+CLI-вариант тоже есть:
 
 ```bash
-npm run process:data
-npm run audit:data
-npm run verify:source
+curl -X POST "https://<your-pages-domain>/api/upload" \
+  -F "password=<UPLOAD_PASSWORD>" \
+  -F "file=@/path/to/Олексієнко.xlsx"
 ```
 
-Источник правды для production UI — только JSON, сгенерированные из `data/raw/Олексієнко.xlsx` через `npm run process:data`. Дополнительно можно выполнить `npm run verify:source`, чтобы проверить наличие файла и что processed JSON не построен из другого источника.
+## Что теперь делает Cloudflare
 
-## Реальный Excel-файл
+- `upload.html` дает удобный приватный UI для загрузки.
+- `functions/api/upload.js` принимает `multipart/form-data`.
+- Endpoint проверяет секрет и optional IP allowlist.
+- Endpoint загружает новый Excel в GitHub path `data/raw/Олексієнко.xlsx`.
+- Endpoint триггерит GitHub Actions через `repository_dispatch`.
 
-Эталонный файл: `data/raw/Олексієнко.xlsx`.
+Cloudflare не парсит Excel. Тяжелая обработка остается в GitHub Actions, что безопаснее и проще поддерживать.
 
-Production pipeline теперь по умолчанию читает только `data/raw/Олексієнко.xlsx` как единственный source of truth. Другие Excel-файлы не попадут в UI случайно. Если нужно временно проверить другой файл, можно задать `RAW_EXCEL_FILE=...`, но для production GitHub Pages используйте `Олексієнко.xlsx`. Это поддерживает два сценария внутри этого рабочего файла:
+## Что теперь делает GitHub Actions
 
-1. полный файл за период;
-2. короткая дозагрузка за 1–3 дня.
+Workflow `.github/workflows/process-data.yml` запускается:
 
-Перед обработкой можно посмотреть, как распознался файл:
+- по `repository_dispatch` типа `excel-uploaded`;
+- вручную через `workflow_dispatch`;
+- по push в processing code (`scripts/process-data.ts`, `scripts/audit-processed-data.mjs`, `scripts/verify-source-data.mjs`, `lib/**`).
 
-```bash
-npm run inspect:excel -- data/raw/Олексієнко.xlsx
-```
+Workflow:
 
-## Используемые листы и колонки
+1. checkout репозиторий;
+2. устанавливает Node 22 и зависимости;
+3. запускает `npm run process:data`;
+4. запускает `npm run audit:data`;
+5. запускает `npm run verify:source`;
+6. коммитит и пушит `data/raw` и `data/processed`, если они изменились.
 
-Листы ищутся не по фиксированному имени, а по заголовкам в первых 25 строках. Это сделано потому, что рабочие Excel-файлы могут иметь плавающие имена листов и служебные строки сверху.
+## Cloudflare Pages setup
 
-### Продажи
+### 1. Подключить репозиторий
 
-Обязательные поля:
+В Cloudflare Dashboard:
 
-- клиент: `Клиент`, `Клієнт`, `Контрагент`, `Торгова точка`
-- группа товара: `Группа товара`, `Група товару`, `Товарная группа`
-- сумма: `Сумма в евро`, `Сума в євро`, `Оборот EUR`, `Сума`, `Сумма`, `Продаж`
+1. `Workers & Pages` -> `Create application` -> `Pages`.
+2. Подключить GitHub репозиторий `walterSHo/CargoTP`.
+3. Build command: `npm run build:pages`
+4. Build output directory: `dist`
 
-Дополнительные поля, если есть:
+Сборка `dist/` делается скриптом `scripts/build-static.mjs`. Это важно: raw Excel из `data/raw` не должен публиковаться как статический файл.
 
-- дата
-- единый код клиента
-- код клиента
-- бренд
-- код/название товара
-- нетто-маржа
-- % скидки
+### 2. Добавить Pages Functions secrets / vars
 
-### Доли групп / план групп
+В Cloudflare Pages project settings -> `Environment variables`:
 
-Обязательные поля:
+- `UPLOAD_PASSWORD`
+  Значение для web form или `curl`.
+- `UPLOAD_BEARER_TOKEN`
+  Необязательно. Можно использовать вместо пароля для header `Authorization: Bearer ...`.
+- `UPLOAD_IP_ALLOWLIST`
+  Необязательно. Список IP через запятую. Если задан, кроме секрета нужен еще allowlist match.
+- `GITHUB_UPLOAD_TOKEN`
+  Fine-grained GitHub token с правами `Contents: Read and write`.
+- `GITHUB_REPO`
+  Значение вида `walterSHo/CargoTP`.
+- `DEFAULT_BRANCH`
+  Обычно `main`.
+- `UPLOAD_RAW_PATH`
+  По умолчанию `data/raw/Олексієнко.xlsx`, обычно менять не нужно.
 
-- группа товара
-- план в деньгах
-- факт
+Для локальной Pages-разработки можно использовать `.dev.vars` по образцу из `.dev.vars.example`. Сам файл `.dev.vars` уже игнорируется Git.
 
-Дополнительные поля:
+### 3. Настроить доступ
 
-- план в %
-- % выполнения
-- % net
+Минимальный безопасный вариант:
 
-### Дебиторка
+- задать `UPLOAD_PASSWORD`;
+- держать `upload.html` вне публичной навигации;
+- при необходимости добавить `UPLOAD_IP_ALLOWLIST`.
 
-Обязательные поля:
+Если нужен server-to-server flow, используйте `UPLOAD_BEARER_TOKEN` и `POST /api/upload` с заголовком `Authorization: Bearer <token>`.
 
-- клиент
-- общая задолженность
+## GitHub setup
 
-Дополнительные поля:
+### 1. GitHub token для Cloudflare
 
-- единый код клиента
-- код клиента
-- непросроченная задолженность
-- просроченная задолженность
-- buckets `0–10`, `11–20`, `21–30`, `31+`
+Нужен fine-grained PAT:
 
-Если обязательные колонки не найдены, parser падает с понятной ошибкой вида: `Лист "..." похож на sales, но нет обязательных колонок: ...`.
+1. GitHub -> `Settings` -> `Developer settings` -> `Personal access tokens` -> `Fine-grained tokens`.
+2. Дать доступ только к этому репозиторию.
+3. Разрешение: `Contents` -> `Read and write`.
+4. Сохранить token только в Cloudflare Pages env как `GITHUB_UPLOAD_TOKEN`.
 
+`repository_dispatch` и `create/update file contents` поддерживаются через GitHub REST API. По GitHub Docs для dispatch нужен write-доступ к repository contents, а для create/update contents нужен `Contents: write`.
 
-### Автоматизация без ручного JSON
+### 2. GitHub Actions
 
-JSON руками создавать не нужно:
+Workflow уже находится в репозитории. Никакой локальный запуск импорт-скрипта не нужен.
 
-- локально: положить Excel в `data/raw/Олексієнко.xlsx` и выполнить `npm run process:data`;
-- через Telegram: отправить Excel боту, бот сам сохранит файл, сконвертирует JSON и при наличии GitHub env сделает push;
-- через GitHub: workflow `.github/workflows/process-data.yml` автоматически конвертирует Excel при push в `data/raw/`.
+После каждого upload flow будет:
 
-## Конвертация Excel → JSON
+- commit с новым `data/raw/Олексієнко.xlsx`;
+- dispatch `excel-uploaded`;
+- Actions parsing;
+- commit processed JSON;
+- автоматический Cloudflare Pages deploy.
 
-```bash
-npm run process:data
-```
+## Production source of truth
 
-Скрипт:
+Эталонный production source:
 
-1. читает `data/raw/Олексієнко.xlsx` как единственный production source of truth;
-2. распознает листы продаж, плана групп и дебиторки;
-3. нормализует даты в `YYYY-MM-DD`;
-4. дедуплицирует пересекающиеся строки при дозаливке;
-5. пишет JSON:
-   - `data/processed/sales.json`
-   - `data/processed/group-plan.json`
-   - `data/processed/receivables.json`
-   - `data/processed/meta.json`
-   - `data/processed/dashboard.json` для совместимости UI.
+- `data/raw/Олексієнко.xlsx`
+- или архивный файл `data/raw/Олексієнко_DD.MM-DD.MM.xlsx`, который получается после обработки
 
-## Валовый план и исключение шин
+`scripts/process-data.ts` читает только этот источник и:
 
-Ручной валовый план хранится в `data/processed/monthly-plans.json` и редактируется на странице `/settings`.
+1. распознает листы продаж, плана групп и дебиторки;
+2. нормализует даты в `YYYY-MM-DD`;
+3. дедуплицирует пересечения;
+4. пишет:
+   `data/processed/sales.json`
+   `data/processed/group-plan.json`
+   `data/processed/receivables.json`
+   `data/processed/meta.json`
+   `data/processed/dashboard.json`
+5. архивирует raw Excel по периоду.
 
-Для KPI выполнения валового плана шины всегда исключаются:
+Если Excel не найден, sales rows пусты или даты невалидны, скрипт падает. Demo данные в UI не подставляются.
+
+## Важные бизнес-правила
+
+### Month selection
+
+- default month берется только из дат parsed sales rows;
+- `monthly-plans.json` не добавляет месяцы в selector сам по себе.
+
+### Валовый план
+
+Ручной валовый план хранится в `data/processed/monthly-plans.json`.
+
+Формула:
 
 ```text
 Выполнение валового плана = оборот без шин / ручной валовый план месяца * 100
 ```
 
-Группа шин распознается helper-функциями:
+### Шины
 
-- `normalizeProductGroup()`
-- `isTireGroup()`
+Шины:
 
-Учитываются варианты: `Автомобільна Шина`, `Автомобильная Шина`, `Шина`, `Шины`, похожие `шин...`, `tire`, `tyre`.
+- показываются в общей аналитике;
+- имеют отдельную аналитику `/tires`;
+- не входят в KPI валового плана.
 
-Важно: шины отображаются в общей аналитике и на отдельной странице `/tires`, но не попадают в KPI валового плана.
+Распознавание идет через `normalizeProductGroup()` и `isTireGroup()`. Поддерживаются варианты вроде `Автомобільна Шина`, `Автомобильная Шина`, `Шина`, `Шины`, `шин...`, `tire`, `tyre`.
 
-## Tire Analytics
+## Проверки против demo/fake данных
 
-Страница `/tires` показывает:
+`npm run audit:data`:
 
-- общий оборот по шинам;
-- клиентов, которые покупают шины;
-- среднюю маржу и скидку;
-- топ клиентов по шинам;
-- топ брендов шин;
-- рост/падение клиентов по шинам относительно предыдущих месяцев;
-- клиентов, которые покупают шины и имеют просроченную дебиторку.
+- показывает counts, months и samples;
+- падает, если в processed JSON найдены известные demo values вроде `Авто Плюс`, `Brand A`, `U-100`.
 
-## Локальный запуск
+`npm run verify:source`:
+
+- проверяет наличие `data/raw/Олексієнко.xlsx` или архивного workbook;
+- проверяет, что processed JSON построен из допустимого source.
+
+## Локальная разработка
+
+### Дашборд
+
+Чтобы посмотреть статическую версию локально:
+
+```bash
+python3 -m http.server 8000
+```
+
+Открыть:
+
+```text
+http://localhost:8000
+```
+
+Если нужен Cloudflare Pages bundle:
+
+```bash
+npm run build:pages
+```
+
+После этого статические production assets лежат в `dist/`.
+
+### Next.js версия
+
+Next.js код в `app/`, `components/`, `lib/` остается расширяемой версией интерфейса:
 
 ```bash
 npm install
-npm run process:data
 npm run dev
 ```
 
-Если реального Excel-файла еще нет или pipeline не запускался, UI показывает явный статус «Нет данных» и не подставляет тестовые строки.
+### Ручной локальный import
 
-## Куда вводить команды
+Локальный `npm run process:data` остается только как fallback для разработки или отладки. Для обычного ежемесячного обновления production дашборда он больше не нужен.
 
-Команды вводятся в терминале, открытом в папке проекта `CargoTP`.
+## Структура проекта
 
-### Windows
-
-1. Откройте папку `CargoTP`.
-2. Кликните правой кнопкой по пустому месту в папке.
-3. Выберите **Open in Terminal** / **Открыть в Терминале**.
-4. Введите:
-
-```bash
-npm install
-npm run bot
+```text
+app/                         # Next.js pages and API routes
+components/                  # UI, charts, tables and page client components
+data/raw/                    # raw Excel source, not publicly deployed
+data/processed/              # generated JSON for dashboard
+dist/                        # Cloudflare Pages deploy artifact
+functions/                   # Cloudflare Pages Functions
+lib/                         # types, Excel parsing, normalization, analytics
+scripts/                     # process-data, audit, verify, static build
+index.html                   # static dashboard source
+upload.html                  # private upload UI source
 ```
-
-### macOS / Linux
-
-```bash
-cd /path/to/CargoTP
-npm install
-npm run bot
-```
-
-### GitHub Codespaces / VS Code
-
-Откройте **Terminal → New Terminal** и выполните:
-
-```bash
-npm install
-npm run bot
-```
-
-После `npm run bot` терминал должен оставаться открытым. Потом напишите боту в Telegram `/start` и отправьте Excel-файл.
-
-## Telegram upload flow
-
-Важно: токен бота нельзя коммитить в репозиторий. Если токен был отправлен в чат/PR, лучше перевыпустить его в BotFather.
-
-Создайте локальный `.env` по `.env.example`. `.env` уже добавлен в `.gitignore`, поэтому токены не попадут в GitHub.
-
-```bash
-TELEGRAM_BOT_TOKEN=<ваш_новый_токен_бота>
-ALLOWED_TELEGRAM_USER_ID=6327034985
-GITHUB_TOKEN=<github_personal_access_token>
-GITHUB_REPO=walterSHo/CargoTP
-DEFAULT_BRANCH=main
-```
-
-> Токены, отправленные в чат, нельзя коммитить. Telegram token лучше перевыпустить в BotFather, а GitHub token — удалить/перевыпустить в GitHub Developer settings. Старые токены считайте скомпрометированными.
-
-### Где взять `GITHUB_REPO`
-
-`GITHUB_REPO` — это владелец и имя репозитория без `https://github.com/`. Для текущего репозитория: `GITHUB_REPO=walterSHo/CargoTP`.
-
-Примеры:
-
-- URL: `https://github.com/ivan/CargoTP` → `GITHUB_REPO=ivan/CargoTP`
-- URL: `https://github.com/company/trade-dashboard` → `GITHUB_REPO=company/trade-dashboard`
-
-Если вы сейчас работаете в этом репозитории, можно посмотреть командой:
-
-```bash
-git remote -v
-```
-
-Берите часть после `github.com/` и без `.git`.
-
-### Где взять `GITHUB_TOKEN`
-
-Нужен GitHub Personal Access Token, чтобы бот мог сделать `git push` обработанных JSON в репозиторий.
-
-Рекомендуемый вариант — fine-grained token:
-
-1. GitHub → аватар справа сверху → **Settings**.
-2. **Developer settings** → **Personal access tokens** → **Fine-grained tokens**.
-3. **Generate new token**.
-4. Repository access: выбрать только репозиторий с дашбордом.
-5. Permissions → **Contents** → **Read and write**.
-6. Сгенерировать token и скопировать его **только в локальный `.env`** как `GITHUB_TOKEN=...`.
-
-Не коммитьте `.env` и не вставляйте GitHub token в README/код. В репозиторий добавлен только `GITHUB_REPO`, сам `GITHUB_TOKEN` хранится локально.
-
-Запуск:
-
-```bash
-npm run bot
-```
-
-Flow:
-
-1. пользователь отправляет `/start`;
-2. загружает Excel workbook;
-3. бот отвечает, что файл принят, и сохраняет его как `data/raw/Олексієнко.xlsx`;
-4. запускает `npm run process:data`, который конвертирует Excel → JSON и переименовывает raw-файл по периоду, например `Олексієнко_01.05-18.05.xlsx`;
-5. запускает `npm run audit:data`;
-6. присылает summary: источник, период, месяцы, counts;
-7. если заданы `GITHUB_TOKEN` и `GITHUB_REPO`, запускает `npm run commit:data`;
-8. GitHub Pages обновляет статический `index.html` после push.

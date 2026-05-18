@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CargoTP Upload</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4efe6;
+        --ink: #1c1917;
+        --muted: #57534e;
+        --line: #d6d3d1;
+        --panel: rgba(255, 252, 248, 0.92);
+        --accent: #0f766e;
+        --accent-strong: #115e59;
+        --danger: #b42318;
+        --ok: #0f766e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(245, 158, 11, 0.16), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.18), transparent 30%),
+          linear-gradient(180deg, #f7f2ea 0%, #efe7db 100%);
+      }
+      main {
+        width: min(680px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0 64px;
+      }
+      .shell {
+        border: 1px solid rgba(214, 211, 209, 0.9);
+        border-radius: 18px;
+        background: var(--panel);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 28px 60px rgba(28, 25, 23, 0.08);
+        overflow: hidden;
+      }
+      .hero {
+        padding: 28px 28px 18px;
+        border-bottom: 1px solid rgba(214, 211, 209, 0.8);
+        background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,247,237,0.72));
+      }
+      .eyebrow {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-strong);
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(30px, 5vw, 44px);
+        line-height: 1.05;
+      }
+      .lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.55;
+      }
+      form {
+        padding: 24px 28px 28px;
+        display: grid;
+        gap: 18px;
+      }
+      label {
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      input, button {
+        font: inherit;
+      }
+      input[type="password"],
+      input[type="file"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--ink);
+      }
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        cursor: pointer;
+      }
+      button[disabled] {
+        cursor: progress;
+        opacity: 0.7;
+      }
+      .status {
+        min-height: 92px;
+        border-radius: 14px;
+        border: 1px solid rgba(214, 211, 209, 0.9);
+        background: rgba(255, 255, 255, 0.85);
+        padding: 16px 18px;
+        white-space: pre-wrap;
+        line-height: 1.55;
+      }
+      .status.error { color: var(--danger); }
+      .status.success { color: var(--ok); }
+      .hint {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+      code {
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.06);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="shell">
+        <div class="hero">
+          <p class="eyebrow">Private Excel Upload</p>
+          <h1>Загрузка исходного Excel</h1>
+          <p class="lead">Файл попадет в GitHub как новый production source, затем GitHub Actions автоматически обновит <code>data/processed</code>, а Cloudflare Pages подхватит свежий деплой без ручного запуска на рабочем ПК.</p>
+        </div>
+
+        <form id="upload-form">
+          <label>
+            Пароль или upload secret
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+
+          <label>
+            Excel-файл текущего месяца
+            <input id="file" name="file" type="file" accept=".xlsx,.xls,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required />
+          </label>
+
+          <button id="submit" type="submit">Загрузить и запустить обновление</button>
+
+          <p class="hint">Приватный endpoint: <code>/api/upload</code>. Для CLI можно отправить <code>multipart/form-data</code> с полями <code>password</code> и <code>file</code>.</p>
+          <div id="status" class="status">Ожидание загрузки.</div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById('upload-form');
+      const submitButton = document.getElementById('submit');
+      const statusNode = document.getElementById('status');
+
+      function setStatus(message, kind) {
+        statusNode.textContent = message;
+        statusNode.className = `status${kind ? ` ${kind}` : ''}`;
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        setStatus('Файл загружается в GitHub и запускается pipeline...', '');
+
+        try {
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: new FormData(form)
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload.ok) {
+            throw new Error([payload.error, payload.nextStep, payload.details].filter(Boolean).join('\n') || `Upload failed with HTTP ${response.status}`);
+          }
+
+          setStatus([
+            'Загрузка принята.',
+            `Файл: ${payload.uploadedFileName}`,
+            `Путь в репозитории: ${payload.rawPath}`,
+            `Commit source: ${payload.sourceCommitSha || 'создан'}`,
+            'GitHub Actions уже запущен и после его коммита Cloudflare Pages развернет обновленный дашборд.'
+          ].join('\n'), 'success');
+          form.reset();
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : String(error), 'error');
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

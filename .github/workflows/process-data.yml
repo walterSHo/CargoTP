@@ -1,19 +1,27 @@
 name: Process Excel data
 
 on:
+  repository_dispatch:
+    types:
+      - excel-uploaded
   push:
     paths:
-      - 'data/raw/**.xlsx'
-      - 'data/raw/**.xls'
       - 'scripts/process-data.ts'
+      - 'scripts/audit-processed-data.mjs'
+      - 'scripts/verify-source-data.mjs'
       - 'lib/**'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: process-excel-data
+  cancel-in-progress: false
+
 jobs:
   process-data:
+    if: github.event_name != 'push' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

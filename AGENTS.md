@@ -25,8 +25,11 @@
 
 ## Production UI
 
-- GitHub Pages использует корневой `index.html`.
+- Production хостится на Cloudflare Pages.
+- Публично деплоится только `dist/`, а не весь корень репозитория.
+- `dist/` должен собираться через `npm run build:pages`.
 - Если меняешь пользовательское поведение дашборда для production, сначала обновляй `index.html`.
+- Если меняешь upload flow, синхронно проверяй `upload.html` и `functions/api/upload.js`.
 - Next.js-код в `app/`, `components/`, `lib/` поддерживай согласованным, если изменение должно жить и в расширяемой версии.
 - Не добавляй marketing landing page вместо рабочего dashboard-интерфейса.
 - UI должен оставаться полезным при пустых данных: понятный статус, без выдуманных KPI.
@@ -38,6 +41,8 @@
 - Используй TypeScript и существующие типы из `lib/types.ts`.
 - Для аналитики и бизнес-логики сначала ищи существующие helpers в `lib/analytics.ts`, `lib/product-groups.ts`, `lib/format.ts`.
 - Для Excel-парсинга расширяй aliases и схемы в `lib/excel.ts`, а не добавляй отдельный парсер рядом.
+- Cloudflare Pages Functions отвечают только за прием файла, а не за тяжелый Excel parsing.
+- Upload flow должен сохранять raw Excel в GitHub и запускать GitHub Actions автоматически.
 - Для данных используй структурный JSON/Excel parsing, не хрупкий string parsing.
 - Держи изменения маленькими и привязанными к задаче.
 - Не добавляй новую зависимость без реальной необходимости.
@@ -49,7 +54,8 @@
 - Для docs-only изменений: `git diff --check`.
 - Для TypeScript/UI изменений: `npm run typecheck`, если зависимости установлены.
 - Для data pipeline: `npm run process:data`, `npm run audit:data`, `npm run verify:source`.
-- Для static dashboard UI: проверить `index.html` через static server, если изменение влияет на загрузку или рендер.
+- Для static dashboard UI: проверить `index.html` и `npm run build:pages`, если изменение влияет на production deploy.
+- Для upload flow: проверить `functions/api/upload.js` синтаксически и убедиться, что README описывает все env vars.
 - Если проверку нельзя выполнить, зафиксируй причину в финальном сообщении.
 
 ## Git Протокол
@@ -66,5 +72,6 @@
 - Нельзя возвращать demo values вроде `Авто Плюс`, `Brand A`, `U-100`, `C-100-A`.
 - Нельзя скрывать ошибку данных под красивыми KPI.
 - Нельзя менять source of truth с `Олексієнко.xlsx` на другой файл без явного решения пользователя.
-- Нельзя чинить static UI только в Next.js и считать задачу завершенной для GitHub Pages.
+- Нельзя публиковать `data/raw` в Cloudflare Pages deploy output.
+- Нельзя чинить static UI только в Next.js и считать задачу завершенной для Cloudflare Pages.
 - Нельзя запускать обработку Excel как "проверку" без понимания, что она меняет файлы.
