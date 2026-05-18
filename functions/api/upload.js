@@ -88,6 +88,7 @@ async function githubRequest(url, token, init = {}) {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      'User-Agent': 'CargoTP-Upload-Function',
       'X-GitHub-Api-Version': '2022-11-28',
       ...init.headers
     }
@@ -96,10 +97,15 @@ async function githubRequest(url, token, init = {}) {
   if (response.status === 204) return null;
 
   const text = await response.text();
-  const payload = text ? JSON.parse(text) : null;
+  const contentType = response.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
+  const payload = text ? (isJson ? JSON.parse(text) : null) : null;
   if (!response.ok) {
-    const message = payload?.message || `GitHub API request failed with ${response.status}`;
+    const message = payload?.message || text || `GitHub API request failed with ${response.status}`;
     throw new Error(message);
+  }
+  if (text && !isJson) {
+    throw new Error(`GitHub API returned non-JSON success response (${response.status}): ${text.slice(0, 300)}`);
   }
   return payload;
 }
@@ -109,14 +115,21 @@ async function getExistingSha(owner, repo, branch, rawPath, token) {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
+      'User-Agent': 'CargoTP-Upload-Function',
       'X-GitHub-Api-Version': '2022-11-28'
     }
   });
 
   if (response.status === 404) return null;
-  const payload = await response.json();
+  const text = await response.text();
+  const contentType = response.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
+  const payload = text ? (isJson ? JSON.parse(text) : null) : null;
   if (!response.ok) {
-    throw new Error(payload?.message || `Cannot read existing ${rawPath}`);
+    throw new Error(payload?.message || text || `Cannot read existing ${rawPath}`);
+  }
+  if (text && !isJson) {
+    throw new Error(`GitHub API returned non-JSON response while reading ${rawPath}: ${text.slice(0, 300)}`);
   }
   return payload?.sha ?? null;
 }
