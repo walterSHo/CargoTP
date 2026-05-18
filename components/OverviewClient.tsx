@@ -6,6 +6,7 @@ import { DailySalesChart, SimpleBarChart, SimplePieChart } from '@/components/Ch
 import { DataTable } from '@/components/DataTable';
 import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
+import { PageHeader } from '@/components/PageHeader';
 import { availableMonths, avg, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
 import { EXCLUDED_GROSS_PLAN_GROUP } from '@/lib/constants';
 import { money, percent } from '@/lib/format';
@@ -93,11 +94,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
 
   if (!month) {
     return (
-      <div className="page-hero">
-        <div className="eyebrow">No data</div>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-white">Огляд дашборду</h1>
-        <p className="mt-3 max-w-2xl text-sm text-muted">Немає оброблених Excel-даних для побудови аналітики.</p>
-      </div>
+      <PageHeader description="Немає оброблених Excel-даних для побудови аналітики." title="Огляд дашборду" />
     );
   }
 
@@ -121,22 +118,17 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
 
   return (
     <div className="space-y-6">
-      <section className="page-hero">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="eyebrow">Dark operations mode</div>
-            <h1 className="mt-2 text-4xl font-black tracking-tight text-white md:text-5xl">Огляд дашборду</h1>
-            <p className="mt-4 text-sm leading-6 text-muted md:text-base">
-              Більш контрастний робочий екран для щоденного контролю обороту, планових долей груп, дебіторки та ризикових клієнтів.
-            </p>
-          </div>
-          <div className="soft-panel p-4 md:min-w-[260px]">
+      <PageHeader
+        aside={(
+          <div className="soft-panel p-4">
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Стан даних</div>
             <div className="mt-2 text-sm text-white">Оновлено: {data.updatedAt ? new Date(data.updatedAt).toLocaleString('uk-UA') : 'немає мітки часу'}</div>
             <div className="mt-2 text-sm text-muted">Активний місяць: <span className="font-semibold text-white">{month}</span></div>
           </div>
-        </div>
-      </section>
+        )}
+        description="Більш контрастний робочий екран для щоденного контролю обороту, планових долей груп, дебіторки та ризикових клієнтів."
+        title="Огляд дашборду"
+      />
 
       <section className="filter-bar">
         <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto]">

@@ -1,15 +1,12 @@
 import { SettingsClient } from '@/components/SettingsClient';
+import { PageHeader } from '@/components/PageHeader';
 import { readDashboardData } from '@/lib/data';
 
 export default function SettingsPage() {
   const { monthlyPlans } = readDashboardData();
   return (
     <div className="space-y-6">
-      <section className="page-hero">
-        <div className="eyebrow">Manual inputs</div>
-        <h1 className="mt-2 text-4xl font-black tracking-tight text-white">Налаштування / Вхідні дані</h1>
-        <p className="mt-3 max-w-2xl text-sm text-muted">Тут зберігається ручний валовий план по місяцях, який потім використовується у всьому дашборді.</p>
-      </section>
+      <PageHeader description="Тут зберігається ручний валовий план по місяцях, який потім використовується у всьому дашборді." title="Налаштування / Вхідні дані" />
       <form className="filter-bar grid gap-4 md:grid-cols-3" action="/api/settings/monthly-plan" method="post">
         <label className="grid gap-2">
           <span className="filter-label">Місяць</span>

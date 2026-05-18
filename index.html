@@ -34,25 +34,62 @@
         color: var(--ink);
         font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
       }
-      header {
+      .app-shell { min-height: 100vh; }
+      .sidebar {
+        display: none;
         position: sticky;
         top: 0;
-        z-index: 8;
+        height: 100vh;
+        padding: 24px 20px;
+        border-right: 1px solid var(--line);
+        background: rgba(6,12,24,.78);
+        backdrop-filter: blur(18px);
+      }
+      .sidebar-brand {
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 18px;
+        background: linear-gradient(180deg, rgba(13,23,42,0.92), rgba(9,16,30,0.92));
+        box-shadow: 0 22px 60px rgba(0,0,0,.24);
+      }
+      .sidebar-brand strong { display: block; font-size: 24px; color: white; }
+      .sidebar-brand span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+      .sidebar-title {
+        margin: 24px 0 10px;
+        color: var(--blue);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .sidebar-nav { display: grid; gap: 8px; }
+      .content-shell { min-width: 0; }
+      main { padding: 18px 20px 22px; }
+      .mobile-nav {
+        position: sticky;
+        top: 0;
+        z-index: 15;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px;
         border-bottom: 1px solid var(--line);
         background: rgba(6,12,24,.78);
         backdrop-filter: blur(16px);
       }
-      nav, main { max-width: 1340px; margin: 0 auto; padding: 16px 20px; }
-      nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-      nav strong { margin-right: 12px; font-size: 18px; color: white; }
+      .mobile-brand strong { display: block; color: white; font-size: 18px; }
+      .mobile-brand span { display: block; color: var(--muted); font-size: 11px; }
+      .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; max-width: 68vw; }
       button, select, input { font: inherit; }
       .tab {
         border: 1px solid var(--line);
         background: rgba(10, 18, 33, 0.84);
         color: var(--muted);
-        border-radius: 999px;
-        padding: 9px 14px;
+        border-radius: 18px;
+        padding: 12px 14px;
         cursor: pointer;
+        text-align: left;
       }
       .tab.active {
         background: linear-gradient(135deg, rgba(78,161,255,0.3), rgba(45,212,191,0.18));
@@ -60,25 +97,8 @@
         color: white;
         box-shadow: 0 14px 28px rgba(78, 161, 255, 0.16);
       }
-      .hero-panel {
-        display: grid;
-        gap: 10px;
-        margin-top: 10px;
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        padding: 22px 22px 20px;
-        background:
-          linear-gradient(145deg, rgba(15, 25, 45, 0.96), rgba(10, 16, 30, 0.94)),
-          linear-gradient(145deg, rgba(78, 161, 255, 0.08), rgba(45, 212, 191, 0.05));
-        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
-      }
-      .eyebrow {
-        color: var(--blue);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        font-size: 11px;
-        font-weight: 800;
-      }
+      .page-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+      .page-header h1 { margin: 0; }
       .toolbar {
         display: grid;
         gap: 14px;
@@ -340,10 +360,16 @@
       .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
       .insight .big { margin-top: 8px; color: white; font-size: 28px; font-weight: 900; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
-      @media (max-width: 860px) {
+      @media (min-width: 980px) {
+        .app-shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); }
+        .sidebar { display: block; }
+        .mobile-nav { display: none; }
+        main { padding: 24px 24px 28px; }
+      }
+      @media (max-width: 979px) {
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
-        nav, main { padding: 14px 14px; }
+        main { padding: 14px 14px 20px; }
         .toolbar { gap: 10px; }
         .toolbar-grid { grid-template-columns: 1fr; }
         .table-meta { align-items: stretch; }
@@ -353,48 +379,71 @@
     </style>
   </head>
   <body>
-    <header>
-      <nav>
-        <strong>CargoTP Dashboard</strong>
-        <button class="tab active" data-tab="overview">Огляд</button>
-        <button class="tab" data-tab="sales">Продажі</button>
-        <button class="tab" data-tab="groups">План груп</button>
-        <button class="tab" data-tab="receivables">Дебіторка</button>
-        <button class="tab" data-tab="tires">Шини</button>
-      </nav>
-    </header>
-
-    <main>
-      <section class="hero-panel">
-        <div class="eyebrow">Dark operations mode</div>
-        <h1>Торговий дашборд</h1>
-        <p class="muted" id="updated">Завантаження даних...</p>
-      </section>
-
-      <div class="toolbar">
-        <div class="toolbar-grid">
-          <label>Місяць <select id="month"></select></label>
-          <label>Пошук <input id="search" list="client-search-suggestions" placeholder="Фільтр за активним режимом..." /></label>
-          <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <strong>CargoTP</strong>
+          <span>Sales dashboard</span>
         </div>
-        <div>
-          <div class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Режим пошуку</div>
-          <div class="mode-pills">
-            <button class="mode-pill active" data-search-mode="code" type="button">Код</button>
-            <button class="mode-pill" data-search-mode="client" type="button">Клієнт</button>
-            <button class="mode-pill" data-search-mode="brand" type="button">Бренд</button>
-            <button class="mode-pill" data-search-mode="group" type="button">Група</button>
+        <div class="sidebar-title">Меню</div>
+        <nav class="sidebar-nav">
+          <button class="tab active" data-tab="overview">Огляд</button>
+          <button class="tab" data-tab="sales">Продажі</button>
+          <button class="tab" data-tab="groups">План груп</button>
+          <button class="tab" data-tab="receivables">Дебіторка</button>
+          <button class="tab" data-tab="tires">Шини</button>
+        </nav>
+      </aside>
+
+      <div class="content-shell">
+        <div class="mobile-nav">
+          <div class="mobile-brand">
+            <strong>CargoTP</strong>
+            <span>Sales dashboard</span>
+          </div>
+          <div class="mobile-tabs">
+            <button class="tab active" data-tab="overview">Огляд</button>
+            <button class="tab" data-tab="sales">Продажі</button>
+            <button class="tab" data-tab="groups">План груп</button>
+            <button class="tab" data-tab="receivables">Дебіторка</button>
+            <button class="tab" data-tab="tires">Шини</button>
           </div>
         </div>
-      </div>
-      <datalist id="client-search-suggestions"></datalist>
 
-      <section class="section active" id="overview"></section>
-      <section class="section" id="sales"></section>
-      <section class="section" id="groups"></section>
-      <section class="section" id="receivables"></section>
-      <section class="section" id="tires"></section>
-    </main>
+        <main>
+          <section class="page-header">
+            <div>
+              <h1 id="page-title">Огляд</h1>
+              <p class="muted" id="updated">Завантаження даних...</p>
+            </div>
+          </section>
+
+          <div class="toolbar">
+            <div class="toolbar-grid">
+              <label>Місяць <select id="month"></select></label>
+              <label>Пошук <input id="search" list="client-search-suggestions" placeholder="Фільтр за активним режимом..." /></label>
+              <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
+            </div>
+            <div>
+              <div class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Режим пошуку</div>
+              <div class="mode-pills">
+                <button class="mode-pill active" data-search-mode="code" type="button">Код</button>
+                <button class="mode-pill" data-search-mode="client" type="button">Клієнт</button>
+                <button class="mode-pill" data-search-mode="brand" type="button">Бренд</button>
+                <button class="mode-pill" data-search-mode="group" type="button">Група</button>
+              </div>
+            </div>
+          </div>
+          <datalist id="client-search-suggestions"></datalist>
+
+          <section class="section active" id="overview"></section>
+          <section class="section" id="sales"></section>
+          <section class="section" id="groups"></section>
+          <section class="section" id="receivables"></section>
+          <section class="section" id="tires"></section>
+        </main>
+      </div>
+    </div>
 
     <script>
       const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
@@ -415,10 +464,16 @@
           tires: { key: 'clientCode', dir: 'asc' }
         },
         expandedRows: {},
-        tableFilters: {
-          sales: {}
-        },
-        openFilterPanel: null
+        tableFilters: {},
+        openFilterPanel: null,
+        filterPanelQuery: ''
+      };
+      const pageTitles = {
+        overview: 'Огляд',
+        sales: 'Продажі',
+        groups: 'План груп',
+        receivables: 'Дебіторка',
+        tires: 'Шини'
       };
 
       const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -662,6 +717,14 @@
         }));
       }
 
+      function activeTableFilters(tableId) {
+        return Object.entries(state.tableFilters[tableId] || {}).flatMap(([filterKey, values]) => values.map((value) => ({ filterKey, value })));
+      }
+
+      function tableColumnTitle(columns, filterKey) {
+        return columns.find((column) => (column.filterKey || column.key) === filterKey)?.title || filterKey;
+      }
+
       function infoLabel(label, explanation) {
         return `<span class="hint-inline">${escapeHtml(label)}<span class="hint-dot" title="${escapeHtml(explanation)}">i</span></span>`;
       }
@@ -671,12 +734,40 @@
       }
 
       function table(tableId, rows, columns, options = {}) {
+        const availableFilterOptions = options.filterOptions || uniqueFilterOptions(rows, columns, columns.map((column) => column.filterKey || column.key).filter(Boolean));
         const filtered = filteredTableRows(tableId, rows, columns);
-        if (!filtered.length) return empty('Немає рядків за активними фільтрами.');
         const currentSort = state.tableSorts[tableId] || {};
         const sorted = sortedRows(tableId, filtered, columns);
         const expandable = typeof options.expandContent === 'function';
+        const activeFilters = activeTableFilters(tableId);
+        if (!filtered.length) {
+          return `
+            ${activeFilters.length ? `
+              <div class="card" style="margin-bottom:12px;">
+                <div class="table-meta">
+                  <div class="table-count">Показано рядків: <strong>0</strong> з ${escapeHtml(String(rows.length))}</div>
+                  <button class="filter-summary-chip" data-table-filter-clear-all="${tableId}" type="button">Очистити все</button>
+                </div>
+                <div class="filter-summary" style="margin-top:12px;">
+                  ${activeFilters.map(({ filterKey, value }) => `<button class="filter-summary-chip" data-filter-chip-remove="${tableId}" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(value)}" type="button">${escapeHtml(tableColumnTitle(columns, filterKey))}: ${escapeHtml(value)}</button>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+            ${empty('Немає рядків за активними фільтрами.')}
+          `;
+        }
         return `
+          ${activeFilters.length ? `
+            <div class="card" style="margin-bottom:12px;">
+              <div class="table-meta">
+                <div class="table-count">Показано рядків: <strong>${escapeHtml(String(filtered.length))}</strong> з ${escapeHtml(String(rows.length))}</div>
+                <button class="filter-summary-chip" data-table-filter-clear-all="${tableId}" type="button">Очистити все</button>
+              </div>
+              <div class="filter-summary" style="margin-top:12px;">
+                ${activeFilters.map(({ filterKey, value }) => `<button class="filter-summary-chip" data-filter-chip-remove="${tableId}" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(value)}" type="button">${escapeHtml(tableColumnTitle(columns, filterKey))}: ${escapeHtml(value)}</button>`).join('')}
+              </div>
+            </div>
+          ` : ''}
           <div class="table-wrap ${options.maxHeight ? 'tall' : ''}">
             <table>
               <thead>
@@ -687,7 +778,7 @@
                     const mark = currentSort.key === sortKey ? (currentSort.dir === 'asc' ? '▲' : '▼') : '↕';
                     const titleHtml = column.titleHtml || escapeHtml(column.title);
                     const filterKey = column.filterKey || column.key;
-                    const filterOptions = options.filterOptions?.[filterKey] || [];
+                    const filterOptions = availableFilterOptions[filterKey] || [];
                     const selectedCount = (state.tableFilters[tableId]?.[filterKey] || []).length;
                     const filterButton = filterOptions.length ? `
                       <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">
@@ -701,8 +792,9 @@
                           <span>Вибір значень</span>
                           <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${filterKey}" type="button">Очистити</button>
                         </div>
+                        <input data-filter-panel-search="${tableId}" placeholder="Пошук значення..." value="${escapeHtml(state.filterPanelQuery)}" />
                         <div class="filter-options">
-                          ${filterOptions.map((option) => {
+                          ${filterOptions.filter((option) => option.toLowerCase().includes(String(state.filterPanelQuery || '').toLowerCase())).map((option) => {
                             const active = (state.tableFilters[tableId]?.[filterKey] || []).includes(option);
                             return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
                           }).join('') || '<div class="empty">Немає значень</div>'}
@@ -971,42 +1063,16 @@
           { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
           { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
         ];
-        const filterOptions = uniqueFilterOptions(rows, salesColumns, ['date', 'unifiedClientCode', 'clientCode', 'clientName', 'brand', 'productGroup']);
         const tableRows = filteredTableRows('sales', rows, salesColumns);
-        const activeFilters = Object.entries(state.tableFilters.sales || {}).flatMap(([filterKey, values]) => values.map((value) => ({ filterKey, value })));
-        const filterLabels = {
-          date: 'Дата',
-          unifiedClientCode: 'Єдиний код',
-          clientCode: 'Код клієнта',
-          clientName: 'Клієнт',
-          brand: 'Бренд',
-          productGroup: 'Група'
-        };
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
-            <div class="card">
-              <div class="table-meta">
-                <div>
-                  <div class="chart-title">Фільтри таблиці продажів</div>
-                  <div class="small">Натисніть <strong>Фільтр</strong> у заголовку колонки, щоб швидко відібрати потрібні дати, клієнтів, бренди або групи.</div>
-                </div>
-                <div class="table-count">Показано рядків: <strong>${escapeHtml(String(tableRows.length))}</strong> з ${escapeHtml(String(rows.length))}</div>
-              </div>
-              ${activeFilters.length ? `
-                <div class="filter-summary" style="margin-top:12px;">
-                  ${activeFilters.map(({ filterKey, value }) => `<button class="filter-summary-chip" data-filter-chip-remove="sales" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(value)}" type="button">${escapeHtml(filterLabels[filterKey] || filterKey)}: ${escapeHtml(value)}</button>`).join('')}
-                  <button class="filter-summary-chip" data-table-filter-clear-all="sales" type="button">Очистити все</button>
-                </div>
-              ` : ''}
-            </div>
             <div class="three-up">
               <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
               <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
               <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(byTop(tableRows, (row) => row.productGroup, (row) => row.amountEur, 8))}</div>
             </div>
             ${table('sales', rows, salesColumns, {
-              filterOptions,
               maxHeight: true,
               rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
             })}
@@ -1111,6 +1177,12 @@
         renderTires();
       }
 
+      function setActiveTab(tabId) {
+        document.querySelectorAll('.tab').forEach((button) => button.classList.toggle('active', button.dataset.tab === tabId));
+        document.querySelectorAll('.section').forEach((element) => element.classList.toggle('active', element.id === tabId));
+        document.getElementById('page-title').textContent = pageTitles[tabId] || 'Огляд';
+      }
+
       async function loadData() {
         try {
           const response = await fetch('data/processed/dashboard.json', { cache: 'no-store' });
@@ -1165,6 +1237,7 @@
         if (filterOpen) {
           const tableId = filterOpen.dataset.tableFilterOpen;
           const filterKey = filterOpen.dataset.filterKey;
+          state.filterPanelQuery = '';
           state.openFilterPanel = state.openFilterPanel?.tableId === tableId && state.openFilterPanel?.filterKey === filterKey
             ? null
             : { tableId, filterKey };
@@ -1245,9 +1318,7 @@
       });
 
       document.querySelectorAll('.tab').forEach((button) => button.addEventListener('click', () => {
-        document.querySelectorAll('.tab,.section').forEach((element) => element.classList.remove('active'));
-        button.classList.add('active');
-        document.getElementById(button.dataset.tab).classList.add('active');
+        setActiveTab(button.dataset.tab);
       }));
 
       document.querySelectorAll('[data-search-mode]').forEach((button) => button.addEventListener('click', () => {
@@ -1270,6 +1341,12 @@
       });
       document.getElementById('search').addEventListener('input', (event) => {
         state.search = event.target.value;
+        renderAll();
+      });
+      document.addEventListener('input', (event) => {
+        const filterInput = event.target.closest('[data-filter-panel-search]');
+        if (!filterInput) return;
+        state.filterPanelQuery = filterInput.value;
         renderAll();
       });
 

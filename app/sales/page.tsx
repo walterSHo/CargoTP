@@ -1,15 +1,12 @@
 import { SalesClient } from '@/components/SalesClient';
+import { PageHeader } from '@/components/PageHeader';
 import { readDashboardData } from '@/lib/data';
 
 export default function SalesPage() {
   const { sales } = readDashboardData();
   return (
     <div className="space-y-6">
-      <section className="page-hero">
-        <div className="eyebrow">Sales radar</div>
-        <h1 className="mt-2 text-4xl font-black tracking-tight text-white">Продажі</h1>
-        <p className="mt-3 max-w-2xl text-sm text-muted">Розділ для перегляду структури продажів, брендів і товарних груп з компактними фільтрами прямо в заголовках таблиці.</p>
-      </section>
+      <PageHeader description="Розділ для перегляду структури продажів, брендів і товарних груп з компактними фільтрами прямо в заголовках таблиці." title="Продажі" />
       <SalesClient sales={sales} />
     </div>
   );

@@ -56,6 +56,30 @@
       radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.07), transparent 28%);
   }
 
+  .app-shell {
+    @apply min-h-screen;
+  }
+
+  .app-main {
+    @apply min-w-0 px-4 py-5 sm:px-6 lg:px-8 lg:py-8;
+  }
+
+  .page-header {
+    @apply flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between;
+  }
+
+  .page-header-copy {
+    @apply max-w-3xl;
+  }
+
+  .page-header-title {
+    @apply text-3xl font-black tracking-tight text-white md:text-4xl;
+  }
+
+  .page-header-note {
+    color: var(--muted);
+  }
+
   .page-hero {
     @apply rounded-[28px] border p-6 md:p-8;
     border-color: var(--line);

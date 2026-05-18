@@ -12,8 +12,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="uk">
       <body className="app-backdrop">
-        <Navigation />
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <div className="app-shell md:grid md:grid-cols-[280px_minmax(0,1fr)]">
+          <Navigation />
+          <main className="app-main">{children}</main>
+        </div>
       </body>
     </html>
   );
