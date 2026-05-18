@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "process:data": "tsx scripts/process-data.ts",
     "bot": "tsx scripts/telegram-bot.ts",
-    "commit:data": "tsx scripts/git-auto-commit.ts"
+    "commit:data": "tsx scripts/git-auto-commit.ts",
+    "inspect:excel": "tsx scripts/inspect-workbook.ts"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.20.5",

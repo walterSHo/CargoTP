@@ -1,17 +1,16 @@
 # Trade Rep Dashboard
 
-Отдельный веб-дашборд торгового представителя: продажи, выполнение планов групп, дебиторка и ежедневное обновление через Telegram-бота.
-
+Отдельный веб-дашборд торгового представителя: продажи, планы групп, дебиторка, ручной валовый план и ежедневное обновление Excel через Telegram-бота.
 
 ## Дерево проекта
 
 ```text
 app/                         # Next.js pages and API routes
-components/                  # UI, charts, table and page client components
-lib/                         # types, parsing, formatting and analytics
-scripts/                     # data pipeline, Telegram bot, git push
-data/raw/                    # uploaded Excel sources
-data/processed/              # dashboard JSON and monthly plan inputs
+components/                  # UI, charts, tables and page client components
+lib/                         # types, Excel parsing, normalization, analytics
+scripts/                     # inspect/process Excel, Telegram bot, git push
+data/raw/                    # uploaded Excel sources, e.g. Олексієнко.xlsx
+data/processed/              # normalized JSON for dashboard
 ```
 
 ## Стек
@@ -20,61 +19,140 @@ data/processed/              # dashboard JSON and monthly plan inputs
 - Tailwind CSS
 - Recharts
 - TanStack Table
-- SheetJS/xlsx для Excel
-- grammY для Telegram-бота
+- SheetJS/xlsx
+- grammY Telegram bot
 
-## Архитектура данных
+## Реальный Excel-файл
 
-```text
-data/raw/                  # ежедневные исходные Excel-файлы
-data/processed/            # нормализованные JSON для сайта
-lib/excel.ts               # парсер Excel, алиасы колонок, валидация
-lib/analytics.ts           # KPI и бизнес-правила
-scripts/process-data.ts    # raw Excel -> processed JSON
-scripts/telegram-bot.ts    # прием 3 файлов и запуск pipeline
-scripts/git-auto-commit.ts # commit/push data changes
-```
+Эталонный файл: `data/raw/Олексієнко.xlsx`.
 
-Файлы должны называться так, чтобы бот понял тип:
+Pipeline не привязан к одному имени файла: он читает все `.xlsx/.xls` из `data/raw/`, определяет типы листов по реальным заголовкам и объединяет данные. Это поддерживает два сценария:
 
-- `sales-YYYY-MM-DD.xlsx`
-- `group-plan-YYYY-MM-DD.xlsx`
-- `receivables-YYYY-MM-DD.xlsx`
+1. полный файл за период;
+2. короткая дозагрузка за 1–3 дня.
 
-## Критическое KPI-правило
-
-Для KPI выполнения валового плана группа `Автомобільна Шина` всегда исключается из оборота. При этом общий оборот в аналитике показывает все группы.
-
-Формула:
-
-```text
-Выполнение валового плана = оборот без "Автомобільна Шина" / ручной валовый план месяца * 100
-```
-
-## Локальный запуск
+Перед обработкой можно посмотреть, как распознался файл:
 
 ```bash
-npm install
-npm run dev
+npm run inspect:excel -- data/raw/Олексієнко.xlsx
 ```
 
-Mock-данные уже лежат в `data/processed/dashboard.json`.
+## Используемые листы и колонки
 
-## Обработка Excel
+Листы ищутся не по фиксированному имени, а по заголовкам в первых 25 строках. Это сделано потому, что рабочие Excel-файлы могут иметь плавающие имена листов и служебные строки сверху.
 
-1. Положите 3 файла в `data/raw/`.
-2. Проверьте префиксы: `sales`, `group-plan`, `receivables`.
-3. Запустите:
+### Продажи
+
+Обязательные поля:
+
+- клиент: `Клиент`, `Клієнт`, `Контрагент`, `Торгова точка`
+- группа товара: `Группа товара`, `Група товару`, `Товарная группа`
+- сумма: `Сумма в евро`, `Сума в євро`, `Оборот EUR`, `Сума`, `Сумма`, `Продаж`
+
+Дополнительные поля, если есть:
+
+- дата
+- единый код клиента
+- код клиента
+- бренд
+- код/название товара
+- нетто-маржа
+- % скидки
+
+### Доли групп / план групп
+
+Обязательные поля:
+
+- группа товара
+- план в деньгах
+- факт
+
+Дополнительные поля:
+
+- план в %
+- % выполнения
+- % net
+
+### Дебиторка
+
+Обязательные поля:
+
+- клиент
+- общая задолженность
+
+Дополнительные поля:
+
+- единый код клиента
+- код клиента
+- непросроченная задолженность
+- просроченная задолженность
+- buckets `0–10`, `11–20`, `21–30`, `31+`
+
+Если обязательные колонки не найдены, parser падает с понятной ошибкой вида: `Лист "..." похож на sales, но нет обязательных колонок: ...`.
+
+## Конвертация Excel → JSON
 
 ```bash
 npm run process:data
 ```
 
-Если обязательная колонка не найдена, скрипт покажет понятную ошибку с именем поля.
+Скрипт:
+
+1. читает все Excel-файлы из `data/raw/`;
+2. распознает листы продаж, плана групп и дебиторки;
+3. нормализует даты в `YYYY-MM-DD`;
+4. дедуплицирует пересекающиеся строки при дозаливке;
+5. пишет JSON:
+   - `data/processed/sales.json`
+   - `data/processed/group-plan.json`
+   - `data/processed/receivables.json`
+   - `data/processed/meta.json`
+   - `data/processed/dashboard.json` для совместимости UI.
+
+## Валовый план и исключение шин
+
+Ручной валовый план хранится в `data/processed/monthly-plans.json` и редактируется на странице `/settings`.
+
+Для KPI выполнения валового плана шины всегда исключаются:
+
+```text
+Выполнение валового плана = оборот без шин / ручной валовый план месяца * 100
+```
+
+Группа шин распознается helper-функциями:
+
+- `normalizeProductGroup()`
+- `isTireGroup()`
+
+Учитываются варианты: `Автомобільна Шина`, `Автомобильная Шина`, `Шина`, `Шины`, похожие `шин...`, `tire`, `tyre`.
+
+Важно: шины отображаются в общей аналитике и на отдельной странице `/tires`, но не попадают в KPI валового плана.
+
+## Tire Analytics
+
+Страница `/tires` показывает:
+
+- общий оборот по шинам;
+- клиентов, которые покупают шины;
+- среднюю маржу и скидку;
+- топ клиентов по шинам;
+- топ брендов шин;
+- рост/падение клиентов по шинам относительно предыдущих месяцев;
+- клиентов, которые покупают шины и имеют просроченную дебиторку.
+
+## Локальный запуск
+
+```bash
+npm install
+npm run process:data
+npm run dev
+```
+
+Если реального Excel-файла еще нет, UI использует mock JSON из `data/processed/`.
 
 ## Telegram upload flow
 
-Создайте `.env` по примеру `.env.example`:
+Создайте `.env` по `.env.example`:
 
 ```bash
 TELEGRAM_BOT_TOKEN=...
@@ -84,31 +162,17 @@ ALLOWED_TELEGRAM_USER_ID=123456789
 DEFAULT_BRANCH=main
 ```
 
-Запуск бота:
+Запуск:
 
 ```bash
 npm run bot
 ```
 
-Сценарий:
+Flow:
 
-1. Пользователь отправляет `/start`.
-2. Загружает 3 Excel-файла.
-3. Бот проверяет, что получены sales, group-plan и receivables.
-4. Файлы сохраняются в `data/raw/`.
-5. Запускается `npm run process:data`.
-6. Запускается `npm run commit:data`.
-7. GitHub/Vercel подхватывает push и обновляет сайт.
-
-## Ручной валовый план месяца
-
-История планов хранится в `data/processed/monthly-plans.json`:
-
-```json
-[
-  { "month": "2026-05", "grossPlan": 163000 },
-  { "month": "2026-06", "grossPlan": 175000 }
-]
-```
-
-Страница `/settings` содержит форму-заготовку. В production ее можно подключить к serverless API, который обновляет JSON и запускает commit/push.
+1. пользователь отправляет `/start`;
+2. загружает 3 Excel-файла или один workbook с несколькими нужными листами;
+3. бот сохраняет файлы в `data/raw/`;
+4. запускается `npm run process:data`;
+5. запускается `npm run commit:data`;
+6. GitHub/Vercel обновляет сайт после push.

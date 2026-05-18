@@ -37,7 +37,8 @@ bot.on('message:document', async (ctx) => {
   const document = ctx.message.document;
   const fileName = document.file_name ?? '';
   const fileType = detectFileType(fileName);
-  if (!fileType) return ctx.reply('Не понял тип файла. Добавьте в имя sales/group-plan/receivables.');
+  const isExcel = /\.xlsx?$/i.test(fileName);
+  if (!fileType && !isExcel) return ctx.reply('Не понял тип файла. Загрузите Excel или добавьте в имя sales/group-plan/receivables.');
 
   fs.mkdirSync(rawDir, { recursive: true });
   const file = await bot.api.getFile(document.file_id);
@@ -45,9 +46,18 @@ bot.on('message:document', async (ctx) => {
   const response = await fetch(`https://api.telegram.org/file/bot${token}/${file.file_path}`);
   if (!response.ok) throw new Error(`Cannot download Telegram file: ${response.status}`);
   const date = new Date().toISOString().slice(0, 10);
-  const targetName = `${fileType === 'groupPlan' ? 'group-plan' : fileType}-${date}-${fileName}`;
+  const prefix = fileType ? (fileType === 'groupPlan' ? 'group-plan' : fileType) : 'workbook';
+  const targetName = `${prefix}-${date}-${fileName}`;
   const targetPath = path.join(rawDir, targetName);
   fs.writeFileSync(targetPath, Buffer.from(await response.arrayBuffer()));
+
+  if (!fileType) {
+    await ctx.reply('Получен общий Excel workbook. Запускаю обработку и push в GitHub.');
+    run('npm', ['run', 'process:data']);
+    run('npm', ['run', 'commit:data']);
+    await ctx.reply('Готово: workbook обработан и отправлен в GitHub.');
+    return;
+  }
 
   const session = sessions.get(ctx.from!.id) ?? {};
   session[fileType] = targetPath;

@@ -5,6 +5,7 @@ const links = [
   ['/sales', 'Sales'],
   ['/group-plan', 'Group Plan'],
   ['/receivables', 'Receivables'],
+  ['/tires', 'Tires'],
   ['/settings', 'Settings']
 ];
 
