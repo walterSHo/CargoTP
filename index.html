@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trade Rep Dashboard — how to open</title>
+    <style>
+      body { font-family: Inter, Arial, sans-serif; margin: 0; background: #f8fafc; color: #0f172a; }
+      main { max-width: 860px; margin: 48px auto; padding: 0 20px; }
+      .card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; box-shadow: 0 10px 24px rgba(15, 23, 42, .06); }
+      code, pre { background: #0f172a; color: #e2e8f0; border-radius: 10px; }
+      code { padding: 2px 6px; }
+      pre { padding: 16px; overflow-x: auto; }
+      a { color: #2563eb; font-weight: 700; }
+      li { margin: 8px 0; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1>Trade Rep Dashboard</h1>
+        <p>Это Next.js-приложение, а не один статический HTML-файл. HTML генерируется локальным dev-сервером.</p>
+        <h2>Как открыть</h2>
+        <ol>
+          <li>Установите зависимости: <code>npm install</code></li>
+          <li>Запустите сайт: <code>npm run dev</code></li>
+          <li>Откройте: <a href="http://localhost:3000">http://localhost:3000</a></li>
+        </ol>
+        <pre><code>npm install
+npm run dev</code></pre>
+        <h2>Где код страниц</h2>
+        <ul>
+          <li><code>app/page.tsx</code> — главная Dashboard Overview</li>
+          <li><code>app/sales/page.tsx</code> — Sales</li>
+          <li><code>app/group-plan/page.tsx</code> — Group Plan</li>
+          <li><code>app/receivables/page.tsx</code> — Receivables</li>
+          <li><code>app/tires/page.tsx</code> — Tire Analytics</li>
+          <li><code>app/settings/page.tsx</code> — Settings</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
