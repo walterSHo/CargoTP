@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DailySalesChart, SimpleBarChart, SimplePieChart } from '@/components/Charts';
+import { DailySalesChart, SimpleBarChart } from '@/components/Charts';
 import { DataTable } from '@/components/DataTable';
 import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
 import { PageHeader } from '@/components/PageHeader';
 import { availableMonths, avg, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
-import { EXCLUDED_GROSS_PLAN_GROUP } from '@/lib/constants';
 import { money, percent } from '@/lib/format';
 import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
 
@@ -20,6 +19,8 @@ const searchModes: Array<{ value: SearchMode; label: string }> = [
   { value: 'brand', label: 'Бренд' },
   { value: 'group', label: 'Група' }
 ];
+
+type GroupGapMode = 'all' | 'deficit';
 
 function topClientColumns(): ColumnDef<TopClientRow>[] {
   return [
@@ -49,7 +50,7 @@ function gapColumns(): ColumnDef<ClientGroupGapRow>[] {
       cell: (info) => {
         const value = String(info.getValue() ?? '');
         const preview = value.length > 52 ? `${value.slice(0, 49)}...` : value;
-        return <span title={value}>{preview || 'Все закрито'}</span>;
+        return <span title={value}>{preview || 'Усі групи закриті'}</span>;
       }
     }
   ];
@@ -91,6 +92,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const [month, setMonth] = useState(months[0] ?? '');
   const [searchMode, setSearchMode] = useState<SearchMode>('code');
   const [query, setQuery] = useState('');
+  const [groupGapMode, setGroupGapMode] = useState<GroupGapMode>('all');
 
   if (!month) {
     return (
@@ -103,18 +105,22 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const kpis = dashboardKpis(monthSales, receivables, data.monthlyPlans, month);
   const topClients = topClientsByTurnover(monthSales, 12);
   const topClientsChart = topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover }));
-  const groupMix = byTop(monthSales, (row) => row.productGroup, (row) => row.amountEur, 8);
   const daily = dailySalesSeries(monthSales);
   const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales);
+  const visibleGroupGaps = groupGapMode === 'deficit' ? groupGaps.filter((row) => row.missingGroups > 0) : groupGaps;
   const groupShareTargets = groupPlanAudit(data.groupPlans, monthSales)
     .sort((a, b) => b.shareOfGrossPlan - a.shareOfGrossPlan)
     .map((row) => ({ name: row.productGroup, value: row.shareOfGrossPlan }))
     .slice(0, 10);
   const activeClients = new Set(monthSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
   const avgDailyTurnover = daily.length ? avg(daily.map((row) => row.turnover)) : 0;
-  const topClientShare = topClients[0]?.sharePercent ?? 0;
-  const topPlannedGroup = groupShareTargets[0];
+  const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
+  const share31Plus = receivables.length
+    ? (receivables.reduce((total, row) => total + row.bucket31Plus, 0) / Math.max(receivables.reduce((total, row) => total + row.totalDebt, 0), 1)) * 100
+    : 0;
   const suggestions = suggestionValues(data, searchMode);
+  const completionTone = kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger';
+  const debtTone = kpis.overdueDebt > 0 ? 'danger' : 'success';
 
   return (
     <div className="space-y-6">
@@ -169,38 +175,11 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="insight-tile">
-          <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Активні клієнти</div>
-          <div className="mt-2 text-3xl font-black text-white">{activeClients}</div>
-          <div className="mt-2 text-sm text-muted">Кількість клієнтів у вибірці після фільтрації.</div>
-        </div>
-        <div className="insight-tile">
-          <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Середній день</div>
-          <div className="mt-2 text-3xl font-black text-white">{money(avgDailyTurnover)}</div>
-          <div className="mt-2 text-sm text-muted">Середній денний оборот за активні дні місяця.</div>
-        </div>
-        <div className="insight-tile">
-          <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Концентрація</div>
-          <div className="mt-2 text-3xl font-black text-white">{percent(topClientShare)}</div>
-          <div className="mt-2 text-sm text-muted">Частка найбільшого клієнта у місячному обороті.</div>
-        </div>
-        <div className="insight-tile">
-          <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Ключова група</div>
-          <div className="mt-2 text-xl font-black text-white">{topPlannedGroup?.name ?? '—'}</div>
-          <div className="mt-2 text-sm text-muted">{topPlannedGroup ? `Цільова доля: ${percent(topPlannedGroup.value)}` : 'Немає планових долей груп.'}</div>
-        </div>
-      </section>
-
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KpiCard title="Загальний оборот" value={money(kpis.totalTurnover)} />
-        <KpiCard title={`Оборот без ${EXCLUDED_GROSS_PLAN_GROUP}`} value={money(kpis.planTurnover)} />
-        <KpiCard title="Валовий план місяця" value={money(kpis.grossPlan)} hint="Ручне значення для обраного місяця" />
-        <KpiCard title="% виконання валового плану" value={percent(kpis.grossPlanCompletion)} />
-        <KpiCard title="Середня нетто-маржа" value={percent(kpis.avgNetMargin)} />
-        <KpiCard title="Середня знижка" value={percent(kpis.avgDiscount)} />
-        <KpiCard title="Прострочена дебіторка" value={money(kpis.overdueDebt)} />
-        <KpiCard title="Непрострочена дебіторка" value={money(kpis.currentDebt)} />
+        <KpiCard hint={`Валовий оборот за ${month}`} title="Загальний оборот" tone="info" value={money(kpis.totalTurnover)} />
+        <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Виконання валового плану" tone={completionTone} value={percent(kpis.grossPlanCompletion)} />
+        <KpiCard hint={`31+ днів: ${percent(share31Plus)} від усієї дебіторки`} title="Прострочена дебіторка" tone={debtTone} value={money(kpis.overdueDebt)} />
+        <KpiCard hint={`Середній день: ${money(avgDailyTurnover)}`} title="Активні клієнти" tone="teal" value={String(activeClients)} />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
@@ -209,26 +188,34 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <SimplePieChart data={topClientsChart} title="Структура обороту по топ-клієнтах" />
-        <SimplePieChart data={groupMix} title="Структура обороту по товарних групах" />
-      </section>
-
-      <section className="space-y-3">
-        <div>
-          <h2 className="section-title text-white">Цільові долі груп у валовому плані</h2>
-          <p className="section-copy text-sm">Це плановий відсоток від обороту, який мають дати групи у валовому плані.</p>
-        </div>
-        <SimpleBarChart data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} />
+        <SimpleBarChart barColor="#2dd4bf" data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} />
+        <SimpleBarChart barColor="#fb7185" data={topOverdueClients} title="Топ клієнтів за прострочкою" />
       </section>
 
       <section className="space-y-3">
         <div>
           <h2 className="section-title text-white">Клієнти, які не закривають планові групи</h2>
-          <p className="section-copy text-sm">У таблиці показані всі клієнти поточного місяця. Натисніть на рядок, щоб побачити, які групи клієнт вже робить і яких саме не вистачає до повного покриття плану.</p>
+          <p className="section-copy text-sm">Перемикайте список між усіма клієнтами місяця та лише тими, у кого є дефіцит по планових групах. Натисніть на рядок, щоб побачити покриття детально.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            className={`strict-button ${groupGapMode === 'all' ? 'strict-button-active' : ''}`}
+            onClick={() => setGroupGapMode('all')}
+            type="button"
+          >
+            Усі клієнти
+          </button>
+          <button
+            className={`strict-button ${groupGapMode === 'deficit' ? 'strict-button-active' : ''}`}
+            onClick={() => setGroupGapMode('deficit')}
+            type="button"
+          >
+            Тільки з дефіцитом
+          </button>
         </div>
         <DataTable
           columns={gapColumns()}
-          data={groupGaps}
+          data={visibleGroupGaps}
           initialSorting={[{ id: 'missingPlanShare', desc: true }, { id: 'turnover', desc: true }]}
           renderExpandedRow={(row) => (
             <div className="soft-panel space-y-3 p-4">
@@ -250,7 +237,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       <section className="space-y-3">
         <div>
           <h2 className="section-title text-white">Топ клієнтів місяця</h2>
-          <p className="section-copy text-sm">Тут видно не тільки оборот, а й частку місяця та ширину роботи по групах.</p>
+          <p className="section-copy text-sm">Деталізацію по брендах і групах залишаємо в таблицях нижче по сторінках, щоб overview залишався коротким і робочим.</p>
         </div>
         <DataTable columns={topClientColumns()} data={topClients} initialSorting={[{ id: 'turnover', desc: true }]} maxHeightClassName="max-h-[30rem]" />
       </section>

@@ -8,7 +8,7 @@ const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2'
 
 function ChartShell({ children, title }: { children: ReactNode; title?: string }) {
   return (
-    <div className="h-80 rounded-[28px] border border-line bg-[linear-gradient(180deg,rgba(13,23,42,0.95),rgba(9,16,30,0.95))] p-4 shadow-[0_22px_60px_rgba(0,0,0,0.28)]">
+    <div className="h-80 rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
       {title ? <div className="mb-4 text-sm font-semibold text-[var(--ink)]">{title}</div> : null}
       <div className={title ? 'h-[calc(100%-2rem)]' : 'h-full'}>{children}</div>
     </div>
@@ -20,13 +20,15 @@ export function SimpleBarChart({
   bars = ['value'],
   title,
   barLabels = {},
-  valueFormatter = money
+  valueFormatter = money,
+  barColor = '#4ea1ff'
 }: {
   data: Array<Record<string, string | number>>;
   bars?: string[];
   title?: string;
   barLabels?: Record<string, string>;
   valueFormatter?: (value: number) => string;
+  barColor?: string;
 }) {
   return (
     <ChartShell title={title}>
@@ -42,7 +44,7 @@ export function SimpleBarChart({
             labelStyle={{ color: '#8da2c7' }}
           />
           {bars.length > 1 ? <Legend /> : null}
-          {bars.map((bar, index) => <Bar dataKey={bar} fill={COLORS[index % COLORS.length]} key={bar} name={barLabels[bar] ?? bar} />)}
+          {bars.map((bar, index) => <Bar dataKey={bar} fill={bars.length === 1 ? barColor : COLORS[index % COLORS.length]} key={bar} name={barLabels[bar] ?? bar} radius={[4, 4, 0, 0]} />)}
         </BarChart>
       </ResponsiveContainer>
     </ChartShell>

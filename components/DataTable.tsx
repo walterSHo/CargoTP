@@ -142,7 +142,7 @@ export function DataTable<T>({
   return (
     <div className="space-y-3">
       {activeFilterEntries.length ? (
-        <div className="flex flex-col gap-3 rounded-[22px] border border-line bg-[rgba(10,18,33,0.72)] px-4 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.16)]">
+        <div className="flex flex-col gap-3 rounded-[16px] border border-line bg-[rgba(10,18,33,0.78)] px-4 py-3 shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="text-sm text-white">
               Показано рядків: <strong>{filteredData.length}</strong> з {data.length}
@@ -154,7 +154,7 @@ export function DataTable<T>({
           <div className="flex flex-wrap gap-2">
             {activeFilterEntries.map(({ columnId, value }) => (
               <button
-                className="inline-flex items-center gap-2 rounded-full border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-3 py-2 text-xs font-semibold text-white"
+                className="inline-flex items-center gap-2 rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-3 py-2 text-xs font-semibold text-white"
                 key={`${columnId}:${value}`}
                 onClick={() => toggleFilter(columnId, value)}
                 type="button"
@@ -167,7 +167,7 @@ export function DataTable<T>({
         </div>
       ) : null}
 
-      <div className={`overflow-x-auto ${maxHeightClassName ? 'overflow-y-auto' : 'overflow-y-visible'} rounded-[24px] border border-line bg-[linear-gradient(180deg,rgba(12,20,36,0.96),rgba(9,16,30,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.24)] ${maxHeightClassName ?? ''}`}>
+      <div className={`overflow-x-auto ${maxHeightClassName ? 'overflow-y-auto' : 'overflow-y-visible'} rounded-[18px] border border-line bg-[rgba(9,16,30,0.96)] shadow-[0_12px_28px_rgba(0,0,0,0.2)] ${maxHeightClassName ?? ''}`}>
         <table className="min-w-full text-sm">
           <thead className="sticky top-0 z-[1] bg-[rgba(16,28,51,0.95)]">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -192,7 +192,7 @@ export function DataTable<T>({
                           {hasFilter ? (
                             <div className="relative" data-table-filter-root="true">
                               <button
-                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold transition ${
+                                className={`inline-flex items-center gap-1 rounded-[10px] border px-2 py-1 text-xs font-semibold transition ${
                                   selectedCount
                                     ? 'border-[rgba(78,161,255,0.44)] bg-[rgba(78,161,255,0.16)] text-white'
                                     : 'border-line bg-[rgba(8,15,28,0.72)] text-[var(--muted)] hover:text-white'
@@ -208,7 +208,7 @@ export function DataTable<T>({
                                 <span>{selectedCount ? `${selectedCount}` : '▾'}</span>
                               </button>
                               {openFilterColumn === columnId ? (
-                                <div className="absolute right-0 top-[calc(100%+0.65rem)] z-20 w-72 rounded-2xl border border-line bg-[rgba(8,15,28,0.98)] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
+                                <div className="absolute right-0 top-[calc(100%+0.65rem)] z-20 w-72 rounded-[14px] border border-line bg-[rgba(8,15,28,0.98)] p-3 shadow-[0_16px_36px_rgba(0,0,0,0.28)]">
                                   <div className="flex items-center justify-between gap-3">
                                     <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Вибір значень</div>
                                     <button
@@ -220,7 +220,7 @@ export function DataTable<T>({
                                     </button>
                                   </div>
                                   <input
-                                    className="mt-3 w-full rounded-xl border border-line bg-[rgba(12,20,36,0.95)] px-3 py-2 text-sm text-white outline-none"
+                                    className="mt-3 w-full rounded-[10px] border border-line bg-[rgba(12,20,36,0.95)] px-3 py-2 text-sm text-white outline-none"
                                     onChange={(event) => setFilterQuery(event.target.value)}
                                     placeholder="Пошук значення..."
                                     value={filterQuery}
@@ -229,7 +229,7 @@ export function DataTable<T>({
                                     {filteredOptions.length ? filteredOptions.map((option) => {
                                       const checked = resolvedFilters[columnId]?.includes(option) ?? false;
                                       return (
-                                        <label className="flex cursor-pointer items-start gap-3 rounded-xl px-2 py-2 text-sm text-[var(--ink)] transition hover:bg-[rgba(78,161,255,0.08)]" key={option}>
+                                        <label className="flex cursor-pointer items-start gap-3 rounded-[10px] px-2 py-2 text-sm text-[var(--ink)] transition hover:bg-[rgba(78,161,255,0.08)]" key={option}>
                                           <input
                                             checked={checked}
                                             className="mt-0.5"

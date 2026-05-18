@@ -1,9 +1,23 @@
-export function KpiCard({ title, value, hint }: { title: string; value: string; hint?: string }) {
+type KpiTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'teal';
+
+export function KpiCard({
+  title,
+  value,
+  hint,
+  tone = 'neutral'
+}: {
+  title: string;
+  value: string;
+  hint?: string;
+  tone?: KpiTone;
+}) {
   return (
-    <div className="group rounded-[24px] border border-line bg-[linear-gradient(180deg,rgba(16,28,51,0.94),rgba(11,19,35,0.96))] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)] transition hover:-translate-y-0.5 hover:border-[rgba(78,161,255,0.35)]">
-      <div className="text-sm font-medium text-muted">{title}</div>
-      <div className="mt-3 text-3xl font-black tracking-tight text-white">{value}</div>
-      {hint ? <div className="mt-3 text-xs text-muted">{hint}</div> : null}
+    <div className={`kpi-card kpi-card-${tone}`}>
+      <div className="pl-3">
+        <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{title}</div>
+        <div className="mt-3 text-[30px] font-black leading-none tracking-[-0.03em] text-white">{value}</div>
+        {hint ? <div className="mt-3 text-xs leading-5 text-muted">{hint}</div> : null}
+      </div>
     </div>
   );
 }

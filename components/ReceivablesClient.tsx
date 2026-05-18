@@ -21,10 +21,15 @@ const columns: ColumnDef<ReceivableRecord>[] = [
 ];
 
 export function ReceivablesClient({ receivables }: { receivables: ReceivableRecord[] }) {
+  const overdueRows = receivables.filter((row) => row.overdueDebt > 0);
+
   return (
-    <>
-      <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} title="Найбільша дебіторка по клієнтах" />
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-2">
+        <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} title="Найбільша дебіторка по клієнтах" />
+        <SimpleBarChart barColor="#fb7185" data={byTop(overdueRows, (row) => row.clientName, (row) => row.overdueDebt, 8)} title="Ризик: найбільша прострочка" />
+      </div>
       <DataTable columns={columns} data={receivables} initialSorting={[{ id: 'totalDebt', desc: true }]} />
-    </>
+    </div>
   );
 }

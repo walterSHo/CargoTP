@@ -26,9 +26,9 @@ export function Navigation() {
           <nav className="flex max-w-[70vw] gap-2 overflow-x-auto pb-1 text-sm font-medium">
             {links.map(([href, label]) => (
               <Link
-                className={`shrink-0 rounded-full border px-4 py-2 transition ${
+                className={`shrink-0 rounded-[12px] border px-4 py-2 transition ${
                   pathname === href
-                    ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white shadow-[0_12px_28px_rgba(78,161,255,0.12)]'
+                    ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                     : 'border-line bg-[rgba(10,18,33,0.72)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
                 }`}
                 href={href}
@@ -42,7 +42,7 @@ export function Navigation() {
       </header>
 
       <aside className="hidden border-r border-line bg-[rgba(6,12,24,0.78)] md:sticky md:top-0 md:flex md:h-screen md:flex-col md:px-5 md:py-6">
-        <div className="rounded-[26px] border border-line bg-[linear-gradient(180deg,rgba(13,23,42,0.92),rgba(9,16,30,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.24)]">
+        <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
           <div className="text-xl font-black tracking-tight text-white">CargoTP</div>
           <div className="mt-1 text-sm text-muted">Sales dashboard</div>
         </div>
@@ -50,9 +50,9 @@ export function Navigation() {
         <nav className="mt-3 flex flex-1 flex-col gap-2 text-sm font-medium">
           {links.map(([href, label]) => (
             <Link
-              className={`group flex items-center justify-between rounded-2xl border px-4 py-3 transition ${
+              className={`group flex items-center justify-between rounded-[14px] border px-4 py-3 transition ${
                 pathname === href
-                  ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white shadow-[0_14px_28px_rgba(78,161,255,0.12)]'
+                  ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                   : 'border-line bg-[rgba(10,18,33,0.62)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
               }`}
               href={href}
