@@ -1,0 +1,9 @@
+{
+  "updatedAt": null,
+  "status": "no_excel_processed",
+  "message": "Нет обработанных данных из data/raw/Олексієнко.xlsx. Запустите npm run process:data после добавления Excel-файла.",
+  "monthlyPlans": [],
+  "sales": [],
+  "groupPlans": [],
+  "receivables": []
+}

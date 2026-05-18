@@ -1,0 +1,12 @@
+{
+  "updatedAt": null,
+  "status": "no_excel_processed",
+  "sourceFiles": [],
+  "sheets": [],
+  "counts": { "sales": 0, "groupPlans": 0, "receivables": 0 },
+  "dateRange": null,
+  "months": [],
+  "unique": { "clients": 0, "clientCodes": 0, "unifiedClientCodes": 0, "brands": 0, "productGroups": 0 },
+  "samples": { "sales": [], "receivables": [], "groupPlans": [] },
+  "message": "Нет обработанных данных из Excel. Production UI не использует demo/fallback данные."
+}
