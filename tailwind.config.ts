@@ -5,8 +5,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        surface: '#f8fafc',
-        ink: '#0f172a'
+        surface: 'var(--surface)',
+        ink: 'var(--ink)',
+        panel: 'var(--panel)',
+        panelAlt: 'var(--panel-alt)',
+        line: 'var(--line)',
+        accent: 'var(--accent)',
+        accentSoft: 'var(--accent-soft)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
+        muted: 'var(--muted)'
       }
     }
   },

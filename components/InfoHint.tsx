@@ -4,7 +4,7 @@ export function InfoHint({ label, explanation }: { label: string; explanation: s
       <span>{label}</span>
       <span
         aria-label={explanation}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-[10px] font-bold text-slate-500"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-line bg-[rgba(78,161,255,0.12)] text-[10px] font-bold text-[var(--accent)]"
         title={explanation}
       >
         i

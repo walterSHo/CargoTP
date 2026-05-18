@@ -10,7 +10,11 @@ export default function ReceivablesPage() {
   const overdue = sum(receivables.map((row) => row.overdueDebt));
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Дебіторська заборгованість</h1>
+      <section className="page-hero">
+        <div className="eyebrow">Debt watch</div>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-white">Дебіторська заборгованість</h1>
+        <p className="mt-3 max-w-2xl text-sm text-muted">Швидкий контроль загальної, простроченої та непростроченої дебіторки з акцентом на найбільш ризикових клієнтах.</p>
+      </section>
       <section className="grid gap-4 md:grid-cols-4">
         <KpiCard title="Загальна дебіторка" value={money(total)} />
         <KpiCard title="Прострочена" value={money(overdue)} />

@@ -6,62 +6,121 @@
     <title>CargoTP Dashboard</title>
     <style>
       :root {
-        color-scheme: light;
-        --bg: #f8fafc;
-        --card: #fff;
-        --ink: #0f172a;
-        --muted: #64748b;
-        --line: #e2e8f0;
-        --blue: #2563eb;
-        --teal: #0f766e;
-        --amber: #d97706;
-        --violet: #7c3aed;
-        --red: #dc2626;
-        --green: #16a34a;
-        --lime: #65a30d;
+        color-scheme: dark;
+        --bg: #08101f;
+        --bg-top: #0d1630;
+        --card: rgba(13, 23, 42, 0.94);
+        --card-2: rgba(18, 30, 53, 0.94);
+        --ink: #e5eefc;
+        --muted: #8da2c7;
+        --line: rgba(148, 163, 184, 0.18);
+        --line-strong: rgba(148, 163, 184, 0.32);
+        --blue: #4ea1ff;
+        --teal: #2dd4bf;
+        --amber: #f59e0b;
+        --violet: #8b5cf6;
+        --red: #fb7185;
+        --green: #34d399;
+        --lime: #a3e635;
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
         background:
-          radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%),
-          radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.1), transparent 28%),
+          radial-gradient(circle at top left, rgba(78, 161, 255, 0.14), transparent 26%),
+          radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 24%),
+          radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 24%),
           var(--bg);
         color: var(--ink);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
       }
       header {
         position: sticky;
         top: 0;
-        z-index: 2;
+        z-index: 8;
         border-bottom: 1px solid var(--line);
-        background: rgba(255,255,255,.92);
-        backdrop-filter: blur(12px);
+        background: rgba(6,12,24,.78);
+        backdrop-filter: blur(16px);
       }
       nav, main { max-width: 1340px; margin: 0 auto; padding: 16px 20px; }
       nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-      nav strong { margin-right: 12px; font-size: 18px; }
+      nav strong { margin-right: 12px; font-size: 18px; color: white; }
       button, select, input { font: inherit; }
       .tab {
         border: 1px solid var(--line);
-        background: white;
+        background: rgba(10, 18, 33, 0.84);
         color: var(--muted);
         border-radius: 999px;
-        padding: 8px 12px;
+        padding: 9px 14px;
         cursor: pointer;
       }
-      .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
-      .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 18px 0; }
+      .tab.active {
+        background: linear-gradient(135deg, rgba(78,161,255,0.3), rgba(45,212,191,0.18));
+        border-color: rgba(78,161,255,0.4);
+        color: white;
+        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.16);
+      }
+      .hero-panel {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 22px 22px 20px;
+        background:
+          linear-gradient(145deg, rgba(15, 25, 45, 0.96), rgba(10, 16, 30, 0.94)),
+          linear-gradient(145deg, rgba(78, 161, 255, 0.08), rgba(45, 212, 191, 0.05));
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+      }
+      .eyebrow {
+        color: var(--blue);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .toolbar {
+        display: grid;
+        gap: 14px;
+        margin: 18px 0;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 18px;
+        background: linear-gradient(180deg, rgba(13, 23, 42, 0.9), rgba(10, 18, 33, 0.9));
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.26);
+      }
+      .toolbar-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 220px minmax(0, 1fr) auto;
+      }
       .toolbar label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; flex: 1 1 220px; min-width: 0; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
       input, select {
         border: 1px solid var(--line);
-        border-radius: 10px;
-        background: white;
-        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(8, 15, 28, 0.9);
+        color: var(--ink);
+        padding: 12px 14px;
         min-width: 0;
         width: 100%;
-        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+      }
+      .mode-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+      .mode-pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(10, 18, 33, 0.82);
+        color: var(--muted);
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .mode-pill.active {
+        border-color: rgba(78, 161, 255, 0.45);
+        background: linear-gradient(135deg, rgba(78,161,255,0.3), rgba(45,212,191,0.18));
+        color: white;
+        box-shadow: 0 14px 28px rgba(78, 161, 255, 0.16);
       }
       h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
       h2 { margin: 0; font-size: 24px; }
@@ -76,17 +135,18 @@
       .card {
         background: var(--card);
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-radius: 24px;
         padding: 18px;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .26);
       }
       .kpi .label { color: var(--muted); font-size: 13px; }
-      .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 800; }
-      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
+      .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 900; color: white; }
+      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, rgba(12,20,36,0.96), rgba(9,16,30,0.96)); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24); }
       .table-wrap.tall { max-height: 30rem; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
-      th { background: #f1f5f9; font-weight: 750; }
+      th { background: rgba(16, 28, 51, 0.95); font-weight: 750; color: var(--ink); }
+      td { color: var(--ink); }
       .table-wrap.tall th { position: sticky; top: 0; z-index: 1; }
       tr:last-child td { border-bottom: 0; }
       .th-sort {
@@ -100,7 +160,7 @@
         font: inherit;
         color: inherit;
       }
-      .sort-mark { font-size: 12px; color: #94a3b8; }
+      .sort-mark { font-size: 12px; color: var(--muted); }
       .hint-inline { display: inline-flex; align-items: center; gap: 8px; }
       .hint-dot {
         display: inline-flex;
@@ -109,32 +169,33 @@
         width: 16px;
         height: 16px;
         border-radius: 999px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--line);
         font-size: 10px;
         font-weight: 700;
-        color: #64748b;
+        color: var(--blue);
+        background: rgba(78, 161, 255, 0.12);
       }
       .bar-list { display: grid; gap: 10px; }
       .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; }
-      .bar-bg { height: 12px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
+      .bar-bg { height: 12px; overflow: hidden; border-radius: 999px; background: rgba(148, 163, 184, 0.16); }
       .bar { height: 100%; border-radius: inherit; background: var(--blue); }
       .status-red { color: var(--red); font-weight: 800; }
       .status-green { color: var(--green); font-weight: 800; }
       .status-lime { color: var(--lime); font-weight: 900; }
       .danger { color: var(--red); }
       .ok { color: var(--green); }
-      .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 16px; background: white; }
+      .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 20px; background: rgba(10,18,33,0.9); color: var(--muted); }
       .small { font-size: 12px; color: var(--muted); }
-      .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; }
+      .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: rgba(78, 161, 255, 0.14); color: #9ecbff; font-size: 12px; font-weight: 700; }
       .expandable-row { cursor: pointer; }
-      .expandable-row:hover { background: #f8fafc; }
+      .expandable-row:hover { background: rgba(78, 161, 255, 0.06); }
       .expand-card {
         display: grid;
         gap: 8px;
         padding: 14px 16px;
         border-radius: 14px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: rgba(15, 25, 45, 0.92);
+        border: 1px solid var(--line);
       }
       .chips { display: flex; flex-wrap: wrap; gap: 8px; }
       .chip {
@@ -142,8 +203,8 @@
         align-items: center;
         padding: 6px 10px;
         border-radius: 999px;
-        background: #eff6ff;
-        color: #1d4ed8;
+        background: rgba(78, 161, 255, 0.14);
+        color: #9ecbff;
         font-size: 12px;
         font-weight: 700;
       }
@@ -160,8 +221,8 @@
         position: absolute;
         inset: 32px;
         border-radius: 50%;
-        background: white;
-        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9);
+        background: rgba(10, 18, 33, 0.96);
+        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
       }
       .pie-center {
         position: absolute;
@@ -182,13 +243,18 @@
       .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
       .legend-swatch { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
       .line-chart { width: 100%; height: 250px; }
-      .line-chart text { font-size: 11px; fill: #64748b; }
+      .line-chart text { font-size: 11px; fill: var(--muted); }
+      .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      .insight { border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: var(--card-2); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2); }
+      .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+      .insight .big { margin-top: 8px; color: white; font-size: 28px; font-weight: 900; }
+      .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
       @media (max-width: 860px) {
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
         nav, main { padding: 14px 14px; }
         .toolbar { gap: 10px; }
-        .toolbar label { flex-basis: 100%; }
+        .toolbar-grid { grid-template-columns: 1fr; }
         th, td { padding: 10px 10px; }
       }
     </style>
@@ -206,13 +272,27 @@
     </header>
 
     <main>
-      <h1>Торговий дашборд</h1>
-      <p class="muted" id="updated">Завантаження даних...</p>
+      <section class="hero-panel">
+        <div class="eyebrow">Dark operations mode</div>
+        <h1>Торговий дашборд</h1>
+        <p class="muted" id="updated">Завантаження даних...</p>
+      </section>
 
       <div class="toolbar">
-        <label>Місяць <select id="month"></select></label>
-        <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
-        <label>Пошук <input id="search" list="client-search-suggestions" placeholder="Код клієнта, назва, бренд..." /></label>
+        <div class="toolbar-grid">
+          <label>Місяць <select id="month"></select></label>
+          <label>Пошук <input id="search" list="client-search-suggestions" placeholder="Фільтр за активним режимом..." /></label>
+          <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
+        </div>
+        <div>
+          <div class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Режим пошуку</div>
+          <div class="mode-pills">
+            <button class="mode-pill active" data-search-mode="code" type="button">Код</button>
+            <button class="mode-pill" data-search-mode="client" type="button">Клієнт</button>
+            <button class="mode-pill" data-search-mode="brand" type="button">Бренд</button>
+            <button class="mode-pill" data-search-mode="group" type="button">Група</button>
+          </div>
+        </div>
       </div>
       <datalist id="client-search-suggestions"></datalist>
 
@@ -230,6 +310,7 @@
         data: null,
         month: '',
         search: '',
+        searchMode: 'code',
         grossPlan: 0,
         clientSuggestions: [],
         tableSorts: {
@@ -259,12 +340,17 @@
       function matchesSearch(row) {
         const normalizedSearch = String(state.search || '').toLowerCase().trim();
         if (!normalizedSearch) return true;
-        const tokens = normalizedSearch
-          .split(/\s+[—-]\s+|,\s*/)
-          .map((part) => part.trim())
-          .filter(Boolean);
-        const haystack = JSON.stringify(row).toLowerCase();
-        return tokens.every((token) => haystack.includes(token));
+        if (state.searchMode === 'code') return `${row.clientCode || ''} ${row.unifiedClientCode || ''}`.toLowerCase().includes(normalizedSearch);
+        if (state.searchMode === 'client') return `${row.clientName || ''}`.toLowerCase().includes(normalizedSearch);
+        if (state.searchMode === 'brand') return `${row.brand || ''}`.toLowerCase().includes(normalizedSearch);
+        return `${row.productGroup || ''}`.toLowerCase().includes(normalizedSearch);
+      }
+      function matchesReceivableSearch(row) {
+        const normalizedSearch = String(state.search || '').toLowerCase().trim();
+        if (!normalizedSearch) return true;
+        if (state.searchMode === 'code') return `${row.clientCode || ''} ${row.unifiedClientCode || ''}`.toLowerCase().includes(normalizedSearch);
+        if (state.searchMode === 'client') return `${row.clientName || ''}`.toLowerCase().includes(normalizedSearch);
+        return true;
       }
       const isTireGroup = (value) => {
         const normalized = normalizeProductGroup(value);
@@ -320,14 +406,31 @@
           .slice(0, limit);
       }
 
-      function collectClientSuggestions() {
-        const map = new Map();
-        [...state.data.sales, ...state.data.receivables].forEach((row) => {
-          if (row.clientCode) map.set(`code:${row.clientCode}`, { value: row.clientCode, label: row.clientName || row.clientCode });
-          if (row.unifiedClientCode) map.set(`unified:${row.unifiedClientCode}`, { value: row.unifiedClientCode, label: row.clientName || row.unifiedClientCode });
-          if (row.clientName) map.set(`name:${row.clientName}`, { value: row.clientName, label: 'Клієнт' });
-        });
-        return [...map.values()].sort((a, b) => a.value.localeCompare(b.value, 'uk', { numeric: true, sensitivity: 'base' })).slice(0, 400);
+      function collectClientSuggestions(mode = state.searchMode) {
+        const values = new Set();
+        if (mode === 'code') {
+          [...state.data.sales, ...state.data.receivables].forEach((row) => {
+            if (row.clientCode) values.add(row.clientCode);
+            if (row.unifiedClientCode) values.add(row.unifiedClientCode);
+          });
+        }
+        if (mode === 'client') [...state.data.sales, ...state.data.receivables].forEach((row) => row.clientName && values.add(row.clientName));
+        if (mode === 'brand') state.data.sales.forEach((row) => row.brand && values.add(row.brand));
+        if (mode === 'group') state.data.sales.forEach((row) => row.productGroup && values.add(row.productGroup));
+        return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' })).slice(0, 300);
+      }
+      function syncSearchSuggestions() {
+        state.clientSuggestions = collectClientSuggestions(state.searchMode);
+        document.getElementById('client-search-suggestions').innerHTML = state.clientSuggestions
+          .map((entry) => `<option value="${escapeHtml(entry)}"></option>`)
+          .join('');
+        const modeLabel = {
+          code: 'кодом клієнта',
+          client: 'назвою клієнта',
+          brand: 'брендом',
+          group: 'товарною групою'
+        };
+        document.getElementById('search').placeholder = `Пошук за ${modeLabel[state.searchMode]}...`;
       }
 
       function dailySalesSeries(rows) {
@@ -588,7 +691,7 @@
 
       function renderOverview() {
         const sales = filteredSales();
-        const receivables = state.data.receivables.filter((row) => matchesSearch(row));
+        const receivables = state.data.receivables.filter((row) => matchesReceivableSearch(row));
         const total = sum(sales, (row) => row.amountEur);
         const planTurnover = sum(sales.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
@@ -601,9 +704,19 @@
           .sort((a, b) => b.share - a.share)
           .map((row) => ({ name: row.productGroup, value: row.share }))
           .slice(0, 10);
+        const activeClients = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
+        const avgDailyTurnover = daily.length ? avg(daily, (row) => row.turnover) : 0;
+        const topClientShare = topClients[0]?.sharePercent || 0;
+        const topPlanGroup = groupShareTargets[0];
 
         document.getElementById('overview').innerHTML = `
           <div class="section-stack">
+            <div class="insight-grid">
+              <div class="insight"><div class="meta">Активні клієнти</div><div class="big">${escapeHtml(String(activeClients))}</div><div class="copy">Кількість клієнтів у поточній вибірці після фільтрації.</div></div>
+              <div class="insight"><div class="meta">Середній день</div><div class="big">${escapeHtml(money(avgDailyTurnover))}</div><div class="copy">Середній денний оборот за активні дні місяця.</div></div>
+              <div class="insight"><div class="meta">Концентрація</div><div class="big">${escapeHtml(pct(topClientShare))}</div><div class="copy">Частка найбільшого клієнта у місячному обороті.</div></div>
+              <div class="insight"><div class="meta">Ключова група</div><div class="big" style="font-size:22px;">${escapeHtml(topPlanGroup?.name || '—')}</div><div class="copy">${escapeHtml(topPlanGroup ? `Цільова доля: ${pct(topPlanGroup.value)}` : 'Немає планових долей груп.')}</div></div>
+            </div>
             <div class="grid">
               ${kpi('Загальний оборот', money(total))}
               ${kpi('Оборот для валового плану', money(planTurnover), 'Шини виключені')}
@@ -737,7 +850,7 @@
       }
 
       function renderReceivables() {
-        const rows = state.data.receivables.filter((row) => matchesSearch(row));
+        const rows = state.data.receivables.filter((row) => matchesReceivableSearch(row));
         const total = sum(rows, (row) => row.totalDebt);
         const overdue = sum(rows, (row) => row.overdueDebt);
         document.getElementById('receivables').innerHTML = `
@@ -826,10 +939,7 @@
         state.data.groupPlans = Array.isArray(state.data.groupPlans) ? state.data.groupPlans : [];
         state.data.receivables = Array.isArray(state.data.receivables) ? state.data.receivables : [];
         state.data.monthlyPlans = Array.isArray(state.data.monthlyPlans) ? state.data.monthlyPlans : [];
-        state.clientSuggestions = collectClientSuggestions();
-        document.getElementById('client-search-suggestions').innerHTML = state.clientSuggestions
-          .map((entry) => `<option value="${escapeHtml(entry.value)}" label="${escapeHtml(entry.label)}"></option>`)
-          .join('');
+        syncSearchSuggestions();
 
         const months = [...new Set(state.data.sales.map((row) => monthOf(row.date)).filter((month) => /^\d{4}-\d{2}$/.test(month)))].sort().reverse();
         const expectedSource = 'data/raw/Олексієнко.xlsx';
@@ -890,6 +1000,14 @@
         document.querySelectorAll('.tab,.section').forEach((element) => element.classList.remove('active'));
         button.classList.add('active');
         document.getElementById(button.dataset.tab).classList.add('active');
+      }));
+
+      document.querySelectorAll('[data-search-mode]').forEach((button) => button.addEventListener('click', () => {
+        state.searchMode = button.dataset.searchMode;
+        document.querySelectorAll('[data-search-mode]').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        syncSearchSuggestions();
+        renderAll();
       }));
 
       document.getElementById('month').addEventListener('change', (event) => {
