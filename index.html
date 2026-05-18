@@ -3,41 +3,193 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Trade Rep Dashboard — how to open</title>
+    <title>Trade Rep Dashboard</title>
     <style>
-      body { font-family: Inter, Arial, sans-serif; margin: 0; background: #f8fafc; color: #0f172a; }
-      main { max-width: 860px; margin: 48px auto; padding: 0 20px; }
-      .card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; box-shadow: 0 10px 24px rgba(15, 23, 42, .06); }
-      code, pre { background: #0f172a; color: #e2e8f0; border-radius: 10px; }
-      code { padding: 2px 6px; }
-      pre { padding: 16px; overflow-x: auto; }
-      a { color: #2563eb; font-weight: 700; }
-      li { margin: 8px 0; }
+      :root { color-scheme: light; --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --blue:#2563eb; --green:#16a34a; --lime:#65a30d; --red:#dc2626; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+      header { position: sticky; top: 0; z-index: 2; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.92); backdrop-filter: blur(12px); }
+      nav, main { max-width: 1280px; margin: 0 auto; padding: 16px 20px; }
+      nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      nav strong { margin-right: 12px; font-size: 18px; }
+      button, select, input { font: inherit; }
+      .tab { border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+      .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
+      .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 18px 0; }
+      label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+      input, select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 10px 12px; min-width: 170px; }
+      h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
+      h2 { margin: 28px 0 12px; }
+      .muted { color: var(--muted); }
+      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 10px 26px rgba(15, 23, 42, .06); }
+      .kpi .label { color: var(--muted); font-size: 13px; }
+      .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 800; }
+      .section { display: none; }
+      .section.active { display: block; }
+      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      th { background: #f1f5f9; font-weight: 750; }
+      tr:last-child td { border-bottom: 0; }
+      .bar-list { display: grid; gap: 10px; }
+      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; }
+      .bar-bg { height: 12px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
+      .bar { height: 100%; border-radius: inherit; background: var(--blue); }
+      .status-red { color: var(--red); font-weight: 800; }
+      .status-green { color: var(--green); font-weight: 800; }
+      .status-lime { color: var(--lime); font-weight: 900; }
+      .danger { color: var(--red); }
+      .ok { color: var(--green); }
+      .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 16px; background: white; }
     </style>
   </head>
   <body>
+    <header>
+      <nav>
+        <strong>Trade Rep Dashboard</strong>
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="sales">Sales</button>
+        <button class="tab" data-tab="groups">Group Plan</button>
+        <button class="tab" data-tab="receivables">Receivables</button>
+        <button class="tab" data-tab="tires">Tires</button>
+      </nav>
+    </header>
+
     <main>
-      <section class="card">
-        <h1>Trade Rep Dashboard</h1>
-        <p>Это Next.js-приложение, а не один статический HTML-файл. HTML генерируется локальным dev-сервером.</p>
-        <h2>Как открыть</h2>
-        <ol>
-          <li>Установите зависимости: <code>npm install</code></li>
-          <li>Запустите сайт: <code>npm run dev</code></li>
-          <li>Откройте: <a href="http://localhost:3000">http://localhost:3000</a></li>
-        </ol>
-        <pre><code>npm install
-npm run dev</code></pre>
-        <h2>Где код страниц</h2>
-        <ul>
-          <li><code>app/page.tsx</code> — главная Dashboard Overview</li>
-          <li><code>app/sales/page.tsx</code> — Sales</li>
-          <li><code>app/group-plan/page.tsx</code> — Group Plan</li>
-          <li><code>app/receivables/page.tsx</code> — Receivables</li>
-          <li><code>app/tires/page.tsx</code> — Tire Analytics</li>
-          <li><code>app/settings/page.tsx</code> — Settings</li>
-        </ul>
-      </section>
+      <h1>Торговый дашборд</h1>
+      <p class="muted" id="updated">Загрузка данных...</p>
+
+      <div class="toolbar">
+        <label>Месяц <select id="month"></select></label>
+        <label>Валовый план месяца <input id="grossPlan" type="number" min="0" step="100" /></label>
+        <label>Поиск <input id="search" placeholder="Клиент, бренд, группа..." /></label>
+      </div>
+
+      <section class="section active" id="overview"></section>
+      <section class="section" id="sales"></section>
+      <section class="section" id="groups"></section>
+      <section class="section" id="receivables"></section>
+      <section class="section" id="tires"></section>
     </main>
+
+    <script>
+      const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
+      let state = { data: null, month: '', search: '', grossPlan: 0 };
+
+      const money = (v) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(v || 0));
+      const pct = (v) => `${Number(v || 0).toFixed(1)}%`;
+      const sum = (rows, get) => rows.reduce((a, r) => a + Number(get(r) || 0), 0);
+      const avg = (rows, get) => rows.length ? sum(rows, get) / rows.length : 0;
+      const monthOf = (date) => String(date || '').slice(0, 7);
+      const normalizeProductGroup = (value) => String(value || '').trim().toLowerCase().replace(/ё/g, 'е').replace(/[ії]/g, 'и').replace(/\s+/g, ' ');
+      const isTireGroup = (value) => {
+        const v = normalizeProductGroup(value);
+        return v.includes('шина') || v.includes('шины') || v.includes('шин') || v.includes('tire') || v.includes('tyre');
+      };
+      const byTop = (rows, key, val, limit = 10) => {
+        const map = new Map();
+        rows.forEach((r) => map.set(key(r) || '—', (map.get(key(r) || '—') || 0) + Number(val(r) || 0)));
+        return [...map.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, limit);
+      };
+      const filteredSales = () => state.data.sales.filter((r) => monthOf(r.date) === state.month && JSON.stringify(r).toLowerCase().includes(state.search.toLowerCase()));
+
+      function kpi(title, value, hint = '') {
+        return `<article class="card kpi"><div class="label">${title}</div><div class="value">${value}</div>${hint ? `<div class="muted">${hint}</div>` : ''}</article>`;
+      }
+      function table(rows, cols) {
+        if (!rows.length) return '<div class="empty">Нет данных</div>';
+        return `<div class="table-wrap"><table><thead><tr>${cols.map(c => `<th>${c.title}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${c.render ? c.render(r) : (r[c.key] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      }
+      function bars(rows) {
+        const max = Math.max(...rows.map(r => r.value), 1);
+        return `<div class="card bar-list">${rows.map(r => `<div class="bar-row"><div>${r.name}</div><div class="bar-bg"><div class="bar" style="width:${Math.max(3, r.value / max * 100)}%"></div></div><strong>${money(r.value)}</strong></div>`).join('')}</div>`;
+      }
+      function completionClass(v) { return v < 95 ? 'status-red' : v <= 100 ? 'status-green' : 'status-lime'; }
+
+      function renderOverview() {
+        const sales = filteredSales();
+        const receivables = state.data.receivables;
+        const total = sum(sales, r => r.amountEur);
+        const planTurnover = sum(sales.filter(r => !isTireGroup(r.productGroup) && normalizeProductGroup(r.productGroup) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP)), r => r.amountEur);
+        const grossPlan = Number(state.grossPlan || 0);
+        document.getElementById('overview').innerHTML = `
+          <div class="grid">
+            ${kpi('Общий оборот', money(total))}
+            ${kpi('Оборот для валового плана', money(planTurnover), 'Шины исключены')}
+            ${kpi('Валовый план месяца', money(grossPlan), 'Ручной ввод')}
+            ${kpi('% выполнения валового плана', pct(grossPlan ? planTurnover / grossPlan * 100 : 0))}
+            ${kpi('Средняя нетто-маржа', pct(avg(sales, r => r.netMargin)))}
+            ${kpi('Средний % скидки', pct(avg(sales, r => r.discountPercent)))}
+            ${kpi('Просроченная дебиторка', money(sum(receivables, r => r.overdueDebt)))}
+            ${kpi('Непросроченная дебиторка', money(sum(receivables, r => r.currentDebt)))}
+          </div>
+          <h2>Топ групп товаров</h2>${bars(byTop(sales, r => r.productGroup, r => r.amountEur, 8))}`;
+      }
+      function renderSales() {
+        const rows = filteredSales();
+        document.getElementById('sales').innerHTML = `<h2>Продажи</h2>${bars(byTop(rows, r => r.clientName, r => r.amountEur, 8))}${table(rows, [
+          {title:'Дата', key:'date'}, {title:'Единый код', key:'unifiedClientCode'}, {title:'Код клиента', key:'clientCode'}, {title:'Клиент', key:'clientName'},
+          {title:'Бренд', key:'brand'}, {title:'Группа', key:'productGroup'}, {title:'Товар', key:'productCode'}, {title:'Сумма', render:r=>money(r.amountEur)}, {title:'Маржа', render:r=>pct(r.netMargin)}, {title:'Скидка', render:r=>pct(r.discountPercent)}
+        ])}`;
+      }
+      function renderGroups() {
+        const sales = filteredSales();
+        const totalPlan = sum(state.data.groupPlans, r => r.planAmount);
+        const rows = state.data.groupPlans.map(g => {
+          const factFromSales = sum(sales.filter(s => normalizeProductGroup(s.productGroup) === normalizeProductGroup(g.productGroup)), s => s.amountEur);
+          return { ...g, factFromSales, variance: factFromSales - g.factAmount, share: totalPlan ? g.planAmount / totalPlan * 100 : 0 };
+        });
+        document.getElementById('groups').innerHTML = `<h2>План групп</h2>${table(rows, [
+          {title:'Группа', key:'productGroup'}, {title:'План %', render:r=>pct(r.planPercent)}, {title:'Доля от плана', render:r=>pct(r.share)}, {title:'План', render:r=>money(r.planAmount)},
+          {title:'Факт из файла', render:r=>money(r.factAmount)}, {title:'Факт из продаж', render:r=>money(r.factFromSales)}, {title:'Отклонение', render:r=>money(r.variance)}, {title:'% выполнения', render:r=>`<span class="${completionClass(r.completionPercent)}">${pct(r.completionPercent)}</span>`}
+        ])}`;
+      }
+      function renderReceivables() {
+        const rows = state.data.receivables.filter(r => JSON.stringify(r).toLowerCase().includes(state.search.toLowerCase())).sort((a,b)=>b.totalDebt-a.totalDebt);
+        const total = sum(rows, r => r.totalDebt), overdue = sum(rows, r => r.overdueDebt);
+        document.getElementById('receivables').innerHTML = `<div class="grid">${kpi('Общая дебиторка', money(total))}${kpi('Просроченная', money(overdue))}${kpi('Доля просрочки', pct(total ? overdue / total * 100 : 0))}</div><h2>Клиенты</h2>${table(rows, [
+          {title:'Клиент', key:'clientName'}, {title:'Всего', render:r=>money(r.totalDebt)}, {title:'Непросроченная', render:r=>money(r.currentDebt)}, {title:'Просроченная', render:r=>`<span class="${r.overdueDebt ? 'danger' : 'ok'}">${money(r.overdueDebt)}</span>`},
+          {title:'0–10', render:r=>money(r.bucket0To10)}, {title:'11–20', render:r=>money(r.bucket11To20)}, {title:'21–30', render:r=>money(r.bucket21To30)}, {title:'31+', render:r=>money(r.bucket31Plus)}
+        ])}`;
+      }
+      function renderTires() {
+        const rows = filteredSales().filter(r => isTireGroup(r.productGroup));
+        const problematic = rows.map(s => ({ sale:s, debt:(state.data.receivables.find(r => r.clientName === s.clientName || r.clientCode === s.clientCode)?.overdueDebt || 0) })).filter(r => r.debt > 0);
+        document.getElementById('tires').innerHTML = `<div class="grid">${kpi('Оборот шин', money(sum(rows, r=>r.amountEur)))}${kpi('Клиенты шин', String(new Set(rows.map(r=>r.clientName)).size))}${kpi('Средняя маржа шин', pct(avg(rows, r=>r.netMargin)))}${kpi('Средняя скидка шин', pct(avg(rows, r=>r.discountPercent)))}</div><h2>Топ клиентов шин</h2>${bars(byTop(rows, r=>r.clientName, r=>r.amountEur, 8))}<h2>Топ брендов шин</h2>${bars(byTop(rows, r=>r.brand || 'Без бренда', r=>r.amountEur, 8))}<h2>Шины + проблемная дебиторка</h2>${table(problematic, [{title:'Клиент', render:r=>r.sale.clientName}, {title:'Оборот шин', render:r=>money(r.sale.amountEur)}, {title:'Просроченная дебиторка', render:r=>money(r.debt)}])}`;
+      }
+      function renderAll() { renderOverview(); renderSales(); renderGroups(); renderReceivables(); renderTires(); }
+
+      async function loadData() {
+        try {
+          const response = await fetch('data/processed/dashboard.json', { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          state.data = await response.json();
+        } catch (error) {
+          document.getElementById('overview').innerHTML = `<div class="empty"><strong>Не удалось загрузить data/processed/dashboard.json.</strong><br>На GitHub Pages это работает сразу. Если открываете локально и браузер блокирует file:// fetch, запустите любой статический сервер: <code>python3 -m http.server</code>.</div>`;
+          document.getElementById('updated').textContent = `Ошибка загрузки данных: ${error.message}`;
+          return;
+        }
+        const months = [...new Set([...state.data.sales.map(r => monthOf(r.date)), ...state.data.monthlyPlans.map(r => r.month)])].filter(Boolean).sort().reverse();
+        state.month = months[0] || new Date().toISOString().slice(0, 7);
+        const monthSelect = document.getElementById('month');
+        monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+        monthSelect.value = state.month;
+        state.grossPlan = state.data.monthlyPlans.find(p => p.month === state.month)?.grossPlan || 0;
+        document.getElementById('grossPlan').value = state.grossPlan;
+        document.getElementById('updated').textContent = `Данные обновлены: ${new Date(state.data.updatedAt).toLocaleString('ru-RU')}`;
+        renderAll();
+      }
+
+      document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab,.section').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      }));
+      document.getElementById('month').addEventListener('change', e => { state.month = e.target.value; state.grossPlan = state.data.monthlyPlans.find(p => p.month === state.month)?.grossPlan || 0; document.getElementById('grossPlan').value = state.grossPlan; renderAll(); });
+      document.getElementById('grossPlan').addEventListener('input', e => { state.grossPlan = Number(e.target.value || 0); renderAll(); });
+      document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; renderAll(); });
+      loadData();
+    </script>
   </body>
 </html>

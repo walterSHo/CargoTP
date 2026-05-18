@@ -5,27 +5,32 @@
 
 ## Как открыть дашборд
 
-Это не один готовый `dashboard.html`, а Next.js-приложение. HTML генерируется сервером разработки.
+Да, теперь можно просто открыть `index.html`: это обычный статический HTML-дашборд для GitHub Pages.
+
+### GitHub Pages
+
+1. В настройках репозитория откройте **Settings → Pages**.
+2. Source: **Deploy from a branch**.
+3. Branch: `main` / folder: `/root`.
+4. Откройте выданный GitHub Pages URL — загрузится `index.html`.
+
+### Локально
+
+Самый простой вариант — открыть `index.html` двойным кликом.
+
+Если браузер заблокирует чтение `data/processed/dashboard.json` из-за `file://`, запустите статический сервер из корня проекта:
 
 ```bash
-npm install
-npm run dev
+python3 -m http.server 8000
 ```
 
-После запуска откройте в браузере:
+И откройте:
 
 ```text
-http://localhost:3000
+http://localhost:8000
 ```
 
-Файл `index.html` в корне — только короткая инструкция для открытия проекта двойным кликом. Сам дашборд находится в `app/`:
-
-- `app/page.tsx` — главная Dashboard Overview;
-- `app/sales/page.tsx` — продажи;
-- `app/group-plan/page.tsx` — план групп;
-- `app/receivables/page.tsx` — дебиторка;
-- `app/tires/page.tsx` — аналитика шин;
-- `app/settings/page.tsx` — настройки валового плана.
+Next.js-код в `app/` оставлен как расширяемая версия, но для GitHub Pages достаточно корневого `index.html` + `data/processed/*.json`.
 
 ## Дерево проекта
 
