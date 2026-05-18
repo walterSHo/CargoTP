@@ -238,7 +238,6 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
           columns={gapColumns()}
           data={groupGaps}
           initialSorting={[{ id: 'missingPlanShare', desc: true }, { id: 'turnover', desc: true }]}
-          maxHeightClassName="max-h-[30rem]"
           renderExpandedRow={(row) => (
             <div className="soft-panel space-y-3 p-4">
               <div className="text-sm font-semibold text-white">{row.clientName} ({row.clientCode || row.unifiedClientCode || 'без коду'})</div>

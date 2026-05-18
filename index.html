@@ -315,13 +315,16 @@
       .pie-center {
         position: absolute;
         inset: 0;
-        display: grid;
-        place-items: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         z-index: 1;
-        font-weight: 700;
       }
-      .pie-center span { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+      .pie-center-stack { display: grid; gap: 4px; justify-items: center; line-height: 1.1; }
+      .pie-center-value { color: white; font-size: 22px; font-weight: 900; }
+      .pie-center-divider,
+      .pie-center-label { color: var(--muted); font-size: 12px; font-weight: 700; }
       .legend-list { display: grid; gap: 10px; }
       .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
       .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -758,7 +761,13 @@
         return `
           <div class="card pie-wrap">
             <div class="pie-chart" style="background: conic-gradient(${gradient});">
-              <div class="pie-center">${escapeHtml(money(total))}<span>${escapeHtml(centerTitle)}</span></div>
+              <div class="pie-center">
+                <div class="pie-center-stack">
+                  <div class="pie-center-value">${escapeHtml(money(total))}</div>
+                  <div class="pie-center-divider">-</div>
+                  <div class="pie-center-label">${escapeHtml(centerTitle)}</div>
+                </div>
+              </div>
             </div>
             <div class="legend-list">
               ${rows.map((row, index) => `
@@ -932,7 +941,6 @@
                 }
               }
             ], {
-              maxHeight: true,
               rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName,
               expandContent: (row) => `
                 <div class="expand-card">

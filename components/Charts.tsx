@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Label, Legend, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { money, percent } from '@/lib/format';
 
 const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
@@ -50,16 +50,36 @@ export function SimpleBarChart({
 }
 
 export function SimplePieChart({ data, title }: { data: Array<{ name: string; value: number }>; title?: string }) {
+  const total = data.reduce((sum, row) => sum + row.value, 0);
   return (
     <ChartShell title={title}>
       <ResponsiveContainer height="100%" width="100%">
         <PieChart>
           <Pie cx="50%" cy="50%" data={data} dataKey="value" innerRadius={52} nameKey="name" outerRadius={92} paddingAngle={2}>
             {data.map((entry, index) => <Cell fill={COLORS[index % COLORS.length]} key={`${entry.name}-${index}`} />)}
+            <Label
+              content={({ viewBox }) => {
+                if (!viewBox || !('cx' in viewBox) || !('cy' in viewBox)) return null;
+                return (
+                  <g>
+                    <text fill="#f1f5ff" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={viewBox.cy - 16}>
+                      {money(total)}
+                    </text>
+                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={viewBox.cy + 2}>
+                      -
+                    </text>
+                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={viewBox.cy + 20}>
+                      {title ?? 'Структура'}
+                    </text>
+                  </g>
+                );
+              }}
+              position="center"
+            />
           </Pie>
           <Tooltip
             contentStyle={{ background: 'rgba(8,15,28,0.96)', border: '1px solid rgba(148,163,184,0.18)', borderRadius: '16px', color: '#e5eefc' }}
-            formatter={(value: number, _name, item) => [`${money(Number(value))} (${percent((Number(value) / Math.max(data.reduce((sum, row) => sum + row.value, 0), 1)) * 100)})`, item.payload?.name ?? '']}
+            formatter={(value: number, _name, item) => [`${money(Number(value))} (${percent((Number(value) / Math.max(total, 1)) * 100)})`, item.payload?.name ?? '']}
             labelStyle={{ color: '#8da2c7' }}
           />
           <Legend />
