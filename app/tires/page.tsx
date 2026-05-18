@@ -1,13 +1,12 @@
 import { TiresClient } from '@/components/TiresClient';
 import { KpiCard } from '@/components/KpiCard';
-import { tireAnalytics } from '@/lib/analytics';
-import { DEFAULT_MONTH } from '@/lib/constants';
+import { latestDataMonth, tireAnalytics } from '@/lib/analytics';
 import { readDashboardData } from '@/lib/data';
 import { money, percent } from '@/lib/format';
 
 export default function TiresPage() {
   const data = readDashboardData();
-  const summary = tireAnalytics(data.sales, data.receivables, DEFAULT_MONTH);
+  const summary = tireAnalytics(data.sales, data.receivables, latestDataMonth(data.sales));
   return (
     <div className="space-y-6">
       <div>

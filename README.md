@@ -52,6 +52,27 @@ data/processed/              # normalized JSON for dashboard
 - SheetJS/xlsx
 - grammY Telegram bot
 
+
+## Audit: защита от demo/fake данных
+
+Проблема была в том, что в production JSON лежали seed/demo строки (`Авто Плюс`, `Brand A`, тестовые коды и суммы), а UI читал их как реальные. Сейчас production-поток исправлен:
+
+- `data/processed/*.json` больше не содержит seed rows;
+- если Excel не обработан, `index.html` показывает «Нет данных из Excel», а не фальшивые KPI;
+- `scripts/process-data.ts` падает с ошибкой, если не найден Excel, sales rows или валидные даты;
+- месяц по умолчанию строится только из дат parsed sales rows;
+- `monthly-plans.json` не добавляет месяцы в month selector;
+- `npm run audit:data` печатает counts, месяцы, unique clients/codes/brands/groups и первые 20 строк каждого набора, а также падает, если в processed JSON найдены известные demo-сущности.
+
+Проверка после загрузки реального файла:
+
+```bash
+npm run process:data
+npm run audit:data
+```
+
+Источник правды для production UI — только JSON, сгенерированные из Excel в `data/raw/` через `npm run process:data`.
+
 ## Реальный Excel-файл
 
 Эталонный файл: `data/raw/Олексієнко.xlsx`.
@@ -178,7 +199,7 @@ npm run process:data
 npm run dev
 ```
 
-Если реального Excel-файла еще нет, UI использует mock JSON из `data/processed/`.
+Если реального Excel-файла еще нет или pipeline не запускался, UI показывает явный статус «Нет данных» и не подставляет тестовые строки.
 
 ## Telegram upload flow
 

@@ -1,24 +1,9 @@
 {
-  "updatedAt": "2026-05-18T00:00:00.000Z",
-  "monthlyPlans": [
-    { "month": "2026-05", "grossPlan": 163000 },
-    { "month": "2026-06", "grossPlan": 175000 }
-  ],
-  "sales": [
-    { "date": "2026-05-02", "unifiedClientCode": "U-100", "clientCode": "C-100-A", "clientName": "Авто Плюс", "brand": "Brand A", "productGroup": "Масла", "productCode": "P-001", "amountEur": 42000, "netMargin": 18, "discountPercent": 4 },
-    { "date": "2026-05-04", "unifiedClientCode": "U-100", "clientCode": "C-100-B", "clientName": "Авто Плюс Склад", "brand": "Brand B", "productGroup": "Автомобільна Шина", "productCode": "P-002", "amountEur": 31000, "netMargin": 11, "discountPercent": 7 },
-    { "date": "2026-05-08", "unifiedClientCode": "U-200", "clientCode": "C-200", "clientName": "Трак Сервис", "brand": "Brand A", "productGroup": "Фильтры", "productCode": "P-003", "amountEur": 58000, "netMargin": 22, "discountPercent": 3 },
-    { "date": "2026-05-12", "unifiedClientCode": "U-300", "clientCode": "C-300", "clientName": "Логистик Груп", "brand": "Brand C", "productGroup": "Аккумуляторы", "productCode": "P-004", "amountEur": 36500, "netMargin": 16, "discountPercent": 5 }
-  ],
-  "groupPlans": [
-    { "productGroup": "Масла", "planPercent": 25, "planAmount": 40000, "factAmount": 41000, "completionPercent": 102.5, "netPercent": 18 },
-    { "productGroup": "Фильтры", "planPercent": 35, "planAmount": 56000, "factAmount": 57500, "completionPercent": 102.7, "netPercent": 22 },
-    { "productGroup": "Аккумуляторы", "planPercent": 20, "planAmount": 32000, "factAmount": 35000, "completionPercent": 109.4, "netPercent": 16 },
-    { "productGroup": "Автомобільна Шина", "planPercent": 20, "planAmount": 32000, "factAmount": 31000, "completionPercent": 96.9, "netPercent": 11 }
-  ],
-  "receivables": [
-    { "unifiedClientCode": "U-100", "clientCode": "C-100-A", "clientName": "Авто Плюс", "totalDebt": 22000, "currentDebt": 14000, "overdueDebt": 8000, "bucket0To10": 5000, "bucket11To20": 3000, "bucket21To30": 0, "bucket31Plus": 0 },
-    { "unifiedClientCode": "U-200", "clientCode": "C-200", "clientName": "Трак Сервис", "totalDebt": 18500, "currentDebt": 18500, "overdueDebt": 0, "bucket0To10": 0, "bucket11To20": 0, "bucket21To30": 0, "bucket31Plus": 0 },
-    { "unifiedClientCode": "U-300", "clientCode": "C-300", "clientName": "Логистик Груп", "totalDebt": 34500, "currentDebt": 15000, "overdueDebt": 19500, "bucket0To10": 7000, "bucket11To20": 5000, "bucket21To30": 4500, "bucket31Plus": 3000 }
-  ]
+  "updatedAt": null,
+  "status": "no_excel_processed",
+  "message": "Нет обработанных данных из data/raw/Олексієнко.xlsx. Запустите npm run process:data после добавления Excel-файла.",
+  "monthlyPlans": [],
+  "sales": [],
+  "groupPlans": [],
+  "receivables": []
 }

@@ -170,14 +170,24 @@
           document.getElementById('updated').textContent = `Ошибка загрузки данных: ${error.message}`;
           return;
         }
-        const months = [...new Set([...state.data.sales.map(r => monthOf(r.date)), ...state.data.monthlyPlans.map(r => r.month)])].filter(Boolean).sort().reverse();
-        state.month = months[0] || new Date().toISOString().slice(0, 7);
+        state.data.sales = Array.isArray(state.data.sales) ? state.data.sales : [];
+        state.data.groupPlans = Array.isArray(state.data.groupPlans) ? state.data.groupPlans : [];
+        state.data.receivables = Array.isArray(state.data.receivables) ? state.data.receivables : [];
+        state.data.monthlyPlans = Array.isArray(state.data.monthlyPlans) ? state.data.monthlyPlans : [];
+        const months = [...new Set(state.data.sales.map(r => monthOf(r.date)).filter(m => /^\d{4}-\d{2}$/.test(m)))].sort().reverse();
+        if (!state.data.sales.length || !months.length) {
+          const message = state.data.message || 'Нет sales rows, полученных из Excel. UI не показывает demo/fallback данные.';
+          document.getElementById('updated').textContent = 'Нет обработанных Excel-данных';
+          document.querySelectorAll('.section').forEach(el => { el.innerHTML = `<div class="empty"><strong>Нет данных из Excel.</strong><br>${message}<br><br>Добавьте <code>data/raw/Олексієнко.xlsx</code> и запустите <code>npm run process:data</code>.</div>`; });
+          return;
+        }
+        state.month = months[0];
         const monthSelect = document.getElementById('month');
         monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
         monthSelect.value = state.month;
         state.grossPlan = state.data.monthlyPlans.find(p => p.month === state.month)?.grossPlan || 0;
         document.getElementById('grossPlan').value = state.grossPlan;
-        document.getElementById('updated').textContent = `Данные обновлены: ${new Date(state.data.updatedAt).toLocaleString('ru-RU')}`;
+        document.getElementById('updated').textContent = state.data.updatedAt ? `Данные обновлены: ${new Date(state.data.updatedAt).toLocaleString('ru-RU')}` : 'Данные загружены из Excel';
         renderAll();
       }
 

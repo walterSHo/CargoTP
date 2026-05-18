@@ -42,7 +42,7 @@ const aliases: FieldMap = {
 };
 
 const required: Record<FileType, string[]> = {
-  sales: ['clientName', 'productGroup', 'amountEur'],
+  sales: ['date', 'clientName', 'productGroup', 'amountEur'],
   groupPlan: ['productGroup', 'planAmount', 'factAmount'],
   receivables: ['clientName', 'totalDebt']
 };
@@ -74,7 +74,7 @@ function dateValue(value: unknown) {
     const year = match[3].length === 2 ? `20${match[3]}` : match[3];
     return `${year}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
   }
-  return text || new Date().toISOString().slice(0, 10);
+  return text;
 }
 
 function mapHeaders(headers: unknown[]) {

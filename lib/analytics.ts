@@ -14,6 +14,15 @@ export function avg(values: number[]) {
   return values.length ? sum(values) / values.length : 0;
 }
 
+
+export function availableMonths(sales: SalesRecord[]) {
+  return [...new Set(sales.map((row) => monthOf(row.date)).filter((month) => /^\d{4}-\d{2}$/.test(month)))].sort();
+}
+
+export function latestDataMonth(sales: SalesRecord[]) {
+  return availableMonths(sales).at(-1) ?? '';
+}
+
 export function salesForMonth(sales: SalesRecord[], month: string) {
   return sales.filter((row) => monthOf(row.date) === month);
 }

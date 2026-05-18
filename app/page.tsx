@@ -1,19 +1,20 @@
 import { KpiCard } from '@/components/KpiCard';
 import { SimpleBarChart } from '@/components/Charts';
-import { dashboardKpis, byTop, salesForMonth } from '@/lib/analytics';
-import { DEFAULT_MONTH, EXCLUDED_GROSS_PLAN_GROUP } from '@/lib/constants';
+import { dashboardKpis, byTop, latestDataMonth, salesForMonth } from '@/lib/analytics';
+import { EXCLUDED_GROSS_PLAN_GROUP } from '@/lib/constants';
 import { readDashboardData } from '@/lib/data';
 import { money, percent } from '@/lib/format';
 
 export default function DashboardPage() {
   const data = readDashboardData();
-  const kpis = dashboardKpis(data.sales, data.receivables, data.monthlyPlans, DEFAULT_MONTH);
-  const monthSales = salesForMonth(data.sales, DEFAULT_MONTH);
+  const month = latestDataMonth(data.sales);
+  const kpis = dashboardKpis(data.sales, data.receivables, data.monthlyPlans, month);
+  const monthSales = salesForMonth(data.sales, month);
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-        <p className="text-slate-500">Данные обновлены: {new Date(data.updatedAt).toLocaleString('ru-RU')}</p>
+        <p className="text-slate-500">{data.updatedAt ? `Данные обновлены: ${new Date(data.updatedAt).toLocaleString('ru-RU')}` : 'Нет обработанных Excel-данных'}</p>
       </div>
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard title="Общий оборот" value={money(kpis.totalTurnover)} />
