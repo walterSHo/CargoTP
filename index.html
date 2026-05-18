@@ -1,37 +1,101 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Trade Rep Dashboard</title>
+    <title>CargoTP Dashboard</title>
     <style>
-      :root { color-scheme: light; --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --blue:#2563eb; --green:#16a34a; --lime:#65a30d; --red:#dc2626; }
+      :root {
+        color-scheme: light;
+        --bg: #f8fafc;
+        --card: #fff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --blue: #2563eb;
+        --teal: #0f766e;
+        --amber: #d97706;
+        --violet: #7c3aed;
+        --red: #dc2626;
+        --green: #16a34a;
+        --lime: #65a30d;
+      }
       * { box-sizing: border-box; }
-      body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
-      header { position: sticky; top: 0; z-index: 2; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.92); backdrop-filter: blur(12px); }
-      nav, main { max-width: 1280px; margin: 0 auto; padding: 16px 20px; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.1), transparent 28%),
+          var(--bg);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,.92);
+        backdrop-filter: blur(12px);
+      }
+      nav, main { max-width: 1340px; margin: 0 auto; padding: 16px 20px; }
       nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
       nav strong { margin-right: 12px; font-size: 18px; }
       button, select, input { font: inherit; }
-      .tab { border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+      .tab {
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
       .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
       .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 18px 0; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
-      input, select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 10px 12px; min-width: 170px; }
+      input, select {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: white;
+        padding: 10px 12px;
+        min-width: 170px;
+      }
       h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
-      h2 { margin: 28px 0 12px; }
+      h2 { margin: 0; font-size: 24px; }
       .muted { color: var(--muted); }
-      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-      .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 10px 26px rgba(15, 23, 42, .06); }
-      .kpi .label { color: var(--muted); font-size: 13px; }
-      .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 800; }
       .section { display: none; }
       .section.active { display: block; }
+      .section-stack { display: grid; gap: 18px; }
+      .section-head { display: grid; gap: 6px; }
+      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+      .two-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .three-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+      }
+      .kpi .label { color: var(--muted); font-size: 13px; }
+      .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 800; }
       .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { background: #f1f5f9; font-weight: 750; }
       tr:last-child td { border-bottom: 0; }
+      .th-sort {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+        font: inherit;
+        color: inherit;
+      }
+      .sort-mark { font-size: 12px; color: #94a3b8; }
       .bar-list { display: grid; gap: 10px; }
       .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; }
       .bar-bg { height: 12px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
@@ -42,28 +106,70 @@
       .danger { color: var(--red); }
       .ok { color: var(--green); }
       .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 16px; background: white; }
+      .small { font-size: 12px; color: var(--muted); }
+      .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; }
+      .pie-wrap { display: grid; gap: 18px; align-items: center; grid-template-columns: minmax(180px, 220px) 1fr; }
+      .pie-chart {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        position: relative;
+        margin: 0 auto;
+      }
+      .pie-chart::after {
+        content: "";
+        position: absolute;
+        inset: 32px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9);
+      }
+      .pie-center {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        z-index: 1;
+        font-weight: 700;
+      }
+      .pie-center span { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+      .legend-list { display: grid; gap: 10px; }
+      .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+      .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+      .chart-shell { display: grid; gap: 14px; }
+      .chart-title { font-size: 15px; font-weight: 750; }
+      .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+      .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .legend-swatch { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+      .line-chart { width: 100%; height: 250px; }
+      .line-chart text { font-size: 11px; fill: #64748b; }
+      @media (max-width: 860px) {
+        .pie-wrap { grid-template-columns: 1fr; }
+        .pie-chart { width: 180px; height: 180px; }
+      }
     </style>
   </head>
   <body>
     <header>
       <nav>
-        <strong>Trade Rep Dashboard</strong>
-        <button class="tab active" data-tab="overview">Overview</button>
-        <button class="tab" data-tab="sales">Sales</button>
-        <button class="tab" data-tab="groups">Group Plan</button>
-        <button class="tab" data-tab="receivables">Receivables</button>
-        <button class="tab" data-tab="tires">Tires</button>
+        <strong>CargoTP Dashboard</strong>
+        <button class="tab active" data-tab="overview">Огляд</button>
+        <button class="tab" data-tab="sales">Продажі</button>
+        <button class="tab" data-tab="groups">План груп</button>
+        <button class="tab" data-tab="receivables">Дебіторка</button>
+        <button class="tab" data-tab="tires">Шини</button>
       </nav>
     </header>
 
     <main>
-      <h1>Торговый дашборд</h1>
-      <p class="muted" id="updated">Загрузка данных...</p>
+      <h1>Торговий дашборд</h1>
+      <p class="muted" id="updated">Завантаження даних...</p>
 
       <div class="toolbar">
-        <label>Месяц <select id="month"></select></label>
-        <label>Валовый план месяца <input id="grossPlan" type="number" min="0" step="100" /></label>
-        <label>Поиск <input id="search" placeholder="Клиент, бренд, группа..." /></label>
+        <label>Місяць <select id="month"></select></label>
+        <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
+        <label>Пошук <input id="search" placeholder="Клієнт, бренд, група..." /></label>
       </div>
 
       <section class="section active" id="overview"></section>
@@ -75,90 +181,532 @@
 
     <script>
       const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
-      let state = { data: null, month: '', search: '', grossPlan: 0 };
+      const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
+      let state = {
+        data: null,
+        month: '',
+        search: '',
+        grossPlan: 0,
+        tableSorts: {
+          topClients: { key: 'turnover', dir: 'desc' },
+          groupGaps: { key: 'missingPlanShare', dir: 'desc' },
+          sales: { key: 'clientCode', dir: 'asc' },
+          groups: { key: 'planAmount', dir: 'desc' },
+          receivables: { key: 'totalDebt', dir: 'desc' },
+          tires: { key: 'clientCode', dir: 'asc' }
+        }
+      };
 
-      const money = (v) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(v || 0));
-      const pct = (v) => `${Number(v || 0).toFixed(1)}%`;
-      const sum = (rows, get) => rows.reduce((a, r) => a + Number(get(r) || 0), 0);
+      const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
+      const pct = (value) => `${Number(value || 0).toFixed(1)}%`;
+      const sum = (rows, get) => rows.reduce((acc, row) => acc + Number(get(row) || 0), 0);
       const avg = (rows, get) => rows.length ? sum(rows, get) / rows.length : 0;
       const monthOf = (date) => String(date || '').slice(0, 7);
+      const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
       const normalizeProductGroup = (value) => String(value || '').trim().toLowerCase().replace(/ё/g, 'е').replace(/[ії]/g, 'и').replace(/\s+/g, ' ');
+      const clientKey = (row) => row.clientCode || row.unifiedClientCode || row.clientName;
+      const matchesSearch = (row) => JSON.stringify(row).toLowerCase().includes(state.search.toLowerCase());
       const isTireGroup = (value) => {
-        const v = normalizeProductGroup(value);
-        return v.includes('шина') || v.includes('шины') || v.includes('шин') || v.includes('tire') || v.includes('tyre');
+        const normalized = normalizeProductGroup(value);
+        return normalized.includes('шина') || normalized.includes('шины') || normalized.includes('шин') || normalized.includes('tire') || normalized.includes('tyre');
       };
-      const byTop = (rows, key, val, limit = 10) => {
+      const isGrossPlanGroup = (group) => !isTireGroup(group) && normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP);
+      const filteredSales = () => state.data.sales.filter((row) => monthOf(row.date) === state.month && matchesSearch(row));
+
+      const byTop = (rows, getKey, getValue, limit = 10) => {
         const map = new Map();
-        rows.forEach((r) => map.set(key(r) || '—', (map.get(key(r) || '—') || 0) + Number(val(r) || 0)));
-        return [...map.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, limit);
+        rows.forEach((row) => {
+          const key = getKey(row) || '—';
+          map.set(key, (map.get(key) || 0) + Number(getValue(row) || 0));
+        });
+        return [...map.entries()]
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, limit);
       };
-      const filteredSales = () => state.data.sales.filter((r) => monthOf(r.date) === state.month && JSON.stringify(r).toLowerCase().includes(state.search.toLowerCase()));
+
+      function topClientsByTurnover(rows, limit = 12) {
+        const totalTurnover = sum(rows, (row) => row.amountEur);
+        const map = new Map();
+        rows.forEach((row) => {
+          const key = clientKey(row);
+          const entry = map.get(key) || {
+            unifiedClientCode: row.unifiedClientCode,
+            clientCode: row.clientCode,
+            clientName: row.clientName,
+            turnover: 0,
+            salesCount: 0,
+            groups: new Set(),
+            brands: new Set()
+          };
+          entry.turnover += Number(row.amountEur || 0);
+          entry.salesCount += 1;
+          if (row.productGroup) entry.groups.add(row.productGroup);
+          if (row.brand) entry.brands.add(row.brand);
+          map.set(key, entry);
+        });
+        return [...map.values()]
+          .map((row) => ({
+            unifiedClientCode: row.unifiedClientCode,
+            clientCode: row.clientCode,
+            clientName: row.clientName,
+            turnover: row.turnover,
+            sharePercent: totalTurnover ? row.turnover / totalTurnover * 100 : 0,
+            salesCount: row.salesCount,
+            productGroups: row.groups.size,
+            brands: row.brands.size
+          }))
+          .sort((a, b) => b.turnover - a.turnover || String(a.clientCode).localeCompare(String(b.clientCode), 'uk', { numeric: true, sensitivity: 'base' }))
+          .slice(0, limit);
+      }
+
+      function dailySalesSeries(rows) {
+        const map = new Map();
+        rows.forEach((row) => {
+          const entry = map.get(row.date) || { turnover: 0, grossPlanTurnover: 0, tireTurnover: 0, clients: new Set() };
+          entry.turnover += Number(row.amountEur || 0);
+          if (isTireGroup(row.productGroup)) entry.tireTurnover += Number(row.amountEur || 0);
+          if (isGrossPlanGroup(row.productGroup)) entry.grossPlanTurnover += Number(row.amountEur || 0);
+          entry.clients.add(clientKey(row));
+          map.set(row.date, entry);
+        });
+        return [...map.entries()]
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([date, value]) => ({
+            date,
+            label: date.slice(8, 10),
+            turnover: value.turnover,
+            grossPlanTurnover: value.grossPlanTurnover,
+            tireTurnover: value.tireTurnover,
+            clients: value.clients.size
+          }));
+      }
+
+      function clientGroupShareGaps(rows) {
+        const relevantPlans = state.data.groupPlans
+          .filter((plan) => Number(plan.planAmount || 0) > 0 && isGrossPlanGroup(plan.productGroup))
+          .map((plan) => ({ ...plan, normalizedGroup: normalizeProductGroup(plan.productGroup) }));
+        const totalPlanAmount = sum(relevantPlans, (plan) => plan.planAmount);
+        if (!relevantPlans.length || totalPlanAmount <= 0) return [];
+
+        const map = new Map();
+        rows
+          .filter((row) => isGrossPlanGroup(row.productGroup))
+          .forEach((row) => {
+            const key = clientKey(row);
+            const entry = map.get(key) || {
+              unifiedClientCode: row.unifiedClientCode,
+              clientCode: row.clientCode,
+              clientName: row.clientName,
+              turnover: 0,
+              groups: new Set()
+            };
+            entry.turnover += Number(row.amountEur || 0);
+            entry.groups.add(normalizeProductGroup(row.productGroup));
+            map.set(key, entry);
+          });
+
+        return [...map.values()]
+          .map((client) => {
+            const coveredPlans = relevantPlans.filter((plan) => client.groups.has(plan.normalizedGroup));
+            const missingPlans = relevantPlans.filter((plan) => !client.groups.has(plan.normalizedGroup));
+            const coveredPlanAmount = sum(coveredPlans, (plan) => plan.planAmount);
+            const missingPlanAmount = totalPlanAmount - coveredPlanAmount;
+            return {
+              unifiedClientCode: client.unifiedClientCode,
+              clientCode: client.clientCode,
+              clientName: client.clientName,
+              turnover: client.turnover,
+              coveredPlanShare: totalPlanAmount ? coveredPlanAmount / totalPlanAmount * 100 : 0,
+              missingPlanShare: totalPlanAmount ? missingPlanAmount / totalPlanAmount * 100 : 0,
+              missingGroups: missingPlans.length,
+              missingGroupNames: missingPlans.map((plan) => plan.productGroup)
+            };
+          })
+          .filter((row) => row.turnover > 0 && row.missingGroups > 0)
+          .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover)
+          .slice(0, 12);
+      }
+
+      function groupPlanRows(rows) {
+        const totalPlan = sum(state.data.groupPlans, (row) => row.planAmount);
+        return state.data.groupPlans.map((groupPlan) => {
+          const factFromSales = sum(rows.filter((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(groupPlan.productGroup)), (row) => row.amountEur);
+          return {
+            ...groupPlan,
+            factFromSales,
+            variance: factFromSales - groupPlan.factAmount,
+            share: totalPlan ? groupPlan.planAmount / totalPlan * 100 : 0
+          };
+        });
+      }
 
       function kpi(title, value, hint = '') {
-        return `<article class="card kpi"><div class="label">${title}</div><div class="value">${value}</div>${hint ? `<div class="muted">${hint}</div>` : ''}</article>`;
+        return `<article class="card kpi"><div class="label">${escapeHtml(title)}</div><div class="value">${escapeHtml(value)}</div>${hint ? `<div class="muted">${escapeHtml(hint)}</div>` : ''}</article>`;
       }
-      function table(rows, cols) {
-        if (!rows.length) return '<div class="empty">Нет данных</div>';
-        return `<div class="table-wrap"><table><thead><tr>${cols.map(c => `<th>${c.title}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${c.render ? c.render(r) : (r[c.key] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+      function empty(message = 'Немає даних') {
+        return `<div class="empty">${escapeHtml(message)}</div>`;
       }
+
+      function compareValues(a, b) {
+        if (typeof a === 'number' && typeof b === 'number') return a - b;
+        return String(a ?? '').localeCompare(String(b ?? ''), 'uk', { numeric: true, sensitivity: 'base' });
+      }
+
+      function sortedRows(tableId, rows, columns) {
+        const sort = state.tableSorts[tableId];
+        if (!sort?.key) return rows;
+        const column = columns.find((item) => (item.sortKey || item.key) === sort.key);
+        if (!column) return rows;
+        return [...rows].sort((left, right) => {
+          const a = column.sortValue ? column.sortValue(left) : (column.key ? left[column.key] : '');
+          const b = column.sortValue ? column.sortValue(right) : (column.key ? right[column.key] : '');
+          const result = compareValues(a, b);
+          return sort.dir === 'asc' ? result : -result;
+        });
+      }
+
+      function table(tableId, rows, columns) {
+        if (!rows.length) return empty();
+        const currentSort = state.tableSorts[tableId] || {};
+        const sorted = sortedRows(tableId, rows, columns);
+        return `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  ${columns.map((column) => {
+                    const sortKey = column.sortKey || column.key;
+                    const sortable = Boolean(sortKey);
+                    const mark = currentSort.key === sortKey ? (currentSort.dir === 'asc' ? '▲' : '▼') : '↕';
+                    return `<th>${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${escapeHtml(column.title)}<span class="sort-mark">${mark}</span></button>` : escapeHtml(column.title)}</th>`;
+                  }).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${sorted.map((row) => `<tr>${columns.map((column) => `<td>${column.render ? column.render(row) : escapeHtml(row[column.key] ?? '')}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
       function bars(rows) {
-        const max = Math.max(...rows.map(r => r.value), 1);
-        return `<div class="card bar-list">${rows.map(r => `<div class="bar-row"><div>${r.name}</div><div class="bar-bg"><div class="bar" style="width:${Math.max(3, r.value / max * 100)}%"></div></div><strong>${money(r.value)}</strong></div>`).join('')}</div>`;
+        if (!rows.length) return empty();
+        const max = Math.max(...rows.map((row) => row.value), 1);
+        return `
+          <div class="card bar-list">
+            ${rows.map((row) => `
+              <div class="bar-row">
+                <div>${escapeHtml(row.name)}</div>
+                <div class="bar-bg"><div class="bar" style="width:${Math.max(3, row.value / max * 100)}%"></div></div>
+                <strong>${escapeHtml(money(row.value))}</strong>
+              </div>
+            `).join('')}
+          </div>
+        `;
       }
-      function completionClass(v) { return v < 95 ? 'status-red' : v <= 100 ? 'status-green' : 'status-lime'; }
+
+      function pie(rows, centerTitle) {
+        if (!rows.length) return empty();
+        const total = sum(rows, (row) => row.value);
+        if (!total) return empty();
+
+        let current = 0;
+        const gradient = rows.map((row, index) => {
+          const start = current / total * 100;
+          current += row.value;
+          const end = current / total * 100;
+          return `${COLORS[index % COLORS.length]} ${start}% ${end}%`;
+        }).join(', ');
+
+        return `
+          <div class="card pie-wrap">
+            <div class="pie-chart" style="background: conic-gradient(${gradient});">
+              <div class="pie-center">${escapeHtml(money(total))}<span>${escapeHtml(centerTitle)}</span></div>
+            </div>
+            <div class="legend-list">
+              ${rows.map((row, index) => `
+                <div class="legend-item">
+                  <span class="legend-dot" style="background:${COLORS[index % COLORS.length]}"></span>
+                  <span>${escapeHtml(row.name)}</span>
+                  <strong>${escapeHtml(pct(total ? row.value / total * 100 : 0))}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      function polylinePoints(rows, key, maxValue, width, height, paddingX, paddingY) {
+        if (rows.length === 1) {
+          const y = height - paddingY - (rows[0][key] / maxValue) * (height - paddingY * 2);
+          return `${width / 2},${y} ${width / 2 + 1},${y}`;
+        }
+        const step = (width - paddingX * 2) / (rows.length - 1);
+        return rows.map((row, index) => {
+          const x = paddingX + step * index;
+          const y = height - paddingY - (row[key] / maxValue) * (height - paddingY * 2);
+          return `${x},${y}`;
+        }).join(' ');
+      }
+
+      function dailyChart(rows) {
+        if (!rows.length) return empty();
+        const width = 760;
+        const height = 250;
+        const paddingX = 28;
+        const paddingY = 24;
+        const plotWidth = width - paddingX * 2;
+        const plotHeight = height - paddingY * 2;
+        const maxValue = Math.max(...rows.flatMap((row) => [row.turnover, row.grossPlanTurnover, row.tireTurnover]), 1);
+        const step = plotWidth / rows.length;
+        const barWidth = Math.max(8, step - 6);
+        const grossPlanLine = polylinePoints(rows, 'grossPlanTurnover', maxValue, width, height, paddingX + step / 2, paddingY);
+        const tireLine = polylinePoints(rows, 'tireTurnover', maxValue, width, height, paddingX + step / 2, paddingY);
+
+        return `
+          <div class="card chart-shell">
+            <div class="chart-title">Щоденна динаміка місяця</div>
+            <div class="chart-legend">
+              <span><i class="legend-swatch" style="background:#2563eb"></i>Оборот</span>
+              <span><i class="legend-swatch" style="background:#0f766e"></i>Оборот для валового плану</span>
+              <span><i class="legend-swatch" style="background:#d97706"></i>Шини</span>
+            </div>
+            <svg class="line-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+              <line x1="${paddingX}" y1="${height - paddingY}" x2="${width - paddingX}" y2="${height - paddingY}" stroke="#cbd5e1" />
+              <line x1="${paddingX}" y1="${paddingY}" x2="${paddingX}" y2="${height - paddingY}" stroke="#cbd5e1" />
+              ${rows.map((row, index) => {
+                const x = paddingX + step * index + 3;
+                const barHeight = row.turnover / maxValue * plotHeight;
+                const y = height - paddingY - barHeight;
+                return `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="#2563eb" opacity="0.75"></rect>`;
+              }).join('')}
+              <polyline fill="none" stroke="#0f766e" stroke-width="3" points="${grossPlanLine}"></polyline>
+              <polyline fill="none" stroke="#d97706" stroke-width="3" points="${tireLine}"></polyline>
+              ${rows.map((row, index) => {
+                const x = paddingX + step * index + barWidth / 2 + 3;
+                return `<text x="${x}" y="${height - 8}" text-anchor="middle">${escapeHtml(row.label)}</text>`;
+              }).join('')}
+            </svg>
+          </div>
+        `;
+      }
+
+      function completionClass(value) {
+        return value < 95 ? 'status-red' : value <= 100 ? 'status-green' : 'status-lime';
+      }
 
       function renderOverview() {
         const sales = filteredSales();
-        const receivables = state.data.receivables;
-        const total = sum(sales, r => r.amountEur);
-        const planTurnover = sum(sales.filter(r => !isTireGroup(r.productGroup) && normalizeProductGroup(r.productGroup) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP)), r => r.amountEur);
+        const receivables = state.data.receivables.filter((row) => matchesSearch(row));
+        const total = sum(sales, (row) => row.amountEur);
+        const planTurnover = sum(sales.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
+        const topClients = topClientsByTurnover(sales, 12);
+        const topClientsChart = topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover }));
+        const groupMix = byTop(sales, (row) => row.productGroup, (row) => row.amountEur, 8);
+        const groupGaps = clientGroupShareGaps(sales);
+        const daily = dailySalesSeries(sales);
+
         document.getElementById('overview').innerHTML = `
-          <div class="grid">
-            ${kpi('Общий оборот', money(total))}
-            ${kpi('Оборот для валового плана', money(planTurnover), 'Шины исключены')}
-            ${kpi('Валовый план месяца', money(grossPlan), 'Ручной ввод')}
-            ${kpi('% выполнения валового плана', pct(grossPlan ? planTurnover / grossPlan * 100 : 0))}
-            ${kpi('Средняя нетто-маржа', pct(avg(sales, r => r.netMargin)))}
-            ${kpi('Средний % скидки', pct(avg(sales, r => r.discountPercent)))}
-            ${kpi('Просроченная дебиторка', money(sum(receivables, r => r.overdueDebt)))}
-            ${kpi('Непросроченная дебиторка', money(sum(receivables, r => r.currentDebt)))}
+          <div class="section-stack">
+            <div class="grid">
+              ${kpi('Загальний оборот', money(total))}
+              ${kpi('Оборот для валового плану', money(planTurnover), 'Шини виключені')}
+              ${kpi('Валовий план місяця', money(grossPlan), 'Ручне значення')}
+              ${kpi('% виконання валового плану', pct(grossPlan ? planTurnover / grossPlan * 100 : 0))}
+              ${kpi('Середня нетто-маржа', pct(avg(sales, (row) => row.netMargin)))}
+              ${kpi('Середня знижка', pct(avg(sales, (row) => row.discountPercent)))}
+              ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)))}
+              ${kpi('Непрострочена дебіторка', money(sum(receivables, (row) => row.currentDebt)))}
+            </div>
+
+            <div class="two-up">
+              ${dailyChart(daily)}
+              <div class="chart-shell">
+                <div class="chart-title">Топ клієнтів за оборотом</div>
+                ${bars(topClientsChart)}
+              </div>
+            </div>
+
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">Структура обороту по топ-клієнтах</div>
+                ${pie(topClientsChart, 'Топ клієнти')}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Структура обороту по товарних групах</div>
+                ${pie(groupMix, 'Товарні групи')}
+              </div>
+            </div>
+
+            <div class="section-head">
+              <h2>Топ клієнтів місяця</h2>
+              <p class="muted">Сортування доступне по кожній колонці. За замовчуванням таблиця відсортована за оборотом.</p>
+            </div>
+            ${table('topClients', topClients, [
+              { title: 'Код клієнта', key: 'clientCode' },
+              { title: 'Клієнт', key: 'clientName' },
+              { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
+              { title: 'Частка місяця', key: 'sharePercent', sortValue: (row) => row.sharePercent, render: (row) => pct(row.sharePercent) },
+              { title: 'Продажів', key: 'salesCount', sortValue: (row) => row.salesCount },
+              { title: 'Груп у роботі', key: 'productGroups', sortValue: (row) => row.productGroups }
+            ])}
+
+            <div class="section-head">
+              <h2>Клієнти, які не закривають планові групи</h2>
+              <p class="muted">Рейтинг побудовано за втраченою часткою планових груп у поточному місяці.</p>
+            </div>
+            ${table('groupGaps', groupGaps, [
+              { title: 'Код клієнта', key: 'clientCode' },
+              { title: 'Клієнт', key: 'clientName' },
+              { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
+              { title: 'Покрита частка', key: 'coveredPlanShare', sortValue: (row) => row.coveredPlanShare, render: (row) => pct(row.coveredPlanShare) },
+              { title: 'Втрачена частка', key: 'missingPlanShare', sortValue: (row) => row.missingPlanShare, render: (row) => `<span class="pill">${escapeHtml(pct(row.missingPlanShare))}</span>` },
+              { title: 'Відсутніх груп', key: 'missingGroups', sortValue: (row) => row.missingGroups },
+              {
+                title: 'Яких груп не вистачає',
+                sortKey: 'missingGroupNames',
+                sortValue: (row) => row.missingGroupNames.join(', '),
+                render: (row) => {
+                  const value = row.missingGroupNames.join(', ');
+                  const preview = value.length > 70 ? `${value.slice(0, 67)}...` : value;
+                  return `<span title="${escapeHtml(value)}">${escapeHtml(preview || '—')}</span>`;
+                }
+              }
+            ])}
           </div>
-          <h2>Топ групп товаров</h2>${bars(byTop(sales, r => r.productGroup, r => r.amountEur, 8))}`;
+        `;
       }
+
       function renderSales() {
         const rows = filteredSales();
-        document.getElementById('sales').innerHTML = `<h2>Продажи</h2>${bars(byTop(rows, r => r.clientName, r => r.amountEur, 8))}${table(rows, [
-          {title:'Дата', key:'date'}, {title:'Единый код', key:'unifiedClientCode'}, {title:'Код клиента', key:'clientCode'}, {title:'Клиент', key:'clientName'},
-          {title:'Бренд', key:'brand'}, {title:'Группа', key:'productGroup'}, {title:'Товар', key:'productCode'}, {title:'Сумма', render:r=>money(r.amountEur)}, {title:'Маржа', render:r=>pct(r.netMargin)}, {title:'Скидка', render:r=>pct(r.discountPercent)}
-        ])}`;
+        document.getElementById('sales').innerHTML = `
+          <div class="section-stack">
+            <div class="three-up">
+              <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(byTop(rows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(byTop(rows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(byTop(rows, (row) => row.productGroup, (row) => row.amountEur, 8))}</div>
+            </div>
+            ${table('sales', rows, [
+              { title: 'Дата', key: 'date' },
+              { title: 'Єдиний код', key: 'unifiedClientCode' },
+              { title: 'Код клієнта', key: 'clientCode' },
+              { title: 'Клієнт', key: 'clientName' },
+              { title: 'Бренд', key: 'brand' },
+              { title: 'Група', key: 'productGroup' },
+              { title: 'Товар', key: 'productCode' },
+              { title: 'Сума', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+              { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+              { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+            ])}
+          </div>
+        `;
       }
+
       function renderGroups() {
-        const sales = filteredSales();
-        const totalPlan = sum(state.data.groupPlans, r => r.planAmount);
-        const rows = state.data.groupPlans.map(g => {
-          const factFromSales = sum(sales.filter(s => normalizeProductGroup(s.productGroup) === normalizeProductGroup(g.productGroup)), s => s.amountEur);
-          return { ...g, factFromSales, variance: factFromSales - g.factAmount, share: totalPlan ? g.planAmount / totalPlan * 100 : 0 };
-        });
-        document.getElementById('groups').innerHTML = `<h2>План групп</h2>${table(rows, [
-          {title:'Группа', key:'productGroup'}, {title:'План %', render:r=>pct(r.planPercent)}, {title:'Доля от плана', render:r=>pct(r.share)}, {title:'План', render:r=>money(r.planAmount)},
-          {title:'Факт из файла', render:r=>money(r.factAmount)}, {title:'Факт из продаж', render:r=>money(r.factFromSales)}, {title:'Отклонение', render:r=>money(r.variance)}, {title:'% выполнения', render:r=>`<span class="${completionClass(r.completionPercent)}">${pct(r.completionPercent)}</span>`}
-        ])}`;
+        const rows = groupPlanRows(filteredSales());
+        document.getElementById('groups').innerHTML = `
+          <div class="section-stack">
+            <div class="chart-shell">
+              <div class="chart-title">Групи з найбільшим фактом із продажів</div>
+              ${bars(rows.map((row) => ({ name: row.productGroup, value: row.factFromSales })).sort((a, b) => b.value - a.value).slice(0, 8))}
+            </div>
+            ${table('groups', rows, [
+              { title: 'Група', key: 'productGroup' },
+              { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
+              { title: 'Частка від плану', key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
+              { title: 'План', key: 'planAmount', sortValue: (row) => row.planAmount, render: (row) => money(row.planAmount) },
+              { title: 'Факт із файлу', key: 'factAmount', sortValue: (row) => row.factAmount, render: (row) => money(row.factAmount) },
+              { title: 'Факт із продажів', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+              { title: 'Відхилення', key: 'variance', sortValue: (row) => row.variance, render: (row) => money(row.variance) },
+              { title: '% виконання', key: 'completionPercent', sortValue: (row) => row.completionPercent, render: (row) => `<span class="${completionClass(row.completionPercent)}">${escapeHtml(pct(row.completionPercent))}</span>` }
+            ])}
+          </div>
+        `;
       }
+
       function renderReceivables() {
-        const rows = state.data.receivables.filter(r => JSON.stringify(r).toLowerCase().includes(state.search.toLowerCase())).sort((a,b)=>b.totalDebt-a.totalDebt);
-        const total = sum(rows, r => r.totalDebt), overdue = sum(rows, r => r.overdueDebt);
-        document.getElementById('receivables').innerHTML = `<div class="grid">${kpi('Общая дебиторка', money(total))}${kpi('Просроченная', money(overdue))}${kpi('Доля просрочки', pct(total ? overdue / total * 100 : 0))}</div><h2>Клиенты</h2>${table(rows, [
-          {title:'Клиент', key:'clientName'}, {title:'Всего', render:r=>money(r.totalDebt)}, {title:'Непросроченная', render:r=>money(r.currentDebt)}, {title:'Просроченная', render:r=>`<span class="${r.overdueDebt ? 'danger' : 'ok'}">${money(r.overdueDebt)}</span>`},
-          {title:'0–10', render:r=>money(r.bucket0To10)}, {title:'11–20', render:r=>money(r.bucket11To20)}, {title:'21–30', render:r=>money(r.bucket21To30)}, {title:'31+', render:r=>money(r.bucket31Plus)}
-        ])}`;
+        const rows = state.data.receivables.filter((row) => matchesSearch(row));
+        const total = sum(rows, (row) => row.totalDebt);
+        const overdue = sum(rows, (row) => row.overdueDebt);
+        document.getElementById('receivables').innerHTML = `
+          <div class="section-stack">
+            <div class="grid">
+              ${kpi('Загальна дебіторка', money(total))}
+              ${kpi('Прострочена', money(overdue))}
+              ${kpi('Непрострочена', money(sum(rows, (row) => row.currentDebt)))}
+              ${kpi('Частка прострочки', pct(total ? overdue / total * 100 : 0))}
+            </div>
+            <div class="chart-shell">
+              <div class="chart-title">Клієнти з найбільшою дебіторкою</div>
+              ${bars(byTop(rows, (row) => row.clientName, (row) => row.totalDebt, 8))}
+            </div>
+            ${table('receivables', rows, [
+              { title: 'Єдиний код', key: 'unifiedClientCode' },
+              { title: 'Код клієнта', key: 'clientCode' },
+              { title: 'Клієнт', key: 'clientName' },
+              { title: 'Усього', key: 'totalDebt', sortValue: (row) => row.totalDebt, render: (row) => money(row.totalDebt) },
+              { title: 'Непрострочена', key: 'currentDebt', sortValue: (row) => row.currentDebt, render: (row) => money(row.currentDebt) },
+              { title: 'Прострочена', key: 'overdueDebt', sortValue: (row) => row.overdueDebt, render: (row) => `<span class="${row.overdueDebt ? 'danger' : 'ok'}">${escapeHtml(money(row.overdueDebt))}</span>` },
+              { title: '0–10', key: 'bucket0To10', sortValue: (row) => row.bucket0To10, render: (row) => money(row.bucket0To10) },
+              { title: '11–20', key: 'bucket11To20', sortValue: (row) => row.bucket11To20, render: (row) => money(row.bucket11To20) },
+              { title: '21–30', key: 'bucket21To30', sortValue: (row) => row.bucket21To30, render: (row) => money(row.bucket21To30) },
+              { title: '31+', key: 'bucket31Plus', sortValue: (row) => row.bucket31Plus, render: (row) => money(row.bucket31Plus) }
+            ])}
+          </div>
+        `;
       }
+
       function renderTires() {
-        const rows = filteredSales().filter(r => isTireGroup(r.productGroup));
-        const problematic = rows.map(s => ({ sale:s, debt:(state.data.receivables.find(r => r.clientName === s.clientName || r.clientCode === s.clientCode)?.overdueDebt || 0) })).filter(r => r.debt > 0);
-        document.getElementById('tires').innerHTML = `<div class="grid">${kpi('Оборот шин', money(sum(rows, r=>r.amountEur)))}${kpi('Клиенты шин', String(new Set(rows.map(r=>r.clientName)).size))}${kpi('Средняя маржа шин', pct(avg(rows, r=>r.netMargin)))}${kpi('Средняя скидка шин', pct(avg(rows, r=>r.discountPercent)))}</div><h2>Топ клиентов шин</h2>${bars(byTop(rows, r=>r.clientName, r=>r.amountEur, 8))}<h2>Топ брендов шин</h2>${bars(byTop(rows, r=>r.brand || 'Без бренда', r=>r.amountEur, 8))}<h2>Шины + проблемная дебиторка</h2>${table(problematic, [{title:'Клиент', render:r=>r.sale.clientName}, {title:'Оборот шин', render:r=>money(r.sale.amountEur)}, {title:'Просроченная дебиторка', render:r=>money(r.debt)}])}`;
+        const rows = filteredSales().filter((row) => isTireGroup(row.productGroup));
+        const problematic = rows
+          .map((sale) => ({ sale, debt: (state.data.receivables.find((row) => row.clientName === sale.clientName || row.clientCode === sale.clientCode)?.overdueDebt || 0) }))
+          .filter((row) => row.debt > 0);
+
+        document.getElementById('tires').innerHTML = `
+          <div class="section-stack">
+            <div class="grid">
+              ${kpi('Оборот шин', money(sum(rows, (row) => row.amountEur)))}
+              ${kpi('Клієнти шин', String(new Set(rows.map((row) => row.clientName)).size))}
+              ${kpi('Середня маржа шин', pct(avg(rows, (row) => row.netMargin)))}
+              ${kpi('Середня знижка шин', pct(avg(rows, (row) => row.discountPercent)))}
+            </div>
+            <div class="three-up">
+              <div class="chart-shell"><div class="chart-title">Топ клієнтів по шинах</div>${bars(byTop(rows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Топ брендів шин</div>${bars(byTop(rows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
+              <div class="chart-shell"><div class="chart-title">Клієнти з прострочкою</div>${bars(byTop(problematic, (row) => row.sale.clientName, (row) => row.debt, 8))}</div>
+            </div>
+            ${table('tires', rows, [
+              { title: 'Дата', key: 'date' },
+              { title: 'Єдиний код', key: 'unifiedClientCode' },
+              { title: 'Код клієнта', key: 'clientCode' },
+              { title: 'Клієнт', key: 'clientName' },
+              { title: 'Бренд', key: 'brand' },
+              { title: 'Група', key: 'productGroup' },
+              { title: 'Товар', key: 'productCode' },
+              { title: 'Оборот', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+              { title: 'Маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+              { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+            ])}
+          </div>
+        `;
       }
-      function renderAll() { renderOverview(); renderSales(); renderGroups(); renderReceivables(); renderTires(); }
+
+      function renderAll() {
+        renderOverview();
+        renderSales();
+        renderGroups();
+        renderReceivables();
+        renderTires();
+      }
 
       async function loadData() {
         try {
@@ -166,47 +714,82 @@
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           state.data = await response.json();
         } catch (error) {
-          document.getElementById('overview').innerHTML = `<div class="empty"><strong>Не удалось загрузить data/processed/dashboard.json.</strong><br>На GitHub Pages это работает сразу. Если открываете локально и браузер блокирует file:// fetch, запустите любой статический сервер: <code>python3 -m http.server</code>.</div>`;
-          document.getElementById('updated').textContent = `Ошибка загрузки данных: ${error.message}`;
+          document.getElementById('overview').innerHTML = `<div class="empty"><strong>Не вдалося завантажити data/processed/dashboard.json.</strong><br>На GitHub Pages це працює одразу. Якщо відкриваєте локально і браузер блокує file:// fetch, запустіть будь-який статичний сервер: <code>python3 -m http.server</code>.</div>`;
+          document.getElementById('updated').textContent = `Помилка завантаження даних: ${error.message}`;
           return;
         }
+
         state.data.sales = Array.isArray(state.data.sales) ? state.data.sales : [];
         state.data.groupPlans = Array.isArray(state.data.groupPlans) ? state.data.groupPlans : [];
         state.data.receivables = Array.isArray(state.data.receivables) ? state.data.receivables : [];
         state.data.monthlyPlans = Array.isArray(state.data.monthlyPlans) ? state.data.monthlyPlans : [];
-        const months = [...new Set(state.data.sales.map(r => monthOf(r.date)).filter(m => /^\d{4}-\d{2}$/.test(m)))].sort().reverse();
+
+        const months = [...new Set(state.data.sales.map((row) => monthOf(row.date)).filter((month) => /^\d{4}-\d{2}$/.test(month)))].sort().reverse();
         const expectedSource = 'data/raw/Олексієнко.xlsx';
         const sourcePattern = /^data\/raw\/Олексієнко(?:_\d{2}\.\d{2}-\d{2}\.\d{2})?\.xlsx?$/;
         const sourceFiles = state.data.meta?.sourceFiles || [];
-        if (state.data.status === 'ok' && !sourceFiles.some(file => sourcePattern.test(file))) {
-          document.getElementById('updated').textContent = 'Ошибка источника данных';
-          document.querySelectorAll('.section').forEach(el => { el.innerHTML = `<div class="empty"><strong>Неверный source of truth.</strong><br>Processed JSON должен быть построен только из <code>${expectedSource}</code> или архивного <code>Олексієнко_DD.MM-DD.MM.xlsx</code>. Сейчас sourceFiles: <code>${sourceFiles.join(', ') || 'не указаны'}</code>.</div>`; });
+
+        if (state.data.status === 'ok' && !sourceFiles.some((file) => sourcePattern.test(file))) {
+          document.getElementById('updated').textContent = 'Помилка джерела даних';
+          document.querySelectorAll('.section').forEach((element) => {
+            element.innerHTML = `<div class="empty"><strong>Неправильне джерело істини.</strong><br>Processed JSON має будуватися тільки з <code>${expectedSource}</code> або архівного <code>Олексієнко_DD.MM-DD.MM.xlsx</code>. Зараз sourceFiles: <code>${escapeHtml(sourceFiles.join(', ') || 'не вказані')}</code>.</div>`;
+          });
           return;
         }
+
         if (!state.data.sales.length || !months.length) {
-          const message = state.data.message || 'Нет sales rows, полученных из Excel. UI не показывает demo/fallback данные.';
-          document.getElementById('updated').textContent = 'Нет обработанных Excel-данных';
-          document.querySelectorAll('.section').forEach(el => { el.innerHTML = `<div class="empty"><strong>Нет данных из Excel.</strong><br>${message}<br><br>Добавьте <code>data/raw/Олексієнко.xlsx</code> и запустите <code>npm run process:data</code>.</div>`; });
+          const message = state.data.message || 'Немає sales rows, отриманих з Excel. UI не показує demo/fallback дані.';
+          document.getElementById('updated').textContent = 'Немає оброблених Excel-даних';
+          document.querySelectorAll('.section').forEach((element) => {
+            element.innerHTML = `<div class="empty"><strong>Немає даних з Excel.</strong><br>${escapeHtml(message)}<br><br>Додайте <code>data/raw/Олексієнко.xlsx</code> і запустіть <code>npm run process:data</code>.</div>`;
+          });
           return;
         }
+
         state.month = months[0];
         const monthSelect = document.getElementById('month');
-        monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+        monthSelect.innerHTML = months.map((month) => `<option value="${month}">${month}</option>`).join('');
         monthSelect.value = state.month;
-        state.grossPlan = state.data.monthlyPlans.find(p => p.month === state.month)?.grossPlan || 0;
+        state.grossPlan = state.data.monthlyPlans.find((plan) => plan.month === state.month)?.grossPlan || 0;
         document.getElementById('grossPlan').value = state.grossPlan;
-        document.getElementById('updated').textContent = state.data.updatedAt ? `Данные обновлены: ${new Date(state.data.updatedAt).toLocaleString('ru-RU')}` : 'Данные загружены из Excel';
+        document.getElementById('updated').textContent = state.data.updatedAt ? `Дані оновлено: ${new Date(state.data.updatedAt).toLocaleString('uk-UA')}` : 'Дані завантажено з Excel';
         renderAll();
       }
 
-      document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab,.section').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.tab).classList.add('active');
+      document.addEventListener('click', (event) => {
+        const sortButton = event.target.closest('[data-table-sort]');
+        if (!sortButton) return;
+        const tableId = sortButton.dataset.tableSort;
+        const sortKey = sortButton.dataset.sortKey;
+        const current = state.tableSorts[tableId] || {};
+        state.tableSorts[tableId] = {
+          key: sortKey,
+          dir: current.key === sortKey && current.dir === 'asc' ? 'desc' : 'asc'
+        };
+        renderAll();
+      });
+
+      document.querySelectorAll('.tab').forEach((button) => button.addEventListener('click', () => {
+        document.querySelectorAll('.tab,.section').forEach((element) => element.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
       }));
-      document.getElementById('month').addEventListener('change', e => { state.month = e.target.value; state.grossPlan = state.data.monthlyPlans.find(p => p.month === state.month)?.grossPlan || 0; document.getElementById('grossPlan').value = state.grossPlan; renderAll(); });
-      document.getElementById('grossPlan').addEventListener('input', e => { state.grossPlan = Number(e.target.value || 0); renderAll(); });
-      document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; renderAll(); });
+
+      document.getElementById('month').addEventListener('change', (event) => {
+        state.month = event.target.value;
+        state.grossPlan = state.data.monthlyPlans.find((plan) => plan.month === state.month)?.grossPlan || 0;
+        document.getElementById('grossPlan').value = state.grossPlan;
+        renderAll();
+      });
+      document.getElementById('grossPlan').addEventListener('input', (event) => {
+        state.grossPlan = Number(event.target.value || 0);
+        renderAll();
+      });
+      document.getElementById('search').addEventListener('input', (event) => {
+        state.search = event.target.value;
+        renderAll();
+      });
+
       loadData();
     </script>
   </body>

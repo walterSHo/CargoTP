@@ -6,10 +6,10 @@ import type { MonthlyPlan } from '@/lib/types';
 import type { ColumnDef } from '@tanstack/react-table';
 
 const columns: ColumnDef<MonthlyPlan>[] = [
-  { accessorKey: 'month', header: 'Месяц' },
-  { accessorKey: 'grossPlan', header: 'Валовый план месяца', cell: (info) => money(Number(info.getValue())) }
+  { accessorKey: 'month', header: 'Місяць' },
+  { accessorKey: 'grossPlan', header: 'Валовий план місяця', cell: (info) => money(Number(info.getValue())) }
 ];
 
 export function SettingsClient({ monthlyPlans }: { monthlyPlans: MonthlyPlan[] }) {
-  return <DataTable columns={columns} data={monthlyPlans} />;
+  return <DataTable columns={columns} data={monthlyPlans} initialSorting={[{ id: 'month', desc: true }]} />;
 }

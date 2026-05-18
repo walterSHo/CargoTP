@@ -2,6 +2,40 @@ import { EXCLUDED_GROSS_PLAN_GROUP } from './constants';
 import { isTireGroup, normalizeProductGroup } from './product-groups';
 import type { GroupPlanRecord, MonthlyPlan, ReceivableRecord, SalesRecord } from './types';
 
+export type TopClientRow = {
+  unifiedClientCode: string;
+  clientCode: string;
+  clientName: string;
+  turnover: number;
+  sharePercent: number;
+  salesCount: number;
+  brands: number;
+  productGroups: number;
+};
+
+export type DailySalesPoint = {
+  date: string;
+  label: string;
+  turnover: number;
+  grossPlanTurnover: number;
+  tireTurnover: number;
+  clients: number;
+};
+
+export type ClientGroupGapRow = {
+  unifiedClientCode: string;
+  clientCode: string;
+  clientName: string;
+  turnover: number;
+  coveredPlanAmount: number;
+  missingPlanAmount: number;
+  coveredPlanShare: number;
+  missingPlanShare: number;
+  coveredGroups: number;
+  missingGroups: number;
+  missingGroupNames: string[];
+};
+
 export function monthOf(date: string) {
   return date.slice(0, 7);
 }
@@ -31,6 +65,14 @@ export function grossPlanTurnover(sales: SalesRecord[]) {
   return sum(sales.filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP) && !isTireGroup(row.productGroup)).map((row) => row.amountEur));
 }
 
+function clientKey(row: Pick<SalesRecord, 'unifiedClientCode' | 'clientCode' | 'clientName'>) {
+  return row.clientCode || row.unifiedClientCode || row.clientName;
+}
+
+function planRelevantGroup(group: string) {
+  return normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP) && !isTireGroup(group);
+}
+
 export function dashboardKpis(sales: SalesRecord[], receivables: ReceivableRecord[], plans: MonthlyPlan[], month: string) {
   const monthSales = salesForMonth(sales, month);
   const totalTurnover = sum(monthSales.map((row) => row.amountEur));
@@ -46,6 +88,118 @@ export function dashboardKpis(sales: SalesRecord[], receivables: ReceivableRecor
     overdueDebt: sum(receivables.map((row) => row.overdueDebt)),
     currentDebt: sum(receivables.map((row) => row.currentDebt))
   };
+}
+
+export function topClientsByTurnover(sales: SalesRecord[], limit = 10): TopClientRow[] {
+  const totalTurnover = sum(sales.map((row) => row.amountEur));
+  const map = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; salesCount: number; brands: Set<string>; productGroups: Set<string> }>();
+
+  sales.forEach((row) => {
+    const key = clientKey(row);
+    const entry = map.get(key) ?? {
+      unifiedClientCode: row.unifiedClientCode,
+      clientCode: row.clientCode,
+      clientName: row.clientName,
+      turnover: 0,
+      salesCount: 0,
+      brands: new Set<string>(),
+      productGroups: new Set<string>()
+    };
+
+    entry.turnover += row.amountEur;
+    entry.salesCount += 1;
+    if (row.brand) entry.brands.add(row.brand);
+    if (row.productGroup) entry.productGroups.add(row.productGroup);
+    map.set(key, entry);
+  });
+
+  return [...map.values()]
+    .map((row) => ({
+      unifiedClientCode: row.unifiedClientCode,
+      clientCode: row.clientCode,
+      clientName: row.clientName,
+      turnover: row.turnover,
+      sharePercent: totalTurnover > 0 ? (row.turnover / totalTurnover) * 100 : 0,
+      salesCount: row.salesCount,
+      brands: row.brands.size,
+      productGroups: row.productGroups.size
+    }))
+    .sort((a, b) => b.turnover - a.turnover || a.clientCode.localeCompare(b.clientCode) || a.clientName.localeCompare(b.clientName))
+    .slice(0, limit);
+}
+
+export function dailySalesSeries(sales: SalesRecord[]): DailySalesPoint[] {
+  const map = new Map<string, { turnover: number; grossPlanTurnover: number; tireTurnover: number; clients: Set<string> }>();
+
+  sales.forEach((row) => {
+    const entry = map.get(row.date) ?? { turnover: 0, grossPlanTurnover: 0, tireTurnover: 0, clients: new Set<string>() };
+    entry.turnover += row.amountEur;
+    if (isTireGroup(row.productGroup)) entry.tireTurnover += row.amountEur;
+    else if (normalizeProductGroup(row.productGroup) !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP)) entry.grossPlanTurnover += row.amountEur;
+    entry.clients.add(clientKey(row));
+    map.set(row.date, entry);
+  });
+
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([date, value]) => ({
+      date,
+      label: date.slice(8, 10),
+      turnover: value.turnover,
+      grossPlanTurnover: value.grossPlanTurnover,
+      tireTurnover: value.tireTurnover,
+      clients: value.clients.size
+    }));
+}
+
+export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: SalesRecord[], limit = 12): ClientGroupGapRow[] {
+  const relevantPlans = groupPlans
+    .filter((row) => row.planAmount > 0 && planRelevantGroup(row.productGroup))
+    .map((row) => ({ ...row, normalizedGroup: normalizeProductGroup(row.productGroup) }));
+  const totalPlanAmount = sum(relevantPlans.map((row) => row.planAmount));
+  if (!relevantPlans.length || totalPlanAmount <= 0) return [];
+
+  const salesByClient = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; groups: Set<string> }>();
+  sales
+    .filter((row) => planRelevantGroup(row.productGroup))
+    .forEach((row) => {
+      const key = clientKey(row);
+      const entry = salesByClient.get(key) ?? {
+        unifiedClientCode: row.unifiedClientCode,
+        clientCode: row.clientCode,
+        clientName: row.clientName,
+        turnover: 0,
+        groups: new Set<string>()
+      };
+      entry.turnover += row.amountEur;
+      entry.groups.add(normalizeProductGroup(row.productGroup));
+      salesByClient.set(key, entry);
+    });
+
+  return [...salesByClient.values()]
+    .map((client) => {
+      const coveredPlans = relevantPlans.filter((plan) => client.groups.has(plan.normalizedGroup));
+      const missingPlans = relevantPlans.filter((plan) => !client.groups.has(plan.normalizedGroup));
+      const coveredPlanAmount = sum(coveredPlans.map((plan) => plan.planAmount));
+      const missingPlanAmount = totalPlanAmount - coveredPlanAmount;
+
+      return {
+        unifiedClientCode: client.unifiedClientCode,
+        clientCode: client.clientCode,
+        clientName: client.clientName,
+        turnover: client.turnover,
+        coveredPlanAmount,
+        missingPlanAmount,
+        coveredPlanShare: totalPlanAmount > 0 ? (coveredPlanAmount / totalPlanAmount) * 100 : 0,
+        missingPlanShare: totalPlanAmount > 0 ? (missingPlanAmount / totalPlanAmount) * 100 : 0,
+        coveredGroups: coveredPlans.length,
+        missingGroups: missingPlans.length,
+        missingGroupNames: missingPlans.map((plan) => plan.productGroup)
+      };
+    })
+    .filter((row) => row.turnover > 0 && row.missingGroups > 0)
+    .sort((a, b) => b.missingPlanShare - a.missingPlanShare || b.turnover - a.turnover || a.clientCode.localeCompare(b.clientCode) || a.clientName.localeCompare(b.clientName))
+    .slice(0, limit);
 }
 
 export function groupPlanAudit(groupPlans: GroupPlanRecord[], sales: SalesRecord[]) {

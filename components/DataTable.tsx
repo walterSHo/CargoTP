@@ -1,9 +1,25 @@
 'use client';
 
-import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table';
+import { useState } from 'react';
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from '@tanstack/react-table';
 
-export function DataTable<T>({ columns, data }: { columns: ColumnDef<T>[]; data: T[] }) {
-  const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel(), getSortedRowModel: getSortedRowModel() });
+export function DataTable<T>({ columns, data, initialSorting = [] }: { columns: ColumnDef<T>[]; data: T[]; initialSorting?: SortingState }) {
+  const [sorting, setSorting] = useState<SortingState>(initialSorting);
+  const table = useReactTable({
+    data,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  });
+
+  function sortLabel(direction: false | 'asc' | 'desc') {
+    if (direction === 'asc') return '▲';
+    if (direction === 'desc') return '▼';
+    return '↕';
+  }
+
   return (
     <div className="overflow-x-auto rounded-xl border bg-white">
       <table className="min-w-full text-sm">
@@ -12,7 +28,14 @@ export function DataTable<T>({ columns, data }: { columns: ColumnDef<T>[]; data:
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th className="whitespace-nowrap px-4 py-3 text-left font-semibold" key={header.id}>
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                    <button className="inline-flex items-center gap-2 text-left" onClick={header.column.getToggleSortingHandler()} type="button">
+                      <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
+                      <span className="text-xs text-slate-400">{sortLabel(header.column.getIsSorted())}</span>
+                    </button>
+                  ) : (
+                    flexRender(header.column.columnDef.header, header.getContext())
+                  )}
                 </th>
               ))}
             </tr>

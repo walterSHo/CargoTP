@@ -10,12 +10,12 @@ export default function ReceivablesPage() {
   const overdue = sum(receivables.map((row) => row.overdueDebt));
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Receivables</h1>
+      <h1 className="text-3xl font-bold">Дебіторська заборгованість</h1>
       <section className="grid gap-4 md:grid-cols-4">
-        <KpiCard title="Общая дебиторка" value={money(total)} />
-        <KpiCard title="Просроченная" value={money(overdue)} />
-        <KpiCard title="Непросроченная" value={money(sum(receivables.map((row) => row.currentDebt)))} />
-        <KpiCard title="Доля просрочки" value={percent(total > 0 ? (overdue / total) * 100 : 0)} />
+        <KpiCard title="Загальна дебіторка" value={money(total)} />
+        <KpiCard title="Прострочена" value={money(overdue)} />
+        <KpiCard title="Непрострочена" value={money(sum(receivables.map((row) => row.currentDebt)))} />
+        <KpiCard title="Частка прострочки" value={percent(total > 0 ? (overdue / total) * 100 : 0)} />
       </section>
       <ReceivablesClient receivables={receivables} />
     </div>

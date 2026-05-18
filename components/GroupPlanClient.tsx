@@ -23,21 +23,26 @@ function statusClass(value: number) {
 }
 
 const columns: ColumnDef<Row>[] = [
-  { accessorKey: 'productGroup', header: 'Группа' },
+  { accessorKey: 'productGroup', header: 'Група' },
   { accessorKey: 'planPercent', header: 'План %', cell: (info) => percent(Number(info.getValue())) },
-  { accessorKey: 'shareOfGrossPlan', header: 'Доля от валового плана', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'shareOfGrossPlan', header: 'Частка від валового плану', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'planAmount', header: 'План', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'factAmount', header: 'Факт из файла', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'factFromSales', header: 'Факт из продаж', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'variance', header: 'Отклонение', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'completionPercent', header: '% выполнения', cell: (info) => <span className={statusClass(Number(info.getValue()))}>{percent(Number(info.getValue()))}</span> }
+  { accessorKey: 'factAmount', header: 'Факт із файлу', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'factFromSales', header: 'Факт із продажів', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'variance', header: 'Відхилення', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'completionPercent', header: '% виконання', cell: (info) => <span className={statusClass(Number(info.getValue()))}>{percent(Number(info.getValue()))}</span> }
 ];
 
 export function GroupPlanClient({ rows }: { rows: Row[] }) {
   return (
     <>
-      <SimpleBarChart data={rows.map((row) => ({ name: row.productGroup, plan: row.planAmount, fact: row.factFromSales }))} bars={['plan', 'fact']} />
-      <DataTable columns={columns} data={rows} />
+      <SimpleBarChart
+        data={rows.map((row) => ({ name: row.productGroup, plan: row.planAmount, fact: row.factFromSales }))}
+        bars={['plan', 'fact']}
+        title="План проти факту за групами"
+        barLabels={{ plan: 'План', fact: 'Факт із продажів' }}
+      />
+      <DataTable columns={columns} data={rows} initialSorting={[{ id: 'planAmount', desc: true }]} />
     </>
   );
 }

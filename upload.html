@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CargoTP Upload</title>
+    <title>Завантаження CargoTP</title>
     <style>
       :root {
         color-scheme: light;
@@ -129,26 +129,26 @@
     <main>
       <section class="shell">
         <div class="hero">
-          <p class="eyebrow">Private Excel Upload</p>
-          <h1>Загрузка исходного Excel</h1>
-          <p class="lead">Файл попадет в GitHub как новый production source, затем GitHub Actions автоматически обновит <code>data/processed</code>, а Cloudflare Pages подхватит свежий деплой без ручного запуска на рабочем ПК.</p>
+          <p class="eyebrow">Приватне завантаження Excel</p>
+          <h1>Завантаження вихідного Excel</h1>
+          <p class="lead">Файл потрапить у GitHub як нове продакшн-джерело, далі GitHub Actions автоматично оновить <code>data/processed</code>, а Cloudflare Pages підхопить свіжий деплой без ручного запуску на робочому ПК.</p>
         </div>
 
         <form id="upload-form">
           <label>
-            Пароль или upload secret
+            Пароль або upload secret
             <input id="password" name="password" type="password" autocomplete="current-password" required />
           </label>
 
           <label>
-            Excel-файл текущего месяца
+            Excel-файл поточного місяця
             <input id="file" name="file" type="file" accept=".xlsx,.xls,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required />
           </label>
 
-          <button id="submit" type="submit">Загрузить и запустить обновление</button>
+          <button id="submit" type="submit">Завантажити й запустити оновлення</button>
 
-          <p class="hint">Приватный endpoint: <code>/api/upload</code>. Для CLI можно отправить <code>multipart/form-data</code> с полями <code>password</code> и <code>file</code>.</p>
-          <div id="status" class="status">Ожидание загрузки.</div>
+          <p class="hint">Приватний endpoint: <code>/api/upload</code>. Для CLI можна надіслати <code>multipart/form-data</code> з полями <code>password</code> і <code>file</code>.</p>
+          <div id="status" class="status">Очікування завантаження.</div>
         </form>
       </section>
     </main>
@@ -166,7 +166,7 @@
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         submitButton.disabled = true;
-        setStatus('Файл загружается в GitHub и запускается pipeline...', '');
+        setStatus('Файл завантажується в GitHub і запускає pipeline...', '');
 
         try {
           const response = await fetch('/api/upload', {
@@ -175,15 +175,15 @@
           });
           const payload = await response.json().catch(() => ({}));
           if (!response.ok || !payload.ok) {
-            throw new Error([payload.error, payload.nextStep, payload.details].filter(Boolean).join('\n') || `Upload failed with HTTP ${response.status}. Server did not return a usable JSON error payload.`);
+            throw new Error([payload.error, payload.nextStep, payload.details].filter(Boolean).join('\n') || `Завантаження завершилося з HTTP ${response.status}. Сервер не повернув придатний JSON з помилкою.`);
           }
 
           setStatus([
-            'Загрузка принята.',
+            'Завантаження прийнято.',
             `Файл: ${payload.uploadedFileName}`,
-            `Путь в репозитории: ${payload.rawPath}`,
-            `Commit source: ${payload.sourceCommitSha || 'создан'}`,
-            'GitHub Actions уже запущен и после его коммита Cloudflare Pages развернет обновленный дашборд.'
+            `Шлях у репозиторії: ${payload.rawPath}`,
+            `SHA коміту джерела: ${payload.sourceCommitSha || 'створено'}`,
+            'GitHub Actions уже запущено, і після його коміту Cloudflare Pages розгорне оновлений дашборд.'
           ].join('\n'), 'success');
           form.reset();
         } catch (error) {

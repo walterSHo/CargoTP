@@ -8,12 +8,12 @@ import type { ReceivableRecord } from '@/lib/types';
 import type { ColumnDef } from '@tanstack/react-table';
 
 const columns: ColumnDef<ReceivableRecord>[] = [
-  { accessorKey: 'unifiedClientCode', header: 'Единый код' },
-  { accessorKey: 'clientCode', header: 'Код клиента' },
-  { accessorKey: 'clientName', header: 'Клиент' },
-  { accessorKey: 'totalDebt', header: 'Всего', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'currentDebt', header: 'Непросроченная', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'overdueDebt', header: 'Просроченная', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'unifiedClientCode', header: 'Єдиний код' },
+  { accessorKey: 'clientCode', header: 'Код клієнта' },
+  { accessorKey: 'clientName', header: 'Клієнт' },
+  { accessorKey: 'totalDebt', header: 'Усього', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'currentDebt', header: 'Непрострочена', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'overdueDebt', header: 'Прострочена', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'bucket0To10', header: '0–10', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'bucket11To20', header: '11–20', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'bucket21To30', header: '21–30', cell: (info) => money(Number(info.getValue())) },
@@ -23,8 +23,8 @@ const columns: ColumnDef<ReceivableRecord>[] = [
 export function ReceivablesClient({ receivables }: { receivables: ReceivableRecord[] }) {
   return (
     <>
-      <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} />
-      <DataTable columns={columns} data={[...receivables].sort((a, b) => b.totalDebt - a.totalDebt)} />
+      <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} title="Найбільша дебіторка по клієнтах" />
+      <DataTable columns={columns} data={receivables} initialSorting={[{ id: 'totalDebt', desc: true }]} />
     </>
   );
 }

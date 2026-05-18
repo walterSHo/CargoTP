@@ -4,13 +4,13 @@ import './globals.css';
 import { Navigation } from '@/components/Navigation';
 
 export const metadata: Metadata = {
-  title: 'Trade Rep Dashboard',
-  description: 'Daily sales, group plan and receivables dashboard'
+  title: 'CargoTP Dashboard',
+  description: 'Щоденний дашборд продажів, плану груп і дебіторської заборгованості'
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="uk">
       <body>
         <Navigation />
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>

@@ -10,14 +10,14 @@ export default function TiresPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Tire Analytics</h1>
-        <p className="text-slate-500">Шины анализируются отдельно и не входят в KPI валового плана.</p>
+        <h1 className="text-3xl font-bold">Аналітика шин</h1>
+        <p className="text-slate-500">Шини аналізуються окремо й не входять до KPI валового плану.</p>
       </div>
       <section className="grid gap-4 md:grid-cols-4">
         <KpiCard title="Оборот шин" value={money(summary.turnover)} />
-        <KpiCard title="Клиенты шин" value={String(summary.topClients.length)} />
-        <KpiCard title="Средняя маржа шин" value={percent(summary.avgMargin)} />
-        <KpiCard title="Средняя скидка шин" value={percent(summary.avgDiscount)} />
+        <KpiCard title="Клієнти шин" value={String(summary.topClients.length)} />
+        <KpiCard title="Середня маржа шин" value={percent(summary.avgMargin)} />
+        <KpiCard title="Середня знижка шин" value={percent(summary.avgDiscount)} />
       </section>
       <TiresClient summary={summary} />
     </div>

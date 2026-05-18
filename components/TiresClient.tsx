@@ -18,28 +18,30 @@ type TireSummary = {
 
 const columns: ColumnDef<SalesRecord>[] = [
   { accessorKey: 'date', header: 'Дата' },
-  { accessorKey: 'clientName', header: 'Клиент' },
+  { accessorKey: 'unifiedClientCode', header: 'Єдиний код' },
+  { accessorKey: 'clientCode', header: 'Код клієнта' },
+  { accessorKey: 'clientName', header: 'Клієнт' },
   { accessorKey: 'brand', header: 'Бренд' },
-  { accessorKey: 'productGroup', header: 'Группа' },
+  { accessorKey: 'productGroup', header: 'Група' },
   { accessorKey: 'productCode', header: 'Товар' },
   { accessorKey: 'amountEur', header: 'Оборот', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'netMargin', header: 'Маржа', cell: (info) => percent(Number(info.getValue())) },
-  { accessorKey: 'discountPercent', header: 'Скидка', cell: (info) => percent(Number(info.getValue())) }
+  { accessorKey: 'discountPercent', header: 'Знижка', cell: (info) => percent(Number(info.getValue())) }
 ];
 
 export function TiresClient({ summary }: { summary: TireSummary }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-2">
-        <SimpleBarChart data={summary.topClients} />
-        <SimpleBarChart data={summary.topBrands} />
+        <SimpleBarChart data={summary.topClients} title="Топ клієнтів по шинах" />
+        <SimpleBarChart data={summary.topBrands} title="Топ брендів шин" />
       </div>
       <section className="grid gap-4 lg:grid-cols-3">
-        <SimpleBarChart data={summary.growingClients.slice(0, 8).map((row) => ({ name: row.name, value: row.delta }))} />
-        <SimpleBarChart data={summary.fallingClients.slice(0, 8).map((row) => ({ name: row.name, value: Math.abs(row.delta) }))} />
-        <SimpleBarChart data={summary.problematicClients} />
+        <SimpleBarChart data={summary.growingClients.slice(0, 8).map((row) => ({ name: row.name, value: row.delta }))} title="Клієнти зі зростанням" />
+        <SimpleBarChart data={summary.fallingClients.slice(0, 8).map((row) => ({ name: row.name, value: Math.abs(row.delta) }))} title="Клієнти зі спадом" />
+        <SimpleBarChart data={summary.problematicClients} title="Клієнти з прострочкою" />
       </section>
-      <DataTable columns={columns} data={summary.rows} />
+      <DataTable columns={columns} data={summary.rows} initialSorting={[{ id: 'clientCode', desc: false }, { id: 'date', desc: false }]} />
     </div>
   );
 }

@@ -29,7 +29,7 @@ function parseRepository(repository) {
   const value = normalizeToken(repository);
   const [owner, repo] = value.split('/');
   if (!owner || !repo) {
-    throw new Error('GITHUB_REPO must look like owner/repository.');
+    throw new Error('GITHUB_REPO має бути у форматі owner/repository.');
   }
   return { owner, repo };
 }
@@ -101,11 +101,11 @@ async function githubRequest(url, token, init = {}) {
   const isJson = contentType.includes('application/json');
   const payload = text ? (isJson ? JSON.parse(text) : null) : null;
   if (!response.ok) {
-    const message = payload?.message || text || `GitHub API request failed with ${response.status}`;
+    const message = payload?.message || text || `Запит до GitHub API завершився помилкою ${response.status}`;
     throw new Error(message);
   }
   if (text && !isJson) {
-    throw new Error(`GitHub API returned non-JSON success response (${response.status}): ${text.slice(0, 300)}`);
+    throw new Error(`GitHub API повернув успішну, але не-JSON відповідь (${response.status}): ${text.slice(0, 300)}`);
   }
   return payload;
 }
@@ -126,10 +126,10 @@ async function getExistingSha(owner, repo, branch, rawPath, token) {
   const isJson = contentType.includes('application/json');
   const payload = text ? (isJson ? JSON.parse(text) : null) : null;
   if (!response.ok) {
-    throw new Error(payload?.message || text || `Cannot read existing ${rawPath}`);
+    throw new Error(payload?.message || text || `Не вдалося прочитати поточний файл ${rawPath}`);
   }
   if (text && !isJson) {
-    throw new Error(`GitHub API returned non-JSON response while reading ${rawPath}: ${text.slice(0, 300)}`);
+    throw new Error(`GitHub API повернув не-JSON відповідь під час читання ${rawPath}: ${text.slice(0, 300)}`);
   }
   return payload?.sha ?? null;
 }
@@ -137,7 +137,7 @@ async function getExistingSha(owner, repo, branch, rawPath, token) {
 export async function onRequestGet() {
   return json({
     ok: true,
-    message: 'Use POST multipart/form-data with field "file" and password/header auth.'
+    message: 'Використовуйте POST multipart/form-data з полем "file" і авторизацією через пароль або header.'
   });
 }
 
@@ -145,37 +145,37 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   if (!getGitHubToken(env)) {
-    return json({ ok: false, error: 'Server is not configured: missing GitHub token.' }, 500);
+    return json({ ok: false, error: 'Сервер не налаштований: відсутній GitHub token.' }, 500);
   }
 
   const hasPassword = normalizeToken(env.UPLOAD_PASSWORD);
   const hasBearerToken = normalizeToken(env.UPLOAD_BEARER_TOKEN);
   if (!hasPassword && !hasBearerToken) {
-    return json({ ok: false, error: 'Server is not configured: set UPLOAD_PASSWORD or UPLOAD_BEARER_TOKEN.' }, 500);
+    return json({ ok: false, error: 'Сервер не налаштований: задайте UPLOAD_PASSWORD або UPLOAD_BEARER_TOKEN.' }, 500);
   }
 
   const formData = await request.formData();
   const password = formData.get('password');
   if (!isAuthorized(request, typeof password === 'string' ? password : '', env)) {
-    return json({ ok: false, error: 'Unauthorized upload request.' }, 401);
+    return json({ ok: false, error: 'Неавторизований запит на завантаження.' }, 401);
   }
 
   const uploadedFile = formData.get('file');
   if (!uploadedFile || typeof uploadedFile.arrayBuffer !== 'function') {
-    return json({ ok: false, error: 'Missing Excel file in field "file".' }, 400);
+    return json({ ok: false, error: 'У полі "file" відсутній Excel-файл.' }, 400);
   }
 
   const fileName = normalizeToken(uploadedFile.name || 'upload.xlsx');
   if (!/\.xlsx?$/i.test(fileName)) {
-    return json({ ok: false, error: 'Only .xlsx and .xls files are allowed.' }, 400);
+    return json({ ok: false, error: 'Дозволені лише файли .xlsx і .xls.' }, 400);
   }
 
   const arrayBuffer = await uploadedFile.arrayBuffer();
   if (!arrayBuffer.byteLength) {
-    return json({ ok: false, error: 'Uploaded file is empty.' }, 400);
+    return json({ ok: false, error: 'Завантажений файл порожній.' }, 400);
   }
   if (arrayBuffer.byteLength > MAX_UPLOAD_SIZE_BYTES) {
-    return json({ ok: false, error: `File is too large. Limit is ${MAX_UPLOAD_SIZE_BYTES} bytes.` }, 413);
+    return json({ ok: false, error: `Файл завеликий. Ліміт: ${MAX_UPLOAD_SIZE_BYTES} байт.` }, 413);
   }
 
   try {
@@ -223,8 +223,8 @@ export async function onRequestPost(context) {
     } catch (dispatchError) {
       return json({
         ok: false,
-        error: 'Excel uploaded to GitHub, but GitHub Actions was not triggered automatically.',
-        nextStep: 'Run the process-data workflow manually from GitHub Actions.',
+        error: 'Excel завантажено в GitHub, але GitHub Actions не запустився автоматично.',
+        nextStep: 'Запустіть workflow process-data вручну з GitHub Actions.',
         branch,
         rawPath,
         uploadedFileName: fileName,
@@ -235,7 +235,7 @@ export async function onRequestPost(context) {
 
     return json({
       ok: true,
-      message: 'Excel uploaded. GitHub Actions has been triggered.',
+      message: 'Excel завантажено. GitHub Actions запущено.',
       branch,
       rawPath,
       uploadedFileName: fileName,

@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const month = String(form.get('month') ?? '').trim();
   const grossPlan = Number(form.get('grossPlan'));
   if (!/^\d{4}-\d{2}$/.test(month) || !Number.isFinite(grossPlan) || grossPlan < 0) {
-    throw new Error('Некорректный месяц или валовый план.');
+    throw new Error('Некоректний місяць або валовий план.');
   }
 
   fs.mkdirSync(processedDir, { recursive: true });
