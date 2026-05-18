@@ -36,6 +36,9 @@ export type ClientGroupGapRow = {
   coveredGroupNames: string[];
   coveredBrandNames: string[];
   missingGroupNames: string[];
+  coveredGroupStats: Array<{ name: string; amount: number; turnoverShare: number; planShare: number }>;
+  coveredBrandStats: Array<{ name: string; amount: number; turnoverShare: number }>;
+  missingGroupStats: Array<{ name: string; planShare: number }>;
 };
 
 export function monthOf(date: string) {
@@ -165,7 +168,16 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
   if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
   const highlightedBrands = new Set(HIGHLIGHT_GROUP_GAP_BRANDS.map((brand) => normalizeProductGroup(brand)));
-  const salesByClient = new Map<string, { unifiedClientCode: string; clientCode: string; clientName: string; turnover: number; groups: Set<string>; brands: Set<string> }>();
+  const salesByClient = new Map<string, {
+    unifiedClientCode: string;
+    clientCode: string;
+    clientName: string;
+    turnover: number;
+    groups: Set<string>;
+    brands: Set<string>;
+    groupAmounts: Map<string, { name: string; amount: number }>;
+    brandAmounts: Map<string, { name: string; amount: number }>;
+  }>();
   sales.forEach((row) => {
     const key = clientKey(row);
     const entry = salesByClient.get(key) ?? {
@@ -174,11 +186,27 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
       clientName: row.clientName,
       turnover: 0,
       groups: new Set<string>(),
-      brands: new Set<string>()
+      brands: new Set<string>(),
+      groupAmounts: new Map<string, { name: string; amount: number }>(),
+      brandAmounts: new Map<string, { name: string; amount: number }>()
     };
     entry.turnover += row.amountEur;
-    if (planRelevantGroup(row.productGroup)) entry.groups.add(normalizeProductGroup(row.productGroup));
-    if (row.brand && highlightedBrands.has(normalizeProductGroup(row.brand))) entry.brands.add(row.brand.trim());
+    if (planRelevantGroup(row.productGroup)) {
+      const normalizedGroup = normalizeProductGroup(row.productGroup);
+      const groupName = row.productGroup.trim();
+      entry.groups.add(normalizedGroup);
+      const currentGroup = entry.groupAmounts.get(normalizedGroup) ?? { name: groupName, amount: 0 };
+      currentGroup.amount += row.amountEur;
+      entry.groupAmounts.set(normalizedGroup, currentGroup);
+    }
+    if (row.brand && highlightedBrands.has(normalizeProductGroup(row.brand))) {
+      const normalizedBrand = normalizeProductGroup(row.brand);
+      const brandName = row.brand.trim();
+      entry.brands.add(brandName);
+      const currentBrand = entry.brandAmounts.get(normalizedBrand) ?? { name: brandName, amount: 0 };
+      currentBrand.amount += row.amountEur;
+      entry.brandAmounts.set(normalizedBrand, currentBrand);
+    }
     salesByClient.set(key, entry);
   });
 
@@ -188,6 +216,31 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
       const missingPlans = relevantPlans.filter((plan) => !client.groups.has(plan.normalizedGroup));
       const coveredPlanAmount = sum(coveredPlans.map((plan) => plan.planAmount));
       const missingPlanAmount = totalPlanAmount - coveredPlanAmount;
+      const coveredGroupStats = coveredPlans
+        .map((plan) => {
+          const fact = client.groupAmounts.get(plan.normalizedGroup);
+          const amount = fact?.amount ?? 0;
+          return {
+            name: plan.productGroup,
+            amount,
+            turnoverShare: client.turnover > 0 ? (amount / client.turnover) * 100 : 0,
+            planShare: totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
+          };
+        })
+        .sort((a, b) => b.amount - a.amount || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
+      const coveredBrandStats = [...client.brandAmounts.values()]
+        .map((brand) => ({
+          name: brand.name,
+          amount: brand.amount,
+          turnoverShare: client.turnover > 0 ? (brand.amount / client.turnover) * 100 : 0
+        }))
+        .sort((a, b) => b.amount - a.amount || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
+      const missingGroupStats = missingPlans
+        .map((plan) => ({
+          name: plan.productGroup,
+          planShare: totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
+        }))
+        .sort((a, b) => b.planShare - a.planShare || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
 
       return {
         unifiedClientCode: client.unifiedClientCode,
@@ -201,8 +254,11 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
         coveredGroups: coveredPlans.length,
         missingGroups: missingPlans.length,
         coveredGroupNames: coveredPlans.map((plan) => plan.productGroup),
-        coveredBrandNames: [...client.brands].sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })),
-        missingGroupNames: missingPlans.map((plan) => plan.productGroup)
+        coveredBrandNames: coveredBrandStats.map((brand) => brand.name),
+        missingGroupNames: missingPlans.map((plan) => plan.productGroup),
+        coveredGroupStats,
+        coveredBrandStats,
+        missingGroupStats
       };
     })
     .filter((row) => row.turnover > 0)

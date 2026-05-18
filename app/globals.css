@@ -141,6 +141,19 @@
     transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
   }
 
+  .filter-select {
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, rgba(229, 238, 252, 0.86) 50%),
+      linear-gradient(135deg, rgba(229, 238, 252, 0.86) 50%, transparent 50%);
+    background-position:
+      calc(100% - 22px) calc(50% - 2px),
+      calc(100% - 16px) calc(50% - 2px);
+    background-repeat: no-repeat;
+    background-size: 6px 6px, 6px 6px;
+    padding-right: 3rem;
+  }
+
   .filter-input:focus,
   .filter-select:focus {
     border-color: rgba(78, 161, 255, 0.6);
@@ -217,5 +230,33 @@
     border-color: rgba(78, 161, 255, 0.42);
     background: rgba(78, 161, 255, 0.16);
     color: var(--ink);
+  }
+
+  .search-suggestion-popover {
+    @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 border p-3;
+    border-radius: 14px;
+    border-color: var(--line);
+    background: rgba(8, 15, 28, 0.98);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  }
+
+  .search-suggestion-grid {
+    @apply grid gap-2;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    max-height: 18rem;
+    overflow: auto;
+  }
+
+  .search-suggestion-option {
+    @apply w-full border px-3 py-2 text-left text-sm transition;
+    border-radius: 10px;
+    border-color: var(--line);
+    background: rgba(12, 20, 36, 0.95);
+    color: var(--ink);
+  }
+
+  .search-suggestion-option:hover {
+    border-color: rgba(78, 161, 255, 0.36);
+    background: rgba(78, 161, 255, 0.12);
   }
 }

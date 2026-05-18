@@ -41,6 +41,7 @@ export function GroupPlanClient({ rows }: { rows: Row[] }) {
         bars={['plan', 'fact']}
         title="План проти факту за групами"
         barLabels={{ plan: 'План', fact: 'Факт із продажів' }}
+        valueLabel="Сума"
       />
       <DataTable columns={columns} data={rows} initialSorting={[{ id: 'planAmount', desc: true }]} />
     </>

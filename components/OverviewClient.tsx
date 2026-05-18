@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DailySalesChart, SimpleBarChart } from '@/components/Charts';
 import { DataTable } from '@/components/DataTable';
@@ -93,6 +93,18 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const [searchMode, setSearchMode] = useState<SearchMode>('code');
   const [query, setQuery] = useState('');
   const [groupGapMode, setGroupGapMode] = useState<GroupGapMode>('all');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (searchRef.current?.contains(event.target as Node)) return;
+      setSearchOpen(false);
+    }
+
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, []);
 
   if (!month) {
     return (
@@ -119,8 +131,15 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
     ? (receivables.reduce((total, row) => total + row.bucket31Plus, 0) / Math.max(receivables.reduce((total, row) => total + row.totalDebt, 0), 1)) * 100
     : 0;
   const suggestions = suggestionValues(data, searchMode);
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleSuggestions = (normalizedQuery
+    ? suggestions.filter((item) => item.toLowerCase().includes(normalizedQuery))
+    : suggestions).slice(0, 24);
   const completionTone = kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger';
   const debtTone = kpis.overdueDebt > 0 ? 'danger' : 'success';
+  const suggestionGridClassName = searchMode === 'group' || searchMode === 'brand'
+    ? 'sm:grid-cols-2 xl:grid-cols-3'
+    : 'sm:grid-cols-2';
 
   return (
     <div className="space-y-6">
@@ -144,19 +163,41 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
               {months.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
-          <label className="grid gap-2">
+          <div className="grid gap-2" ref={searchRef}>
             <span className="filter-label">Пошук</span>
-            <input
-              className="filter-input"
-              list="overview-search-suggestions"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={`Фільтр за полем: ${searchModes.find((item) => item.value === searchMode)?.label.toLowerCase()}`}
-              value={query}
-            />
-            <datalist id="overview-search-suggestions">
-              {suggestions.map((item) => <option key={item} value={item} />)}
-            </datalist>
-          </label>
+            <div className="relative">
+              <input
+                className="filter-input"
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                placeholder={`Фільтр за полем: ${searchModes.find((item) => item.value === searchMode)?.label.toLowerCase()}`}
+                value={query}
+              />
+              {searchOpen && visibleSuggestions.length ? (
+                <div className="search-suggestion-popover">
+                  <div className={`search-suggestion-grid ${suggestionGridClassName}`}>
+                    {visibleSuggestions.map((item) => (
+                      <button
+                        className="search-suggestion-option"
+                        key={item}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          setQuery(item);
+                          setSearchOpen(false);
+                        }}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
           <div className="grid gap-2">
             <span className="filter-label">Режим</span>
             <div className="flex flex-wrap gap-2">
@@ -164,7 +205,10 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <button
                   className={`filter-pill ${searchMode === item.value ? 'filter-pill-active' : ''}`}
                   key={item.value}
-                  onClick={() => setSearchMode(item.value)}
+                  onClick={() => {
+                    setSearchMode(item.value);
+                    setSearchOpen(true);
+                  }}
                   type="button"
                 >
                   {item.label}
@@ -184,12 +228,12 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
 
       <section className="grid gap-4 xl:grid-cols-2">
         <DailySalesChart data={daily} title={`Щоденна динаміка за ${month}`} />
-        <SimpleBarChart data={topClientsChart} title="Топ клієнтів за оборотом" />
+        <SimpleBarChart data={topClientsChart} title="Топ клієнтів за оборотом" valueLabel="Оборот" />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <SimpleBarChart barColor="#2dd4bf" data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} />
-        <SimpleBarChart barColor="#fb7185" data={topOverdueClients} title="Топ клієнтів за прострочкою" />
+        <SimpleBarChart barColor="#2dd4bf" data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} valueLabel="Цільова доля" />
+        <SimpleBarChart barColor="#fb7185" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
       </section>
 
       <section className="space-y-3">
@@ -218,16 +262,37 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
           data={visibleGroupGaps}
           initialSorting={[{ id: 'missingPlanShare', desc: true }, { id: 'turnover', desc: true }]}
           renderExpandedRow={(row) => (
-            <div className="soft-panel space-y-3 p-4">
+            <div className="soft-panel space-y-4 p-4">
               <div className="text-sm font-semibold text-white">{row.clientName} ({row.clientCode || row.unifiedClientCode || 'без коду'})</div>
               <div className="text-sm text-muted">
                 Покрита частка плану: <strong className="text-white">{percent(row.coveredPlanShare)}</strong>. Втрачена частка: <strong className="text-white">{percent(row.missingPlanShare)}</strong>.
               </div>
-              <div className="text-sm text-muted">
-                Групи, які клієнт вже робить: <span className="text-white">{[...row.coveredGroupNames, ...row.coveredBrandNames].join(', ') || 'поки немає планових груп'}</span>
+              <div className="space-y-2">
+                <div className="text-sm text-muted">Групи, які клієнт вже робить:</div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {[...row.coveredGroupStats, ...row.coveredBrandStats.map((brand) => ({ ...brand, planShare: null }))].map((item) => (
+                    <div className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] px-3 py-2" key={item.name}>
+                      <div className="text-sm font-semibold text-white">{item.name}</div>
+                      <div className="mt-1 text-xs text-muted">
+                        {money(item.amount)} · {percent(item.turnoverShare)} клієнта
+                        {'planShare' in item && typeof item.planShare === 'number' ? ` · ціль ${percent(item.planShare)}` : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="text-sm text-muted">
-                Повний список відсутніх груп: <span className="text-white">{row.missingGroupNames.join(', ') || 'усі планові групи вже закриті'}</span>
+              <div className="space-y-2">
+                <div className="text-sm text-muted">Групи, яких не вистачає:</div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {row.missingGroupStats.length ? row.missingGroupStats.map((item) => (
+                    <div className="rounded-[12px] border border-line bg-[rgba(78,161,255,0.08)] px-3 py-2" key={item.name}>
+                      <div className="text-sm font-semibold text-white">{item.name}</div>
+                      <div className="mt-1 text-xs text-muted">Ціль групи: {percent(item.planShare)} валового плану</div>
+                    </div>
+                  )) : (
+                    <div className="rounded-[12px] border border-line bg-[rgba(52,211,153,0.08)] px-3 py-2 text-sm text-white">Усі планові групи вже закриті</div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -239,7 +304,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
           <h2 className="section-title text-white">Топ клієнтів місяця</h2>
           <p className="section-copy text-sm">Деталізацію по брендах і групах залишаємо в таблицях нижче по сторінках, щоб overview залишався коротким і робочим.</p>
         </div>
-        <DataTable columns={topClientColumns()} data={topClients} initialSorting={[{ id: 'turnover', desc: true }]} maxHeightClassName="max-h-[30rem]" />
+        <DataTable columns={topClientColumns()} data={topClients} initialSorting={[{ id: 'turnover', desc: true }]} />
       </section>
     </div>
   );

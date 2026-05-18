@@ -45,9 +45,9 @@ export function SalesClient({ sales }: { sales: SalesRecord[] }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-3">
-        <SimpleBarChart data={byTop(filteredSales, (row) => row.clientName, (row) => row.amountEur, 5)} title="Топ клієнтів за оборотом" />
-        <SimpleBarChart data={byTop(filteredSales, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 5)} title="Топ брендів" />
-        <SimpleBarChart data={byTop(filteredSales, (row) => row.productGroup, (row) => row.amountEur, 5)} title="Топ товарних груп" />
+        <SimpleBarChart data={byTop(filteredSales, (row) => row.clientName, (row) => row.amountEur, 5)} title="Топ клієнтів за оборотом" valueLabel="Оборот" />
+        <SimpleBarChart data={byTop(filteredSales, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 5)} title="Топ брендів" valueLabel="Оборот" />
+        <SimpleBarChart data={byTop(filteredSales, (row) => row.productGroup, (row) => row.amountEur, 5)} title="Топ товарних груп" valueLabel="Оборот" />
       </div>
       <DataTable
         activeFilters={filters}

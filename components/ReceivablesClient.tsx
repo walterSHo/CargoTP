@@ -26,8 +26,8 @@ export function ReceivablesClient({ receivables }: { receivables: ReceivableReco
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-2">
-        <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} title="Найбільша дебіторка по клієнтах" />
-        <SimpleBarChart barColor="#fb7185" data={byTop(overdueRows, (row) => row.clientName, (row) => row.overdueDebt, 8)} title="Ризик: найбільша прострочка" />
+        <SimpleBarChart data={byTop(receivables, (row) => row.clientName, (row) => row.totalDebt, 8)} title="Найбільша дебіторка по клієнтах" valueLabel="Дебіторка" />
+        <SimpleBarChart barColor="#fb7185" data={byTop(overdueRows, (row) => row.clientName, (row) => row.overdueDebt, 8)} title="Ризик: найбільша прострочка" valueLabel="Прострочка" />
       </div>
       <DataTable columns={columns} data={receivables} initialSorting={[{ id: 'totalDebt', desc: true }]} />
     </div>
