@@ -52,13 +52,16 @@
       }
       .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
       .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 18px 0; }
+      .toolbar label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; flex: 1 1 220px; min-width: 0; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
       input, select {
         border: 1px solid var(--line);
         border-radius: 10px;
         background: white;
         padding: 10px 12px;
-        min-width: 170px;
+        min-width: 0;
+        width: 100%;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
       }
       h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
       h2 { margin: 0; font-size: 24px; }
@@ -79,10 +82,12 @@
       }
       .kpi .label { color: var(--muted); font-size: 13px; }
       .kpi .value { margin-top: 8px; font-size: 26px; font-weight: 800; }
-      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; }
+      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
+      .table-wrap.tall { max-height: 30rem; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { background: #f1f5f9; font-weight: 750; }
+      .table-wrap.tall th { position: sticky; top: 0; z-index: 1; }
       tr:last-child td { border-bottom: 0; }
       .th-sort {
         display: inline-flex;
@@ -96,6 +101,19 @@
         color: inherit;
       }
       .sort-mark { font-size: 12px; color: #94a3b8; }
+      .hint-inline { display: inline-flex; align-items: center; gap: 8px; }
+      .hint-dot {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        font-size: 10px;
+        font-weight: 700;
+        color: #64748b;
+      }
       .bar-list { display: grid; gap: 10px; }
       .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; }
       .bar-bg { height: 12px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
@@ -108,6 +126,27 @@
       .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 16px; background: white; }
       .small { font-size: 12px; color: var(--muted); }
       .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; }
+      .expandable-row { cursor: pointer; }
+      .expandable-row:hover { background: #f8fafc; }
+      .expand-card {
+        display: grid;
+        gap: 8px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+      }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+      }
       .pie-wrap { display: grid; gap: 18px; align-items: center; grid-template-columns: minmax(180px, 220px) 1fr; }
       .pie-chart {
         width: 200px;
@@ -147,6 +186,10 @@
       @media (max-width: 860px) {
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
+        nav, main { padding: 14px 14px; }
+        .toolbar { gap: 10px; }
+        .toolbar label { flex-basis: 100%; }
+        th, td { padding: 10px 10px; }
       }
     </style>
   </head>
@@ -169,8 +212,9 @@
       <div class="toolbar">
         <label>Місяць <select id="month"></select></label>
         <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
-        <label>Пошук <input id="search" placeholder="Клієнт, бренд, група..." /></label>
+        <label>Пошук <input id="search" list="client-search-suggestions" placeholder="Код клієнта, назва, бренд..." /></label>
       </div>
+      <datalist id="client-search-suggestions"></datalist>
 
       <section class="section active" id="overview"></section>
       <section class="section" id="sales"></section>
@@ -187,6 +231,7 @@
         month: '',
         search: '',
         grossPlan: 0,
+        clientSuggestions: [],
         tableSorts: {
           topClients: { key: 'turnover', dir: 'desc' },
           groupGaps: { key: 'missingPlanShare', dir: 'desc' },
@@ -194,7 +239,8 @@
           groups: { key: 'planAmount', dir: 'desc' },
           receivables: { key: 'totalDebt', dir: 'desc' },
           tires: { key: 'clientCode', dir: 'asc' }
-        }
+        },
+        expandedRows: {}
       };
 
       const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -210,7 +256,16 @@
         .replaceAll("'", '&#39;');
       const normalizeProductGroup = (value) => String(value || '').trim().toLowerCase().replace(/ё/g, 'е').replace(/[ії]/g, 'и').replace(/\s+/g, ' ');
       const clientKey = (row) => row.clientCode || row.unifiedClientCode || row.clientName;
-      const matchesSearch = (row) => JSON.stringify(row).toLowerCase().includes(state.search.toLowerCase());
+      function matchesSearch(row) {
+        const normalizedSearch = String(state.search || '').toLowerCase().trim();
+        if (!normalizedSearch) return true;
+        const tokens = normalizedSearch
+          .split(/\s+[—-]\s+|,\s*/)
+          .map((part) => part.trim())
+          .filter(Boolean);
+        const haystack = JSON.stringify(row).toLowerCase();
+        return tokens.every((token) => haystack.includes(token));
+      }
       const isTireGroup = (value) => {
         const normalized = normalizeProductGroup(value);
         return normalized.includes('шина') || normalized.includes('шины') || normalized.includes('шин') || normalized.includes('tire') || normalized.includes('tyre');
@@ -263,6 +318,16 @@
           }))
           .sort((a, b) => b.turnover - a.turnover || String(a.clientCode).localeCompare(String(b.clientCode), 'uk', { numeric: true, sensitivity: 'base' }))
           .slice(0, limit);
+      }
+
+      function collectClientSuggestions() {
+        const map = new Map();
+        [...state.data.sales, ...state.data.receivables].forEach((row) => {
+          if (row.clientCode) map.set(`code:${row.clientCode}`, { value: row.clientCode, label: row.clientName || row.clientCode });
+          if (row.unifiedClientCode) map.set(`unified:${row.unifiedClientCode}`, { value: row.unifiedClientCode, label: row.clientName || row.unifiedClientCode });
+          if (row.clientName) map.set(`name:${row.clientName}`, { value: row.clientName, label: 'Клієнт' });
+        });
+        return [...map.values()].sort((a, b) => a.value.localeCompare(b.value, 'uk', { numeric: true, sensitivity: 'base' })).slice(0, 400);
       }
 
       function dailySalesSeries(rows) {
@@ -372,12 +437,21 @@
         });
       }
 
-      function table(tableId, rows, columns) {
+      function infoLabel(label, explanation) {
+        return `<span class="hint-inline">${escapeHtml(label)}<span class="hint-dot" title="${escapeHtml(explanation)}">i</span></span>`;
+      }
+
+      function rowExpansionKey(tableId, rowKey) {
+        return `${tableId}:${rowKey}`;
+      }
+
+      function table(tableId, rows, columns, options = {}) {
         if (!rows.length) return empty();
         const currentSort = state.tableSorts[tableId] || {};
         const sorted = sortedRows(tableId, rows, columns);
+        const expandable = typeof options.expandContent === 'function';
         return `
-          <div class="table-wrap">
+          <div class="table-wrap ${options.maxHeight ? 'tall' : ''}">
             <table>
               <thead>
                 <tr>
@@ -385,19 +459,28 @@
                     const sortKey = column.sortKey || column.key;
                     const sortable = Boolean(sortKey);
                     const mark = currentSort.key === sortKey ? (currentSort.dir === 'asc' ? '▲' : '▼') : '↕';
-                    return `<th>${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${escapeHtml(column.title)}<span class="sort-mark">${mark}</span></button>` : escapeHtml(column.title)}</th>`;
+                    const titleHtml = column.titleHtml || escapeHtml(column.title);
+                    return `<th>${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}</th>`;
                   }).join('')}
                 </tr>
               </thead>
               <tbody>
-                ${sorted.map((row) => `<tr>${columns.map((column) => `<td>${column.render ? column.render(row) : escapeHtml(row[column.key] ?? '')}</td>`).join('')}</tr>`).join('')}
+                ${sorted.map((row, index) => {
+                  const rowKey = options.rowKey ? options.rowKey(row, index) : String(index);
+                  const expandedKey = rowExpansionKey(tableId, rowKey);
+                  const expanded = Boolean(state.expandedRows[expandedKey]);
+                  const cells = columns.map((column) => `<td>${column.render ? column.render(row) : escapeHtml(row[column.key] ?? '')}</td>`).join('');
+                  const baseRow = `<tr class="${expandable ? 'expandable-row' : ''}" ${expandable ? `data-row-toggle="${tableId}" data-row-key="${escapeHtml(rowKey)}"` : ''}>${cells}</tr>`;
+                  const extraRow = expandable && expanded ? `<tr><td colspan="${columns.length}">${options.expandContent(row)}</td></tr>` : '';
+                  return `${baseRow}${extraRow}`;
+                }).join('')}
               </tbody>
             </table>
           </div>
         `;
       }
 
-      function bars(rows) {
+      function bars(rows, valueFormatter = money) {
         if (!rows.length) return empty();
         const max = Math.max(...rows.map((row) => row.value), 1);
         return `
@@ -406,7 +489,7 @@
               <div class="bar-row">
                 <div>${escapeHtml(row.name)}</div>
                 <div class="bar-bg"><div class="bar" style="width:${Math.max(3, row.value / max * 100)}%"></div></div>
-                <strong>${escapeHtml(money(row.value))}</strong>
+                <strong>${escapeHtml(valueFormatter(row.value))}</strong>
               </div>
             `).join('')}
           </div>
@@ -514,6 +597,10 @@
         const groupMix = byTop(sales, (row) => row.productGroup, (row) => row.amountEur, 8);
         const groupGaps = clientGroupShareGaps(sales);
         const daily = dailySalesSeries(sales);
+        const groupShareTargets = groupPlanRows(sales)
+          .sort((a, b) => b.share - a.share)
+          .map((row) => ({ name: row.productGroup, value: row.share }))
+          .slice(0, 10);
 
         document.getElementById('overview').innerHTML = `
           <div class="section-stack">
@@ -548,6 +635,15 @@
             </div>
 
             <div class="section-head">
+              <h2>Цільові долі груп у валовому плані</h2>
+              <p class="muted">Це плановий відсоток від обороту, який мають дати групи у валовому плані.</p>
+            </div>
+            <div class="chart-shell">
+              <div class="chart-title">Планові долі груп</div>
+              ${bars(groupShareTargets, pct)}
+            </div>
+
+            <div class="section-head">
               <h2>Топ клієнтів місяця</h2>
               <p class="muted">Сортування доступне по кожній колонці. За замовчуванням таблиця відсортована за оборотом.</p>
             </div>
@@ -555,20 +651,17 @@
               { title: 'Код клієнта', key: 'clientCode' },
               { title: 'Клієнт', key: 'clientName' },
               { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
-              { title: 'Частка місяця', key: 'sharePercent', sortValue: (row) => row.sharePercent, render: (row) => pct(row.sharePercent) },
-              { title: 'Продажів', key: 'salesCount', sortValue: (row) => row.salesCount },
-              { title: 'Груп у роботі', key: 'productGroups', sortValue: (row) => row.productGroups }
-            ])}
+              { title: 'Частка місяця', titleHtml: infoLabel('Частка місяця', 'Показує, яку частину всього обороту обраного місяця формує цей клієнт.'), key: 'sharePercent', sortValue: (row) => row.sharePercent, render: (row) => pct(row.sharePercent) }
+            ], { maxHeight: true, rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName })}
 
             <div class="section-head">
               <h2>Клієнти, які не закривають планові групи</h2>
-              <p class="muted">Рейтинг побудовано за втраченою часткою планових груп у поточному місяці.</p>
+              <p class="muted">Рейтинг побудовано за втраченою часткою планових груп у поточному місяці. Натисніть на рядок, щоб побачити повний список груп.</p>
             </div>
             ${table('groupGaps', groupGaps, [
               { title: 'Код клієнта', key: 'clientCode' },
               { title: 'Клієнт', key: 'clientName' },
               { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
-              { title: 'Покрита частка', key: 'coveredPlanShare', sortValue: (row) => row.coveredPlanShare, render: (row) => pct(row.coveredPlanShare) },
               { title: 'Втрачена частка', key: 'missingPlanShare', sortValue: (row) => row.missingPlanShare, render: (row) => `<span class="pill">${escapeHtml(pct(row.missingPlanShare))}</span>` },
               { title: 'Відсутніх груп', key: 'missingGroups', sortValue: (row) => row.missingGroups },
               {
@@ -581,7 +674,17 @@
                   return `<span title="${escapeHtml(value)}">${escapeHtml(preview || '—')}</span>`;
                 }
               }
-            ])}
+            ], {
+              maxHeight: true,
+              rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName,
+              expandContent: (row) => `
+                <div class="expand-card">
+                  <div><strong>${escapeHtml(row.clientName)}</strong> (${escapeHtml(row.clientCode || row.unifiedClientCode || 'без коду')})</div>
+                  <div class="small">Покрита частка плану: <strong>${escapeHtml(pct(row.coveredPlanShare))}</strong>. Втрачена частка: <strong>${escapeHtml(pct(row.missingPlanShare))}</strong>.</div>
+                  <div class="chips">${row.missingGroupNames.map((name) => `<span class="chip">${escapeHtml(name)}</span>`).join('') || '<span class="chip">—</span>'}</div>
+                </div>
+              `
+            })}
           </div>
         `;
       }
@@ -606,7 +709,7 @@
               { title: 'Сума', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
               { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
               { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
-            ])}
+            ], { rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}` })}
           </div>
         `;
       }
@@ -622,13 +725,13 @@
             ${table('groups', rows, [
               { title: 'Група', key: 'productGroup' },
               { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
-              { title: 'Частка від плану', key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
+              { title: 'Частка від плану', titleHtml: infoLabel('Частка від плану', 'Цільовий відсоток валового плану, який має дати ця товарна група.'), key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
               { title: 'План', key: 'planAmount', sortValue: (row) => row.planAmount, render: (row) => money(row.planAmount) },
               { title: 'Факт із файлу', key: 'factAmount', sortValue: (row) => row.factAmount, render: (row) => money(row.factAmount) },
               { title: 'Факт із продажів', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
               { title: 'Відхилення', key: 'variance', sortValue: (row) => row.variance, render: (row) => money(row.variance) },
               { title: '% виконання', key: 'completionPercent', sortValue: (row) => row.completionPercent, render: (row) => `<span class="${completionClass(row.completionPercent)}">${escapeHtml(pct(row.completionPercent))}</span>` }
-            ])}
+            ], { rowKey: (row) => row.productGroup })}
           </div>
         `;
       }
@@ -660,7 +763,7 @@
               { title: '11–20', key: 'bucket11To20', sortValue: (row) => row.bucket11To20, render: (row) => money(row.bucket11To20) },
               { title: '21–30', key: 'bucket21To30', sortValue: (row) => row.bucket21To30, render: (row) => money(row.bucket21To30) },
               { title: '31+', key: 'bucket31Plus', sortValue: (row) => row.bucket31Plus, render: (row) => money(row.bucket31Plus) }
-            ])}
+            ], { rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName })}
           </div>
         `;
       }
@@ -695,7 +798,7 @@
               { title: 'Оборот', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
               { title: 'Маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
               { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
-            ])}
+            ], { rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}` })}
           </div>
         `;
       }
@@ -723,6 +826,10 @@
         state.data.groupPlans = Array.isArray(state.data.groupPlans) ? state.data.groupPlans : [];
         state.data.receivables = Array.isArray(state.data.receivables) ? state.data.receivables : [];
         state.data.monthlyPlans = Array.isArray(state.data.monthlyPlans) ? state.data.monthlyPlans : [];
+        state.clientSuggestions = collectClientSuggestions();
+        document.getElementById('client-search-suggestions').innerHTML = state.clientSuggestions
+          .map((entry) => `<option value="${escapeHtml(entry.value)}" label="${escapeHtml(entry.label)}"></option>`)
+          .join('');
 
         const months = [...new Set(state.data.sales.map((row) => monthOf(row.date)).filter((month) => /^\d{4}-\d{2}$/.test(month)))].sort().reverse();
         const expectedSource = 'data/raw/Олексієнко.xlsx';
@@ -766,6 +873,16 @@
           key: sortKey,
           dir: current.key === sortKey && current.dir === 'asc' ? 'desc' : 'asc'
         };
+        renderAll();
+      });
+
+      document.addEventListener('click', (event) => {
+        const rowToggle = event.target.closest('[data-row-toggle]');
+        if (!rowToggle) return;
+        const tableId = rowToggle.dataset.rowToggle;
+        const rowKey = rowToggle.dataset.rowKey;
+        const key = rowExpansionKey(tableId, rowKey);
+        state.expandedRows[key] = !state.expandedRows[key];
         renderAll();
       });
 

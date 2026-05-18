@@ -1,8 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { DailySalesChart, SimpleBarChart, SimplePieChart } from '@/components/Charts';
 import { DataTable } from '@/components/DataTable';
+import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
-import { clientGroupShareGaps, dailySalesSeries, dashboardKpis, latestDataMonth, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
+import { clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, latestDataMonth, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
 import { EXCLUDED_GROSS_PLAN_GROUP } from '@/lib/constants';
 import { readDashboardData } from '@/lib/data';
 import { money, percent } from '@/lib/format';
@@ -11,16 +12,17 @@ const topClientColumns: ColumnDef<TopClientRow>[] = [
   { accessorKey: 'clientCode', header: 'Код клієнта' },
   { accessorKey: 'clientName', header: 'Клієнт' },
   { accessorKey: 'turnover', header: 'Оборот', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'sharePercent', header: 'Частка місяця', cell: (info) => percent(Number(info.getValue())) },
-  { accessorKey: 'salesCount', header: 'Продажів' },
-  { accessorKey: 'productGroups', header: 'Груп у роботі' }
+  {
+    accessorKey: 'sharePercent',
+    header: () => <InfoHint explanation="Показує, яку частину всього обороту обраного місяця формує цей клієнт." label="Частка місяця" />,
+    cell: (info) => percent(Number(info.getValue()))
+  }
 ];
 
 const gapColumns: ColumnDef<ClientGroupGapRow>[] = [
   { accessorKey: 'clientCode', header: 'Код клієнта' },
   { accessorKey: 'clientName', header: 'Клієнт' },
   { accessorKey: 'turnover', header: 'Оборот', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'coveredPlanShare', header: 'Покрита частка плану', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'missingPlanShare', header: 'Втрачена частка плану', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'missingGroups', header: 'Відсутніх груп' },
   {
@@ -55,6 +57,10 @@ export default function DashboardPage() {
   const groupMix = byTop(monthSales, (row) => row.productGroup, (row) => row.amountEur, 8);
   const daily = dailySalesSeries(monthSales);
   const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales, 12);
+  const groupShareTargets = groupPlanAudit(data.groupPlans, monthSales)
+    .sort((a, b) => b.shareOfGrossPlan - a.shareOfGrossPlan)
+    .map((row) => ({ name: row.productGroup, value: row.shareOfGrossPlan }))
+    .slice(0, 10);
 
   return (
     <div className="space-y-6">
@@ -88,10 +94,34 @@ export default function DashboardPage() {
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-2xl font-semibold">Клієнти, які не закривають планові групи</h2>
-          <p className="text-sm text-slate-500">Рейтинг побудований за втраченою часткою планових груп у поточному місяці.</p>
+          <h2 className="text-2xl font-semibold">Цільові долі груп у валовому плані</h2>
+          <p className="text-sm text-slate-500">Це плановий відсоток від обороту, який мають дати групи у валовому плані.</p>
         </div>
-        <DataTable columns={gapColumns} data={groupGaps} initialSorting={[{ id: 'missingPlanShare', desc: true }, { id: 'turnover', desc: true }]} />
+        <SimpleBarChart data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} />
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-2xl font-semibold">Клієнти, які не закривають планові групи</h2>
+          <p className="text-sm text-slate-500">Рейтинг побудований за втраченою часткою планових груп у поточному місяці. Натисніть на рядок, щоб побачити повний список груп.</p>
+        </div>
+        <DataTable
+          columns={gapColumns}
+          data={groupGaps}
+          initialSorting={[{ id: 'missingPlanShare', desc: true }, { id: 'turnover', desc: true }]}
+          maxHeightClassName="max-h-[30rem]"
+          renderExpandedRow={(row) => (
+            <div className="space-y-2">
+              <div className="text-sm font-semibold text-slate-800">{row.clientName} ({row.clientCode || row.unifiedClientCode || 'без коду'})</div>
+              <div className="text-sm text-slate-600">
+                Покрита частка плану: <strong>{percent(row.coveredPlanShare)}</strong>. Втрачена частка: <strong>{percent(row.missingPlanShare)}</strong>.
+              </div>
+              <div className="text-sm text-slate-600">
+                Повний список відсутніх груп: {row.missingGroupNames.join(', ') || '—'}
+              </div>
+            </div>
+          )}
+        />
       </section>
 
       <section className="space-y-3">
@@ -99,7 +129,7 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-semibold">Топ клієнтів місяця</h2>
           <p className="text-sm text-slate-500">Тут видно не тільки оборот, а й частку місяця та ширину роботи по групах.</p>
         </div>
-        <DataTable columns={topClientColumns} data={topClients} initialSorting={[{ id: 'turnover', desc: true }]} />
+        <DataTable columns={topClientColumns} data={topClients} initialSorting={[{ id: 'turnover', desc: true }]} maxHeightClassName="max-h-[30rem]" />
       </section>
     </div>
   );

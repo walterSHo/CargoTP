@@ -15,7 +15,19 @@ function ChartShell({ children, title }: { children: ReactNode; title?: string }
   );
 }
 
-export function SimpleBarChart({ data, bars = ['value'], title, barLabels = {} }: { data: Array<Record<string, string | number>>; bars?: string[]; title?: string; barLabels?: Record<string, string> }) {
+export function SimpleBarChart({
+  data,
+  bars = ['value'],
+  title,
+  barLabels = {},
+  valueFormatter = money
+}: {
+  data: Array<Record<string, string | number>>;
+  bars?: string[];
+  title?: string;
+  barLabels?: Record<string, string>;
+  valueFormatter?: (value: number) => string;
+}) {
   return (
     <ChartShell title={title}>
       <ResponsiveContainer height="100%" width="100%">
@@ -23,7 +35,7 @@ export function SimpleBarChart({ data, bars = ['value'], title, barLabels = {} }
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip formatter={(value: number) => money(Number(value))} />
+          <Tooltip formatter={(value: number) => valueFormatter(Number(value))} />
           {bars.length > 1 ? <Legend /> : null}
           {bars.map((bar, index) => <Bar dataKey={bar} fill={COLORS[index % COLORS.length]} key={bar} name={barLabels[bar] ?? bar} />)}
         </BarChart>

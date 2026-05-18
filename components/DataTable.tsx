@@ -1,10 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { Fragment, useState } from 'react';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from '@tanstack/react-table';
 
-export function DataTable<T>({ columns, data, initialSorting = [] }: { columns: ColumnDef<T>[]; data: T[]; initialSorting?: SortingState }) {
+export function DataTable<T>({
+  columns,
+  data,
+  initialSorting = [],
+  maxHeightClassName,
+  renderExpandedRow
+}: {
+  columns: ColumnDef<T>[];
+  data: T[];
+  initialSorting?: SortingState;
+  maxHeightClassName?: string;
+  renderExpandedRow?: (row: T) => ReactNode;
+}) {
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   const table = useReactTable({
     data,
     columns,
@@ -20,10 +34,14 @@ export function DataTable<T>({ columns, data, initialSorting = [] }: { columns: 
     return '↕';
   }
 
+  function toggleExpanded(rowId: string) {
+    setExpandedRows((current) => ({ ...current, [rowId]: !current[rowId] }));
+  }
+
   return (
-    <div className="overflow-x-auto rounded-xl border bg-white">
+    <div className={`overflow-auto rounded-xl border bg-white ${maxHeightClassName ?? ''}`}>
       <table className="min-w-full text-sm">
-        <thead className="bg-slate-50">
+        <thead className="sticky top-0 z-[1] bg-slate-50">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
@@ -42,15 +60,32 @@ export function DataTable<T>({ columns, data, initialSorting = [] }: { columns: 
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr className="border-t" key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td className="whitespace-nowrap px-4 py-3" key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {table.getRowModel().rows.map((row) => {
+            const expandedContent = renderExpandedRow?.(row.original);
+            const isExpanded = Boolean(expandedRows[row.id]);
+
+            return (
+              <Fragment key={row.id}>
+                <tr
+                  className={`border-t ${expandedContent ? 'cursor-pointer hover:bg-slate-50' : ''}`}
+                  onClick={expandedContent ? () => toggleExpanded(row.id) : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td className="whitespace-nowrap px-4 py-3" key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+                {expandedContent && isExpanded ? (
+                  <tr className="border-t bg-slate-50/70">
+                    <td className="px-4 py-4" colSpan={row.getVisibleCells().length}>
+                      {expandedContent}
+                    </td>
+                  </tr>
+                ) : null}
+              </Fragment>
+            );
+          })}
         </tbody>
       </table>
     </div>
