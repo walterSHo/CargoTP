@@ -5684,7 +5684,7 @@
     "productGroup": "ГАЛЬМІВНА СИСТЕМА",
     "productCode": "PR 4040-00329",
     "amountEur": 11.22,
-    "netMargin": 45.930481283422395,
+    "netMargin": 45.930481283422495,
     "discountPercent": 30.006238303181497
   },
   {
@@ -7977,7 +7977,7 @@
     "productCode": "DT 1.27352",
     "amountEur": 16.94,
     "netMargin": 28.9651711924439,
-    "discountPercent": 28.006799830004198
+    "discountPercent": 28.006799830004297
   },
   {
     "date": "2026-05-12",
@@ -11456,7 +11456,7 @@
     "productGroup": "ДВИГУН",
     "productCode": "EL 549.331",
     "amountEur": 9.93,
-    "netMargin": 26.933534743202397,
+    "netMargin": 26.7099697885196,
     "discountPercent": 28.0434782608696
   },
   {
@@ -12373,6 +12373,30 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "13297",
+    "clientCode": "13297",
+    "clientName": "Ультрафильтр",
+    "brand": "DONALDSON",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "DO P554005",
+    "amountEur": 434.18,
+    "netMargin": 17.8553595283062,
+    "discountPercent": 30.0014509810244
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "00463",
+    "clientCode": "00463",
+    "clientName": "АВАНТИ ГРУП",
+    "brand": "FERODO",
+    "productGroup": "ГАЛЬМІВНА СИСТЕМА",
+    "productCode": "FE FCR214A",
+    "amountEur": 211.72,
+    "netMargin": 9.32467409786511,
+    "discountPercent": 28.001088213289798
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "00607",
     "clientCode": "00607",
     "clientName": "АВТОМОТОРС",
@@ -12430,6 +12454,18 @@
     "amountEur": 98.93,
     "netMargin": 6.9712928333164905,
     "discountPercent": 30.0007075638576
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "13297",
+    "clientCode": "13297",
+    "clientName": "Ультрафильтр",
+    "brand": "DONALDSON",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "DO P532499",
+    "amountEur": 62.94,
+    "netMargin": 14.345090562440399,
+    "discountPercent": 30.0044483985765
   },
   {
     "date": "2026-05-18",
@@ -12505,6 +12541,18 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "13297",
+    "clientCode": "13297",
+    "clientName": "Ультрафильтр",
+    "brand": "DONALDSON",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "DO P158675",
+    "amountEur": 58.33,
+    "netMargin": 11.252014400822901,
+    "discountPercent": 30.001200048001902
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "15302",
     "clientCode": "19209",
     "clientName": "ТАЙФУН СЕРВИС",
@@ -12512,7 +12560,7 @@
     "productGroup": "ФІЛЬТР",
     "productCode": "MF PU1059X",
     "amountEur": 15.2,
-    "netMargin": 10.7453947368421,
+    "netMargin": 10.8184210526316,
     "discountPercent": 29.9861814831875
   },
   {
@@ -12526,6 +12574,18 @@
     "amountEur": 218.78,
     "netMargin": 12.8043239784258,
     "discountPercent": 0
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "07071",
+    "clientCode": "21586",
+    "clientName": "ИНТЕРБУС-СЕРВИС",
+    "brand": "AUGER",
+    "productGroup": "ПІДВІСКА",
+    "productCode": "AUG 57695",
+    "amountEur": 37.62,
+    "netMargin": 49.790271132376404,
+    "discountPercent": 26.0031471282455
   },
   {
     "date": "2026-05-18",
@@ -12550,6 +12610,30 @@
     "amountEur": 37.1,
     "netMargin": 22.5816711590296,
     "discountPercent": 30
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "03738",
+    "clientCode": "03738",
+    "clientName": "МБК Макаров",
+    "brand": "MANN",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "MF PU12002-2Z",
+    "amountEur": 74.38,
+    "netMargin": 16.7936273191718,
+    "discountPercent": 28.0030974736231
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "13082",
+    "clientCode": "13082",
+    "clientName": "АЗОВ СКАН ТРАНС",
+    "brand": "PROFIT",
+    "productGroup": "ГАЛЬМІВНА СИСТЕМА",
+    "productCode": "PR 5075-0031",
+    "amountEur": 129.67,
+    "netMargin": 24.689133955425298,
+    "discountPercent": 26.004336909381397
   },
   {
     "date": "2026-05-18",
@@ -12613,6 +12697,30 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "21578",
+    "clientCode": "22147",
+    "clientName": "Гарилит Сервис",
+    "brand": "ELRING",
+    "productGroup": "ДВИГУН",
+    "productCode": "EL 233.451",
+    "amountEur": 7.55,
+    "netMargin": 8.31523178807947,
+    "discountPercent": 28.0266920877026
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "00437",
+    "clientCode": "23988",
+    "clientName": "ПРОМОТОР АКТИВ",
+    "brand": "KS",
+    "productGroup": "ДВИГУН",
+    "productCode": "KS 81-62000",
+    "amountEur": 42.31,
+    "netMargin": 6.95651146301111,
+    "discountPercent": 26.005596362364503
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "02432",
     "clientCode": "02432",
     "clientName": "СИНТА-ГРУП",
@@ -12622,6 +12730,18 @@
     "amountEur": 73.16,
     "netMargin": 27.9357572443958,
     "discountPercent": 29.9971294612956
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "02432",
+    "clientCode": "02432",
+    "clientName": "СИНТА-ГРУП",
+    "brand": "DT",
+    "productGroup": "СИСТЕМА ЗЧЕПЛЕННЯ",
+    "productCode": "DT 6.21254",
+    "amountEur": 6.98,
+    "netMargin": 14.836676217765,
+    "discountPercent": 29.989969909729204
   },
   {
     "date": "2026-05-18",
@@ -12673,6 +12793,42 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "05584",
+    "clientCode": "05584",
+    "clientName": "Автоконтакт Плюс",
+    "brand": "E_RICAMBI",
+    "productGroup": "ТРАНСМІСІЯ",
+    "productCode": "ER 74530684",
+    "amountEur": 17.16,
+    "netMargin": 17.961538461538503,
+    "discountPercent": 27.9899286613512
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "05584",
+    "clientCode": "05584",
+    "clientName": "Автоконтакт Плюс",
+    "brand": "PROFIT",
+    "productGroup": "ГАЛЬМІВНА СИСТЕМА",
+    "productCode": "PR 5050-29315",
+    "amountEur": 100.83,
+    "netMargin": 41.0999702469503,
+    "discountPercent": 27.9991431019709
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "07071",
+    "clientCode": "21586",
+    "clientName": "ИНТЕРБУС-СЕРВИС",
+    "brand": "SKF",
+    "productGroup": "РЕМІННИЙ ПРИВІД",
+    "productCode": "SK VKMCV 51006",
+    "amountEur": 256.93,
+    "netMargin": 15.977970653485398,
+    "discountPercent": 26.001555254745
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "09753",
     "clientCode": "08691",
     "clientName": "ГОРОДИСЬКИЙ ВИКТОР ГРИГОРОВИЧ",
@@ -12697,6 +12853,42 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "11511",
+    "clientCode": "25296",
+    "clientName": "Глобал Автоцентр",
+    "brand": "KS",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "KS 50014675",
+    "amountEur": 32.45,
+    "netMargin": 16.3842835130971,
+    "discountPercent": 30.0043140638482
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "11511",
+    "clientCode": "25296",
+    "clientName": "Глобал Автоцентр",
+    "brand": "WIX",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "WX WL10081",
+    "amountEur": 12.73,
+    "netMargin": 18.827179890023597,
+    "discountPercent": 30.016492578339697
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "13082",
+    "clientCode": "13082",
+    "clientName": "АЗОВ СКАН ТРАНС",
+    "brand": "MONROE",
+    "productGroup": "АМОРТИЗАЦІЯ",
+    "productCode": "MN F5004",
+    "amountEur": 102.21,
+    "netMargin": -5.32785441737599,
+    "discountPercent": -3.39908952959029
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "13916",
     "clientCode": "13916",
     "clientName": "АВРОРА АВТО",
@@ -12718,6 +12910,30 @@
     "amountEur": 73.91,
     "netMargin": 31.974293059126,
     "discountPercent": 30.0094696969697
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "15302",
+    "clientCode": "19209",
+    "clientName": "ТАЙФУН СЕРВИС",
+    "brand": "FEBI",
+    "productGroup": "ПІДВІСКА",
+    "productCode": "FB 19585",
+    "amountEur": 4.25,
+    "netMargin": 17.385882352941202,
+    "discountPercent": 29.983525535420103
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "15302",
+    "clientCode": "19209",
+    "clientName": "ТАЙФУН СЕРВИС",
+    "brand": "MERCEDES",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "MB 0000901752",
+    "amountEur": 116.88,
+    "netMargin": 12.293720054757,
+    "discountPercent": 29.9994010900162
   },
   {
     "date": "2026-05-18",
@@ -12781,6 +12997,18 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "15602",
+    "clientCode": "27822",
+    "clientName": "Назуков Олег Ігорович",
+    "brand": "PROFIT",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "PR 1512-790000",
+    "amountEur": 54.16,
+    "netMargin": 42.064623338257,
+    "discountPercent": 23.9966320516419
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "16416",
     "clientCode": "16416",
     "clientName": "ПРОМБУДЦЕНТР",
@@ -12788,7 +13016,7 @@
     "productGroup": "ЕЛЕКТРИКА",
     "productCode": "DT 3.60570",
     "amountEur": 48.01,
-    "netMargin": 36.0549885440533,
+    "netMargin": 37.4667777546344,
     "discountPercent": 27.999400119976
   },
   {
@@ -12817,6 +13045,42 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "17081",
+    "clientCode": "17081",
+    "clientName": "СПЕШЛ КАРС",
+    "brand": "NURAL",
+    "productGroup": "ДВИГУН",
+    "productCode": "NU 89-283100-80",
+    "amountEur": 156.71,
+    "netMargin": -2.21996043647502,
+    "discountPercent": 0
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "18113",
+    "clientCode": "18113",
+    "clientName": "ЕВРОКЛУБ",
+    "brand": "GATES",
+    "productGroup": "РЕМІННИЙ ПРИВІД",
+    "productCode": "GT 10PK2473HD",
+    "amountEur": 22.78,
+    "netMargin": 14.496049165934998,
+    "discountPercent": 30.0153609831029
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "18113",
+    "clientCode": "18113",
+    "clientName": "ЕВРОКЛУБ",
+    "brand": "GATES",
+    "productGroup": "РЕМІННИЙ ПРИВІД",
+    "productCode": "GT T38699",
+    "amountEur": 45.51,
+    "netMargin": 15.6229400131839,
+    "discountPercent": 29.9953853253346
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "18993",
     "clientCode": "18993",
     "clientName": "М-ТРАК",
@@ -12826,6 +13090,30 @@
     "amountEur": 54.28,
     "netMargin": 41.2102063375092,
     "discountPercent": 29.9974206860975
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "18993",
+    "clientCode": "18993",
+    "clientName": "М-ТРАК",
+    "brand": "CORTECO",
+    "productGroup": "ПІДВІСКА",
+    "productCode": "CO 01018219B",
+    "amountEur": 11.98,
+    "netMargin": 8.365609348914859,
+    "discountPercent": 29.982466393921698
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "18993",
+    "clientCode": "18993",
+    "clientName": "М-ТРАК",
+    "brand": "DOMAR",
+    "productGroup": "КУЗОВ ТА ОПТИКА",
+    "productCode": "DM DK3115",
+    "amountEur": 39.37,
+    "netMargin": 6.18923037846076,
+    "discountPercent": 29.9964438122333
   },
   {
     "date": "2026-05-18",
@@ -12925,6 +13213,54 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "18993",
+    "clientCode": "18993",
+    "clientName": "М-ТРАК",
+    "brand": "WUHLERMANN",
+    "productGroup": "СИСТЕМА ВИПУСКУ ВІДПРАЦЬОВАНИХ ГАЗІВ",
+    "productCode": "WU 12030183",
+    "amountEur": 23.48,
+    "netMargin": 34.412265758092,
+    "discountPercent": 29.994036970781202
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "21578",
+    "clientCode": "22147",
+    "clientName": "Гарилит Сервис",
+    "brand": "DT",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "DT 5.45065",
+    "amountEur": 16.56,
+    "netMargin": 24.3828502415459,
+    "discountPercent": 28.000000000000004
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "21578",
+    "clientCode": "22147",
+    "clientName": "Гарилит Сервис",
+    "brand": "HALDEX",
+    "productGroup": "ПНЕВМАТИКА",
+    "productCode": "HX 031006309",
+    "amountEur": 29.42,
+    "netMargin": 13.211080897348701,
+    "discountPercent": 27.998042094958397
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "21578",
+    "clientCode": "22147",
+    "clientName": "Гарилит Сервис",
+    "brand": "MERCEDES",
+    "productGroup": "ДВИГУН",
+    "productCode": "MB 4720780680",
+    "amountEur": 70.86,
+    "netMargin": 5.00832627716624,
+    "discountPercent": 28.0097531240475
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "25180",
     "clientCode": "19203",
     "clientName": "Прайм Техсервис",
@@ -12937,6 +13273,18 @@
   },
   {
     "date": "2026-05-18",
+    "unifiedClientCode": "25180",
+    "clientCode": "25180",
+    "clientName": "ТРЕЙЛЕР СОЛЮШНЗ",
+    "brand": "VIGNAL",
+    "productGroup": "ЕЛЕКТРИКА",
+    "productCode": "VG D16224",
+    "amountEur": 4.94,
+    "netMargin": 40.3967611336032,
+    "discountPercent": 30.028328611897997
+  },
+  {
+    "date": "2026-05-18",
     "unifiedClientCode": "28482",
     "clientCode": "28482",
     "clientName": "ЛИДЕР АВТО 23",
@@ -12946,5 +13294,77 @@
     "amountEur": 266,
     "netMargin": 11.5789473684211,
     "discountPercent": 24
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "29574",
+    "clientCode": "30460",
+    "clientName": "Хавро Андрій Миколайович",
+    "brand": "FEBI",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "FB 33770",
+    "amountEur": 11.55,
+    "netMargin": 20.0580086580087,
+    "discountPercent": 24.0131578947368
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "29574",
+    "clientCode": "30460",
+    "clientName": "Хавро Андрій Миколайович",
+    "brand": "MAHLE",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "MH LXS256",
+    "amountEur": 11.87,
+    "netMargin": 25.6764953664701,
+    "discountPercent": 24.0076824583867
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "29574",
+    "clientCode": "30460",
+    "clientName": "Хавро Андрій Миколайович",
+    "brand": "MANN",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "MF W950/7",
+    "amountEur": 7.92,
+    "netMargin": 20.875,
+    "discountPercent": 23.9923224568138
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "29574",
+    "clientCode": "30460",
+    "clientName": "Хавро Андрій Миколайович",
+    "brand": "WIX_HD",
+    "productGroup": "ФІЛЬТР",
+    "productCode": "WX 33532",
+    "amountEur": 17.61,
+    "netMargin": 23.780806360022698,
+    "discountPercent": 23.9965472593871
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "32023",
+    "clientCode": "32023",
+    "clientName": "ВЕРТЕКС 22",
+    "brand": "AUGER",
+    "productGroup": "ТРАНСМІСІЯ",
+    "productCode": "AUG 10590",
+    "amountEur": 8.18,
+    "netMargin": 13.202933985330102,
+    "discountPercent": 23.9776951672862
+  },
+  {
+    "date": "2026-05-18",
+    "unifiedClientCode": "32023",
+    "clientCode": "32023",
+    "clientName": "ВЕРТЕКС 22",
+    "brand": "AUGER",
+    "productGroup": "УПРАВЛІННЯ КЕРМОМ",
+    "productCode": "AUG 10593",
+    "amountEur": 14.37,
+    "netMargin": 36.9053583855254,
+    "discountPercent": 24.008461131676402
   }
 ]
