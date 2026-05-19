@@ -1,7 +1,7 @@
 {
   "status": "ok",
   "meta": {
-    "updatedAt": "2026-05-18T21:05:37.886Z",
+    "updatedAt": "2026-05-19T04:56:46.200Z",
     "status": "ok",
     "sourceFiles": [
       "data/raw/Олексієнко_01.05-18.05.xlsx"
@@ -708,7 +708,7 @@
       ]
     }
   },
-  "updatedAt": "2026-05-18T21:05:37.886Z",
+  "updatedAt": "2026-05-19T04:56:46.200Z",
   "sales": [
     {
       "date": "2026-05-01",
