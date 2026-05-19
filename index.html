@@ -37,6 +37,13 @@
         color: var(--ink);
         font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
       }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition-duration: 0ms !important; }
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
       .app-shell { min-height: 100vh; }
       .sidebar {
         display: none;
@@ -79,7 +86,9 @@
         padding: 12px 14px;
         cursor: pointer;
         text-align: left;
+        transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
       }
+      .tab:hover { transform: translateY(-1px); }
       .tab.active {
         background: rgba(78,161,255,0.16);
         border-color: rgba(78,161,255,0.4);
@@ -96,6 +105,8 @@
         padding: 18px;
         background: rgba(10, 18, 33, 0.9);
         box-shadow: var(--shadow-soft);
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        animation: fadeUp 420ms ease-out both;
       }
       .toolbar-grid {
         display: grid;
@@ -135,7 +146,9 @@
         padding: 10px 14px;
         font-size: 13px;
         font-weight: 700;
+        transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
+      .mode-pill:hover { transform: translateY(-1px); }
       .mode-pill.active {
         border-color: rgba(78, 161, 255, 0.45);
         background: rgba(78,161,255,0.16);
@@ -171,10 +184,12 @@
         text-align: left;
         font-size: 13px;
         cursor: pointer;
+        transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
       }
       .search-suggestion:hover {
         border-color: rgba(78, 161, 255, 0.36);
         background: rgba(78, 161, 255, 0.12);
+        transform: translateY(-1px);
       }
       h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
       h2 { margin: 0; font-size: 24px; }
@@ -192,6 +207,13 @@
         border-radius: var(--radius-panel);
         padding: 18px;
         box-shadow: var(--shadow-soft);
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+        animation: fadeUp 420ms ease-out both;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(148,163,184,0.28);
+        box-shadow: 0 18px 36px rgba(0,0,0,0.24);
       }
       .kpi {
         position: relative;
@@ -207,6 +229,16 @@
         width: 4px;
         background: var(--kpi-accent, var(--blue));
       }
+      .kpi::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent 34%, transparent 72%, rgba(78,161,255,0.06));
+        opacity: 0;
+        transition: opacity 180ms ease;
+        pointer-events: none;
+      }
+      .kpi:hover::after { opacity: 1; }
       .kpi .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
       .kpi .value { margin-top: 10px; font-size: 30px; line-height: 1; font-weight: 900; color: white; letter-spacing: -.03em; }
       .kpi .muted { margin-top: 10px; font-size: 12px; line-height: 1.5; }
@@ -289,7 +321,9 @@
         text-align: left;
         font-size: 13px;
         cursor: pointer;
+        transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
       }
+      .filter-option:hover { transform: translateY(-1px); }
       .filter-option.active {
         border-color: rgba(78, 161, 255, 0.45);
         background: rgba(78, 161, 255, 0.16);
@@ -338,9 +372,11 @@
         background: rgba(78, 161, 255, 0.12);
       }
       .bar-list { display: grid; gap: 10px; }
-      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; }
+      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; transition: background-color 140ms ease, transform 140ms ease; }
+      .bar-row:hover { background: rgba(78,161,255,0.08); transform: translateX(2px); }
       .bar-bg { height: 12px; overflow: hidden; border-radius: 8px; background: rgba(148, 163, 184, 0.16); }
-      .bar { height: 100%; border-radius: inherit; background: var(--blue); }
+      .bar { height: 100%; border-radius: inherit; background: var(--blue); transition: width 260ms ease, filter 140ms ease; }
+      .bar-row:hover .bar { filter: saturate(1.12) brightness(1.08); }
       .status-red { color: var(--red); font-weight: 800; }
       .status-green { color: var(--green); font-weight: 800; }
       .status-lime { color: var(--lime); font-weight: 900; }
@@ -377,7 +413,9 @@
         border-radius: 50%;
         position: relative;
         margin: 0 auto;
+        transition: transform 180ms ease, filter 180ms ease;
       }
+      .pie-chart:hover { transform: scale(1.02); filter: saturate(1.08); }
       .pie-chart::after {
         content: "";
         position: absolute;
@@ -400,7 +438,8 @@
       .pie-center-divider,
       .pie-center-label { color: var(--muted); font-size: 12px; font-weight: 700; }
       .legend-list { display: grid; gap: 10px; }
-      .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+      .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; transition: background-color 140ms ease, transform 140ms ease; }
+      .legend-item:hover { background: rgba(78,161,255,0.08); transform: translateX(2px); }
       .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
       .chart-shell { display: grid; gap: 14px; }
       .chart-title { font-size: 15px; font-weight: 750; }
@@ -409,6 +448,26 @@
       .legend-swatch { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
       .line-chart { width: 100%; height: 250px; }
       .line-chart text { font-size: 11px; fill: var(--muted); }
+      .chart-point { cursor: pointer; }
+      .chart-tooltip {
+        position: fixed;
+        z-index: 60;
+        max-width: 280px;
+        pointer-events: none;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(8, 15, 28, 0.96);
+        color: white;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        padding: 10px 12px;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 120ms ease, transform 120ms ease;
+      }
+      .chart-tooltip.visible { opacity: 1; transform: translateY(0); }
+      .chart-tooltip-title { color: var(--ink); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+      .chart-tooltip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+      .chart-tooltip-row strong { color: white; }
       .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
       .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 16px; background: var(--card-2); box-shadow: var(--shadow-soft); }
       .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -489,6 +548,7 @@
         </main>
       </div>
     </div>
+    <div class="chart-tooltip" id="chart-tooltip" hidden></div>
 
     <script>
       const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
@@ -531,6 +591,10 @@
       const pct = (value) => `${Number(value || 0).toFixed(1)}%`;
       const sum = (rows, get) => rows.reduce((acc, row) => acc + Number(get(row) || 0), 0);
       const avg = (rows, get) => rows.length ? sum(rows, get) / rows.length : 0;
+      const shortLabel = (value, limit = 16) => {
+        const label = String(value ?? '');
+        return label.length > limit ? `${label.slice(0, Math.max(limit - 1, 8))}…` : label;
+      };
       const monthOf = (date) => String(date || '').slice(0, 7);
       const escapeHtml = (value) => String(value ?? '')
         .replaceAll('&', '&amp;')
@@ -541,6 +605,32 @@
       const normalizeProductGroup = (value) => String(value || '').trim().toLowerCase().replace(/ё/g, 'е').replace(/[ії]/g, 'и').replace(/\s+/g, ' ');
       const clientKey = (row) => row.clientCode || row.unifiedClientCode || row.clientName;
       const isProfitBrand = (value) => normalizeProductGroup(value) === normalizeProductGroup(PROFIT_GROUP_NAME);
+      function tooltipAttrs(title, rows = []) {
+        return `data-tooltip-title="${escapeHtml(title)}" data-tooltip-body="${escapeHtml(rows.join('|'))}"`;
+      }
+      function showChartTooltip(target, x, y) {
+        const tooltip = document.getElementById('chart-tooltip');
+        const title = target.dataset.tooltipTitle;
+        const body = target.dataset.tooltipBody ? target.dataset.tooltipBody.split('|') : [];
+        if (!title && !body.length) return;
+        tooltip.innerHTML = `
+          ${title ? `<div class="chart-tooltip-title">${escapeHtml(title)}</div>` : ''}
+          ${body.map((row) => {
+            const [label, value] = row.split('::');
+            return `<div class="chart-tooltip-row"><span>${escapeHtml(label || '')}</span><strong>${escapeHtml(value || '')}</strong></div>`;
+          }).join('')}
+        `;
+        tooltip.hidden = false;
+        tooltip.classList.add('visible');
+        const bounds = tooltip.getBoundingClientRect();
+        tooltip.style.left = `${Math.min(x + 18, window.innerWidth - bounds.width - 14)}px`;
+        tooltip.style.top = `${Math.max(14, y - bounds.height - 14)}px`;
+      }
+      function hideChartTooltip() {
+        const tooltip = document.getElementById('chart-tooltip');
+        tooltip.classList.remove('visible');
+        tooltip.hidden = true;
+      }
       function matchesSearch(row) {
         const normalizedSearch = String(state.search || '').toLowerCase().trim();
         if (!normalizedSearch) return true;
@@ -997,11 +1087,12 @@
       function bars(rows, valueFormatter = money, color = '#4ea1ff') {
         if (!rows.length) return empty();
         const max = Math.max(...rows.map((row) => row.value), 1);
+        const total = sum(rows, (row) => row.value);
         return `
           <div class="card bar-list">
             ${rows.map((row) => `
-              <div class="bar-row" title="${escapeHtml(`${row.name}: ${valueFormatter(row.value)}`)}">
-                <div>${escapeHtml(row.name)}</div>
+              <div class="bar-row chart-point" ${tooltipAttrs(row.name, ['Значення::' + valueFormatter(row.value), 'Частка::' + pct(total ? row.value / total * 100 : 0)])}>
+                <div title="${escapeHtml(row.name)}">${escapeHtml(shortLabel(row.name, 28))}</div>
                 <div class="bar-bg"><div class="bar" style="width:${Math.max(3, row.value / max * 100)}%; background:${color};"></div></div>
                 <strong>${escapeHtml(valueFormatter(row.value))}</strong>
               </div>
@@ -1036,9 +1127,9 @@
             </div>
             <div class="legend-list">
               ${rows.map((row, index) => `
-                <div class="legend-item">
+                <div class="legend-item chart-point" ${tooltipAttrs(row.name, ['Сума::' + money(row.value), 'Частка::' + pct(total ? row.value / total * 100 : 0)])}>
                   <span class="legend-dot" style="background:${COLORS[index % COLORS.length]}"></span>
-                  <span>${escapeHtml(row.name)}</span>
+                  <span title="${escapeHtml(row.name)}">${escapeHtml(shortLabel(row.name, 26))}</span>
                   <strong>${escapeHtml(pct(total ? row.value / total * 100 : 0))}</strong>
                 </div>
               `).join('')}
@@ -1089,7 +1180,7 @@
                 const x = paddingX + step * index + 3;
                 const barHeight = row.turnover / maxValue * plotHeight;
                 const y = height - paddingY - barHeight;
-                return `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="#2563eb" opacity="0.75"><title>${escapeHtml(`${row.date}: оборот ${money(row.turnover)}`)}</title></rect>`;
+                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="#2563eb" opacity="0.75"></rect>`;
               }).join('')}
               <polyline fill="none" stroke="#0f766e" stroke-width="3" points="${grossPlanLine}"></polyline>
               <polyline fill="none" stroke="#d97706" stroke-width="3" points="${tireLine}"></polyline>
@@ -1098,8 +1189,8 @@
                 const grossPlanY = height - paddingY - (row.grossPlanTurnover / maxValue) * (height - paddingY * 2);
                 const tireY = height - paddingY - (row.tireTurnover / maxValue) * (height - paddingY * 2);
                 return `
-                  <circle cx="${x}" cy="${grossPlanY}" r="4" fill="#0f766e"><title>${escapeHtml(`${row.date}: оборот для валового плану ${money(row.grossPlanTurnover)}`)}</title></circle>
-                  <circle cx="${x}" cy="${tireY}" r="4" fill="#d97706"><title>${escapeHtml(`${row.date}: шини ${money(row.tireTurnover)}`)}</title></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот для валового плану::' + money(row.grossPlanTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${grossPlanY}" r="4" fill="#0f766e"></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Шини::' + money(row.tireTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${tireY}" r="4" fill="#d97706"></circle>
                 `;
               }).join('')}
               ${rows.map((row, index) => {
@@ -1568,6 +1659,23 @@
         if (!groupGapModeButton) return;
         state.groupGapMode = groupGapModeButton.dataset.groupGapMode;
         renderOverview();
+      });
+
+      document.addEventListener('mousemove', (event) => {
+        const tooltipTarget = event.target.closest('[data-tooltip-title], [data-tooltip-body]');
+        if (!tooltipTarget) {
+          hideChartTooltip();
+          return;
+        }
+        showChartTooltip(tooltipTarget, event.clientX, event.clientY);
+      });
+
+      document.addEventListener('mouseout', (event) => {
+        const source = event.target.closest('[data-tooltip-title], [data-tooltip-body]');
+        if (!source) return;
+        const related = event.relatedTarget?.closest?.('[data-tooltip-title], [data-tooltip-body]');
+        if (related) return;
+        hideChartTooltip();
       });
 
       document.querySelectorAll('.tab').forEach((button) => button.addEventListener('click', () => {

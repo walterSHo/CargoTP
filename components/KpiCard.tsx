@@ -12,7 +12,7 @@ export function KpiCard({
   tone?: KpiTone;
 }) {
   return (
-    <div className={`kpi-card kpi-card-${tone}`}>
+    <div className={`kpi-card interactive-lift motion-fade-up kpi-card-${tone}`}>
       <div className="pl-3">
         <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{title}</div>
         <div className="mt-3 text-[30px] font-black leading-none tracking-[-0.03em] text-white">{value}</div>

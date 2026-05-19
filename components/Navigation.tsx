@@ -21,7 +21,7 @@ export function Navigation() {
         <nav className="flex gap-2 overflow-x-auto pb-1 text-sm font-medium">
           {links.map(([href, label]) => (
             <Link
-              className={`shrink-0 rounded-[12px] border px-4 py-2 transition ${
+              className={`interactive-lift shrink-0 rounded-[12px] border px-4 py-2 transition ${
                 pathname === href
                   ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                   : 'border-line bg-[rgba(10,18,33,0.72)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
@@ -40,7 +40,7 @@ export function Navigation() {
         <nav className="mt-3 flex flex-1 flex-col gap-2 text-sm font-medium">
           {links.map(([href, label]) => (
             <Link
-              className={`group flex items-center justify-between rounded-[12px] border px-3 py-3 transition ${
+              className={`interactive-lift group flex items-center justify-between rounded-[12px] border px-3 py-3 transition ${
                 pathname === href
                   ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                   : 'border-line bg-[rgba(10,18,33,0.62)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
