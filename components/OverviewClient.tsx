@@ -7,7 +7,7 @@ import { DataTable } from '@/components/DataTable';
 import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
 import { PageHeader } from '@/components/PageHeader';
-import { PROFIT_GROUP_NAME } from '@/lib/constants';
+import { AGGREGATE_PLAN_GROUP, PROFIT_GROUP_NAME } from '@/lib/constants';
 import { availableMonths, avg, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
 import { money, percent } from '@/lib/format';
 import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
@@ -135,6 +135,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales);
   const visibleGroupGaps = groupGapMode === 'deficit' ? groupGaps.filter((row) => row.missingGroups > 0) : groupGaps;
   const groupShareTargets = groupPlanAudit(data.groupPlans, monthSales)
+    .filter((row) => row.productGroup !== AGGREGATE_PLAN_GROUP)
     .map((row) => ({
       name: row.productGroup,
       turnover: row.factFromSales,
@@ -142,8 +143,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       targetShare: row.productGroup === PROFIT_GROUP_NAME ? row.planPercent : row.shareOfGrossPlan,
       completionPercent: row.completionPercent
     }))
-    .filter((row) => row.turnover > 0)
-    .sort((a, b) => b.turnover - a.turnover)
+    .sort((a, b) => b.targetShare - a.targetShare || b.turnover - a.turnover)
     .slice(0, 10);
   const activeClients = new Set(monthSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
   const avgDailyTurnover = daily.length ? avg(daily.map((row) => row.turnover)) : 0;
@@ -153,9 +153,9 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
     : 0;
   const suggestions = suggestionValues(data, searchMode);
   const normalizedQuery = query.trim().toLowerCase();
-  const visibleSuggestions = (normalizedQuery
+  const visibleSuggestions = normalizedQuery
     ? suggestions.filter((item) => item.toLowerCase().includes(normalizedQuery))
-    : suggestions).slice(0, 24);
+    : suggestions;
   const completionTone = kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger';
   const debtTone = kpis.overdueDebt > 0 ? 'danger' : 'success';
   const suggestionGridClassName = searchMode === 'group' || searchMode === 'brand'
@@ -310,7 +310,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                   {[...row.coveredGroupStats, ...row.coveredBrandStats.map((brand) => ({ ...brand, planShare: null }))].map((item) => (
                     <div className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
-                      <div className="mt-1 text-[11px] leading-4 text-muted">
+                      <div className="mt-1 text-[10px] leading-4 text-muted">
                         {money(item.amount)} · {percent(item.turnoverShare)}
                         {'planShare' in item && typeof item.planShare === 'number' ? ` · ${percent(item.planShare)}` : ''}
                       </div>
@@ -324,7 +324,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                   {row.missingGroupStats.length ? row.missingGroupStats.map((item) => (
                     <div className="rounded-[12px] border border-line bg-[rgba(78,161,255,0.08)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
-                      <div className="mt-1 text-xs text-muted">Ціль групи: {percent(item.planShare)} валового плану</div>
+                      <div className="mt-1 text-[10px] leading-4 text-muted">{percent(item.planShare)}</div>
                     </div>
                   )) : (
                     <div className="rounded-[12px] border border-line bg-[rgba(52,211,153,0.08)] px-3 py-2 text-sm text-white">Усі планові групи вже закриті</div>

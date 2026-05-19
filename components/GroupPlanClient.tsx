@@ -2,6 +2,7 @@
 
 import { DataTable } from './DataTable';
 import { SimpleBarChart } from './Charts';
+import { AGGREGATE_PLAN_GROUP } from '@/lib/constants';
 import { money, percent } from '@/lib/format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -30,16 +31,18 @@ const columns: ColumnDef<Row>[] = [
 ];
 
 export function GroupPlanClient({ rows }: { rows: Row[] }) {
+  const visibleRows = rows.filter((row) => row.productGroup !== AGGREGATE_PLAN_GROUP);
+
   return (
     <>
       <SimpleBarChart
-        data={rows.map((row) => ({ name: row.productGroup, plan: row.planAmount, fact: row.factFromSales }))}
+        data={visibleRows.map((row) => ({ name: row.productGroup, plan: row.planAmount, fact: row.factFromSales }))}
         bars={['plan', 'fact']}
         title="План проти факту за групами"
         barLabels={{ plan: 'План', fact: 'Факт із продажів' }}
         valueLabel="Сума"
       />
-      <DataTable columns={columns} data={rows} initialSorting={[{ id: 'planAmount', desc: true }]} />
+      <DataTable columns={columns} data={visibleRows} initialSorting={[{ id: 'planAmount', desc: true }]} />
     </>
   );
 }

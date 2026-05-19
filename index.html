@@ -494,6 +494,8 @@
       const EXCLUDED_TIRE_GROUP = 'Автомобільна Шина';
       const AGGREGATE_PLAN_GROUP = 'Все';
       const HIGHLIGHT_GROUP_GAP_BRANDS = ['PROFIT'];
+      const PROFIT_GROUP_NAME = 'PROFIT';
+      const PROFIT_PLAN_PERCENT = 11;
       const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
       let state = {
         data: null,
@@ -538,12 +540,14 @@
         .replaceAll("'", '&#39;');
       const normalizeProductGroup = (value) => String(value || '').trim().toLowerCase().replace(/ё/g, 'е').replace(/[ії]/g, 'и').replace(/\s+/g, ' ');
       const clientKey = (row) => row.clientCode || row.unifiedClientCode || row.clientName;
+      const isProfitBrand = (value) => normalizeProductGroup(value) === normalizeProductGroup(PROFIT_GROUP_NAME);
       function matchesSearch(row) {
         const normalizedSearch = String(state.search || '').toLowerCase().trim();
         if (!normalizedSearch) return true;
         if (state.searchMode === 'code') return `${row.clientCode || ''} ${row.unifiedClientCode || ''}`.toLowerCase().includes(normalizedSearch);
         if (state.searchMode === 'client') return `${row.clientName || ''}`.toLowerCase().includes(normalizedSearch);
         if (state.searchMode === 'brand') return `${row.brand || ''}`.toLowerCase().includes(normalizedSearch);
+        if (normalizeProductGroup(PROFIT_GROUP_NAME).includes(normalizedSearch) && isProfitBrand(row.brand)) return true;
         return `${row.productGroup || ''}`.toLowerCase().includes(normalizedSearch);
       }
       function matchesReceivableSearch(row) {
@@ -551,7 +555,7 @@
         if (!normalizedSearch) return true;
         if (state.searchMode === 'code') return `${row.clientCode || ''} ${row.unifiedClientCode || ''}`.toLowerCase().includes(normalizedSearch);
         if (state.searchMode === 'client') return `${row.clientName || ''}`.toLowerCase().includes(normalizedSearch);
-        return true;
+        return false;
       }
       const isTireGroup = (value) => {
         const normalized = normalizeProductGroup(value);
@@ -560,6 +564,28 @@
       const isGrossPlanGroup = (group) => !isTireGroup(group)
         && normalizeProductGroup(group) !== normalizeProductGroup(EXCLUDED_TIRE_GROUP)
         && normalizeProductGroup(group) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP);
+      function groupPlanBaseAmount() {
+        const aggregatePlan = state.data.groupPlans.find((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(AGGREGATE_PLAN_GROUP));
+        if (Number(aggregatePlan?.planAmount || 0) > 0) return Number(aggregatePlan.planAmount || 0);
+        return sum(state.data.groupPlans.filter((row) => Number(row.planAmount || 0) > 0 && isGrossPlanGroup(row.productGroup)), (row) => row.planAmount);
+      }
+      function effectiveGroupPlans() {
+        const plans = state.data.groupPlans
+          .filter((plan) => Number(plan.planAmount || 0) > 0 && isGrossPlanGroup(plan.productGroup))
+          .map((plan) => ({ ...plan }));
+        const basePlanAmount = groupPlanBaseAmount();
+        if (basePlanAmount > 0) {
+          plans.push({
+            productGroup: PROFIT_GROUP_NAME,
+            planPercent: PROFIT_PLAN_PERCENT,
+            planAmount: basePlanAmount * PROFIT_PLAN_PERCENT / 100,
+            factAmount: 0,
+            completionPercent: 0,
+            netPercent: 0
+          });
+        }
+        return plans;
+      }
       const filteredSales = () => state.data.sales.filter((row) => monthOf(row.date) === state.month && matchesSearch(row));
 
       const byTop = (rows, getKey, getValue, limit = 10) => {
@@ -619,8 +645,13 @@
         }
         if (mode === 'client') [...state.data.sales, ...state.data.receivables].forEach((row) => row.clientName && values.add(row.clientName));
         if (mode === 'brand') state.data.sales.forEach((row) => row.brand && values.add(row.brand));
-        if (mode === 'group') state.data.sales.forEach((row) => row.productGroup && values.add(row.productGroup));
-        return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' })).slice(0, 300);
+        if (mode === 'group') {
+          state.data.sales.forEach((row) => {
+            if (row.productGroup) values.add(row.productGroup);
+            if (isProfitBrand(row.brand)) values.add(PROFIT_GROUP_NAME);
+          });
+        }
+        return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' }));
       }
       function syncSearchSuggestions() {
         state.clientSuggestions = collectClientSuggestions(state.searchMode);
@@ -639,7 +670,7 @@
         const filtered = normalizedSearch
           ? state.clientSuggestions.filter((entry) => entry.toLowerCase().includes(normalizedSearch))
           : state.clientSuggestions;
-        return filtered.slice(0, 24);
+        return filtered;
       }
 
       function renderSearchSuggestions() {
@@ -688,8 +719,7 @@
       }
 
       function clientGroupShareGaps(rows) {
-        const relevantPlans = state.data.groupPlans
-          .filter((plan) => Number(plan.planAmount || 0) > 0 && isGrossPlanGroup(plan.productGroup))
+        const relevantPlans = effectiveGroupPlans()
           .map((plan) => ({ ...plan, normalizedGroup: normalizeProductGroup(plan.productGroup) }));
         const totalPlanAmount = sum(relevantPlans, (plan) => plan.planAmount);
         if (!relevantPlans.length || totalPlanAmount <= 0) return [];
@@ -724,6 +754,13 @@
             currentBrand.amount += Number(row.amountEur || 0);
             entry.brandAmounts.set(normalizedBrand, currentBrand);
           }
+          if (isProfitBrand(row.brand)) {
+            const normalizedProfitGroup = normalizeProductGroup(PROFIT_GROUP_NAME);
+            entry.groups.add(normalizedProfitGroup);
+            const currentProfit = entry.groupAmounts.get(normalizedProfitGroup) || { name: PROFIT_GROUP_NAME, amount: 0 };
+            currentProfit.amount += Number(row.amountEur || 0);
+            entry.groupAmounts.set(normalizedProfitGroup, currentProfit);
+          }
           map.set(key, entry);
         });
 
@@ -741,11 +778,14 @@
                   name: plan.productGroup,
                   amount,
                   turnoverShare: client.turnover ? amount / client.turnover * 100 : 0,
-                  planShare: totalPlanAmount ? plan.planAmount / totalPlanAmount * 100 : 0
+                  planShare: normalizeProductGroup(plan.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)
+                    ? PROFIT_PLAN_PERCENT
+                    : totalPlanAmount ? plan.planAmount / totalPlanAmount * 100 : 0
                 };
               })
               .sort((a, b) => b.amount - a.amount || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
             const coveredBrandStats = [...client.brandAmounts.values()]
+              .filter((brand) => normalizeProductGroup(brand.name) !== normalizeProductGroup(PROFIT_GROUP_NAME))
               .map((brand) => ({
                 name: brand.name,
                 amount: brand.amount,
@@ -755,7 +795,9 @@
             const missingGroupStats = missingPlans
               .map((plan) => ({
                 name: plan.productGroup,
-                planShare: totalPlanAmount ? plan.planAmount / totalPlanAmount * 100 : 0
+                planShare: normalizeProductGroup(plan.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)
+                  ? PROFIT_PLAN_PERCENT
+                  : totalPlanAmount ? plan.planAmount / totalPlanAmount * 100 : 0
               }))
               .sort((a, b) => b.planShare - a.planShare || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
             return {
@@ -780,14 +822,18 @@
       }
 
       function groupPlanRows(rows) {
-        const totalPlan = sum(state.data.groupPlans, (row) => row.planAmount);
-        return state.data.groupPlans.map((groupPlan) => {
-          const factFromSales = sum(rows.filter((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(groupPlan.productGroup)), (row) => row.amountEur);
+        const plans = effectiveGroupPlans();
+        const totalPlan = sum(plans, (row) => row.planAmount);
+        return plans.map((groupPlan) => {
+          const factFromSales = normalizeProductGroup(groupPlan.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)
+            ? sum(rows.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur)
+            : sum(rows.filter((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(groupPlan.productGroup)), (row) => row.amountEur);
           return {
             ...groupPlan,
             factFromSales,
-            variance: factFromSales - groupPlan.factAmount,
-            share: totalPlan ? groupPlan.planAmount / totalPlan * 100 : 0
+            variance: factFromSales - Number(groupPlan.factAmount || 0),
+            share: totalPlan ? groupPlan.planAmount / totalPlan * 100 : 0,
+            completionPercent: Number(groupPlan.planAmount || 0) ? factFromSales / Number(groupPlan.planAmount || 0) * 100 : 0
           };
         });
       }
@@ -1071,7 +1117,13 @@
 
       function renderOverview() {
         const sales = filteredSales();
-        const receivables = state.data.receivables.filter((row) => matchesReceivableSearch(row));
+        const visibleClientKeys = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+        const receivables = state.data.receivables.filter((row) => {
+          if (state.searchMode === 'brand' || state.searchMode === 'group') {
+            return !state.search || visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName);
+          }
+          return matchesReceivableSearch(row);
+        });
         const total = sum(sales, (row) => row.amountEur);
         const planTurnover = sum(sales.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
@@ -1081,8 +1133,19 @@
         const visibleGroupGaps = state.groupGapMode === 'deficit' ? groupGaps.filter((row) => row.missingGroups > 0) : groupGaps;
         const daily = dailySalesSeries(sales);
         const groupShareTargets = groupPlanRows(sales)
-          .sort((a, b) => b.share - a.share)
-          .map((row) => ({ name: row.productGroup, value: row.share }))
+          .filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP))
+          .sort((a, b) => {
+            const leftTarget = normalizeProductGroup(a.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : a.share;
+            const rightTarget = normalizeProductGroup(b.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : b.share;
+            return rightTarget - leftTarget || b.factFromSales - a.factFromSales;
+          })
+          .map((row) => ({
+            name: row.productGroup,
+            turnover: row.factFromSales,
+            turnoverShare: total ? row.factFromSales / total * 100 : 0,
+            targetShare: normalizeProductGroup(row.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : row.share,
+            completionPercent: row.completionPercent
+          }))
           .slice(0, 10);
         const activeClients = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
         const avgDailyTurnover = daily.length ? avg(daily, (row) => row.turnover) : 0;
@@ -1114,7 +1177,18 @@
             <div class="two-up">
               <div class="chart-shell">
                 <div class="chart-title">Планові долі груп</div>
-                ${bars(groupShareTargets, pct, '#2dd4bf')}
+                <div class="small" style="margin-bottom:12px;">Факт показано як долю від обороту місяця, праворуч ціль групи. PROFIT рахується окремо з ціллю 11%.</div>
+                <div class="search-suggestions-grid">
+                  ${groupShareTargets.map((row) => `
+                    <div class="filter-option" style="cursor:default;">
+                      <div style="font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
+                      <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(row.turnover))} · ${escapeHtml(pct(row.turnoverShare))} · ${escapeHtml(pct(row.targetShare))}</div>
+                      <div style="margin-top:10px;height:8px;overflow:hidden;border-radius:999px;background:rgba(141,162,199,0.16);">
+                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;border-radius:999px;background:linear-gradient(90deg,#4ea1ff,#2dd4bf);"></div>
+                      </div>
+                    </div>
+                  `).join('') || empty('Немає планових груп')}
+                </div>
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Топ клієнтів за прострочкою</div>
@@ -1169,7 +1243,7 @@
                     ${[...row.coveredGroupStats, ...row.coveredBrandStats.map((brand) => ({ ...brand, planShare: null }))].map((item) => `
                       <div class="filter-option" style="cursor:default;">
                         <div style="font-weight:700;color:white;">${escapeHtml(item.name)}</div>
-                        <div class="small">${escapeHtml(money(item.amount))} · ${escapeHtml(pct(item.turnoverShare))} клієнта${typeof item.planShare === 'number' ? ` · ціль ${escapeHtml(pct(item.planShare))}` : ''}</div>
+                        <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(item.amount))} · ${escapeHtml(pct(item.turnoverShare))}${typeof item.planShare === 'number' ? ` · ${escapeHtml(pct(item.planShare))}` : ''}</div>
                       </div>
                     `).join('') || '<div class="filter-option" style="cursor:default;">поки немає планових груп</div>'}
                   </div>
@@ -1178,7 +1252,7 @@
                     ${row.missingGroupStats.map((item) => `
                       <div class="filter-option" style="cursor:default;">
                         <div style="font-weight:700;color:white;">${escapeHtml(item.name)}</div>
-                        <div class="small">Ціль групи: ${escapeHtml(pct(item.planShare))} валового плану</div>
+                        <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(pct(item.planShare))}</div>
                       </div>
                     `).join('') || '<div class="filter-option" style="cursor:default;">усі планові групи вже закриті</div>'}
                   </div>
@@ -1221,7 +1295,7 @@
       }
 
       function renderGroups() {
-        const rows = groupPlanRows(filteredSales());
+        const rows = groupPlanRows(filteredSales()).filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP));
         document.getElementById('groups').innerHTML = `
           <div class="section-stack">
             <div class="chart-shell">
@@ -1233,9 +1307,7 @@
               { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
               { title: 'Частка від плану', titleHtml: infoLabel('Частка від плану', 'Цільовий відсоток валового плану, який має дати ця товарна група.'), key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
               { title: 'План', key: 'planAmount', sortValue: (row) => row.planAmount, render: (row) => money(row.planAmount) },
-              { title: 'Факт із файлу', key: 'factAmount', sortValue: (row) => row.factAmount, render: (row) => money(row.factAmount) },
               { title: 'Факт із продажів', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
-              { title: 'Відхилення', key: 'variance', sortValue: (row) => row.variance, render: (row) => money(row.variance) },
               { title: '% виконання', key: 'completionPercent', sortValue: (row) => row.completionPercent, render: (row) => `<span class="${completionClass(row.completionPercent)}">${escapeHtml(pct(row.completionPercent))}</span>` }
             ], { rowKey: (row) => row.productGroup })}
           </div>
