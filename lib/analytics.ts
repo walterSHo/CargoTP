@@ -1,4 +1,4 @@
-import { AGGREGATE_PLAN_GROUP, EXCLUDED_GROSS_PLAN_GROUP, HIGHLIGHT_GROUP_GAP_BRANDS } from './constants';
+import { AGGREGATE_PLAN_GROUP, EXCLUDED_GROSS_PLAN_GROUP, HIGHLIGHT_GROUP_GAP_BRANDS, PROFIT_GROUP_NAME, PROFIT_PLAN_PERCENT } from './constants';
 import { isTireGroup, normalizeProductGroup } from './product-groups';
 import type { GroupPlanRecord, MonthlyPlan, ReceivableRecord, SalesRecord } from './types';
 
@@ -41,6 +41,12 @@ export type ClientGroupGapRow = {
   missingGroupStats: Array<{ name: string; planShare: number }>;
 };
 
+type GroupPlanAuditRow = GroupPlanRecord & {
+  factFromSales: number;
+  variance: number;
+  shareOfGrossPlan: number;
+};
+
 export function monthOf(date: string) {
   return date.slice(0, 7);
 }
@@ -79,6 +85,43 @@ function planRelevantGroup(group: string) {
   return normalized !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP)
     && normalized !== normalizeProductGroup(AGGREGATE_PLAN_GROUP)
     && !isTireGroup(group);
+}
+
+function isProfitBrand(value: string) {
+  return normalizeProductGroup(value) === normalizeProductGroup(PROFIT_GROUP_NAME);
+}
+
+function groupPlanBaseAmount(groupPlans: GroupPlanRecord[]) {
+  const aggregatePlan = groupPlans.find((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(AGGREGATE_PLAN_GROUP));
+  if (aggregatePlan?.planAmount) return aggregatePlan.planAmount;
+  return sum(groupPlans.filter((row) => planRelevantGroup(row.productGroup)).map((row) => row.planAmount));
+}
+
+function profitPlanRecord(groupPlans: GroupPlanRecord[]): GroupPlanRecord | null {
+  const basePlanAmount = groupPlanBaseAmount(groupPlans);
+  if (basePlanAmount <= 0) return null;
+  return {
+    productGroup: PROFIT_GROUP_NAME,
+    planPercent: PROFIT_PLAN_PERCENT,
+    planAmount: (basePlanAmount * PROFIT_PLAN_PERCENT) / 100,
+    factAmount: 0,
+    completionPercent: 0,
+    netPercent: 0
+  };
+}
+
+function effectiveGroupPlans(groupPlans: GroupPlanRecord[]) {
+  const relevantPlans = groupPlans.filter((row) => row.planAmount > 0 && planRelevantGroup(row.productGroup));
+  const profitPlan = profitPlanRecord(groupPlans);
+  return profitPlan ? [...relevantPlans, profitPlan] : relevantPlans;
+}
+
+function groupFactAmount(sales: SalesRecord[], productGroup: string) {
+  if (normalizeProductGroup(productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)) {
+    return sum(sales.filter((row) => isProfitBrand(row.brand)).map((row) => row.amountEur));
+  }
+
+  return sum(sales.filter((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(productGroup)).map((row) => row.amountEur));
 }
 
 export function dashboardKpis(sales: SalesRecord[], receivables: ReceivableRecord[], plans: MonthlyPlan[], month: string) {
@@ -161,9 +204,7 @@ export function dailySalesSeries(sales: SalesRecord[]): DailySalesPoint[] {
 }
 
 export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: SalesRecord[], limit?: number): ClientGroupGapRow[] {
-  const relevantPlans = groupPlans
-    .filter((row) => row.planAmount > 0 && planRelevantGroup(row.productGroup))
-    .map((row) => ({ ...row, normalizedGroup: normalizeProductGroup(row.productGroup) }));
+  const relevantPlans = effectiveGroupPlans(groupPlans).map((row) => ({ ...row, normalizedGroup: normalizeProductGroup(row.productGroup) }));
   const totalPlanAmount = sum(relevantPlans.map((row) => row.planAmount));
   if (!relevantPlans.length || totalPlanAmount <= 0) return [];
 
@@ -207,6 +248,13 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
       currentBrand.amount += row.amountEur;
       entry.brandAmounts.set(normalizedBrand, currentBrand);
     }
+    if (isProfitBrand(row.brand)) {
+      const normalizedProfitGroup = normalizeProductGroup(PROFIT_GROUP_NAME);
+      entry.groups.add(normalizedProfitGroup);
+      const currentProfit = entry.groupAmounts.get(normalizedProfitGroup) ?? { name: PROFIT_GROUP_NAME, amount: 0 };
+      currentProfit.amount += row.amountEur;
+      entry.groupAmounts.set(normalizedProfitGroup, currentProfit);
+    }
     salesByClient.set(key, entry);
   });
 
@@ -224,11 +272,14 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
             name: plan.productGroup,
             amount,
             turnoverShare: client.turnover > 0 ? (amount / client.turnover) * 100 : 0,
-            planShare: totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
+            planShare: normalizeProductGroup(plan.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)
+              ? PROFIT_PLAN_PERCENT
+              : totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
           };
         })
         .sort((a, b) => b.amount - a.amount || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
       const coveredBrandStats = [...client.brandAmounts.values()]
+        .filter((brand) => normalizeProductGroup(brand.name) !== normalizeProductGroup(PROFIT_GROUP_NAME))
         .map((brand) => ({
           name: brand.name,
           amount: brand.amount,
@@ -238,7 +289,9 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
       const missingGroupStats = missingPlans
         .map((plan) => ({
           name: plan.productGroup,
-          planShare: totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
+          planShare: normalizeProductGroup(plan.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME)
+            ? PROFIT_PLAN_PERCENT
+            : totalPlanAmount > 0 ? (plan.planAmount / totalPlanAmount) * 100 : 0
         }))
         .sort((a, b) => b.planShare - a.planShare || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
 
@@ -268,11 +321,18 @@ export function clientGroupShareGaps(groupPlans: GroupPlanRecord[], sales: Sales
 }
 
 export function groupPlanAudit(groupPlans: GroupPlanRecord[], sales: SalesRecord[]) {
-  const totalGrossPlan = sum(groupPlans.map((row) => row.planAmount));
-  return groupPlans.map((plan) => {
-    const factFromSales = sum(sales.filter((row) => normalizeProductGroup(row.productGroup) === normalizeProductGroup(plan.productGroup)).map((row) => row.amountEur));
+  const relevantPlans = effectiveGroupPlans(groupPlans);
+  const totalGrossPlan = sum(relevantPlans.map((row) => row.planAmount));
+  return relevantPlans.map((plan): GroupPlanAuditRow => {
+    const factFromSales = groupFactAmount(sales, plan.productGroup);
     const shareOfGrossPlan = totalGrossPlan > 0 ? (plan.planAmount / totalGrossPlan) * 100 : 0;
-    return { ...plan, factFromSales, variance: factFromSales - plan.factAmount, shareOfGrossPlan };
+    return {
+      ...plan,
+      factFromSales,
+      variance: factFromSales - plan.factAmount,
+      completionPercent: plan.planAmount > 0 ? (factFromSales / plan.planAmount) * 100 : 0,
+      shareOfGrossPlan
+    };
   });
 }
 

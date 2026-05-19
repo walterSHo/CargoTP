@@ -7,6 +7,7 @@ import { DataTable } from '@/components/DataTable';
 import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
 import { PageHeader } from '@/components/PageHeader';
+import { PROFIT_GROUP_NAME } from '@/lib/constants';
 import { availableMonths, avg, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
 import { money, percent } from '@/lib/format';
 import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
@@ -62,6 +63,7 @@ function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
   if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
   if (mode === 'client') return row.clientName.toLowerCase().includes(value);
   if (mode === 'brand') return row.brand.toLowerCase().includes(value);
+  if (PROFIT_GROUP_NAME.toLowerCase().includes(value) && row.brand.toLowerCase() === PROFIT_GROUP_NAME.toLowerCase()) return true;
   return row.productGroup.toLowerCase().includes(value);
 }
 
@@ -70,7 +72,7 @@ function matchesReceivables(row: ReceivableRecord, mode: SearchMode, query: stri
   const value = query.toLowerCase();
   if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
   if (mode === 'client') return row.clientName.toLowerCase().includes(value);
-  return true;
+  return false;
 }
 
 function suggestionValues(data: ProcessedData, mode: SearchMode) {
@@ -83,8 +85,13 @@ function suggestionValues(data: ProcessedData, mode: SearchMode) {
   }
   if (mode === 'client') [...data.sales, ...data.receivables].forEach((row) => row.clientName && values.add(row.clientName));
   if (mode === 'brand') data.sales.forEach((row) => row.brand && values.add(row.brand));
-  if (mode === 'group') data.sales.forEach((row) => row.productGroup && values.add(row.productGroup));
-  return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' })).slice(0, 200);
+  if (mode === 'group') {
+    data.sales.forEach((row) => {
+      if (row.productGroup) values.add(row.productGroup);
+      if (row.brand.toLowerCase() === PROFIT_GROUP_NAME.toLowerCase()) values.add(PROFIT_GROUP_NAME);
+    });
+  }
+  return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' }));
 }
 
 export function OverviewClient({ data }: { data: ProcessedData }) {
@@ -113,7 +120,14 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   }
 
   const monthSales = salesForMonth(data.sales, month).filter((row) => matchesSales(row, searchMode, query));
-  const receivables = data.receivables.filter((row) => matchesReceivables(row, searchMode, query));
+  const visibleClientKeys = new Set(monthSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+  const receivables = data.receivables.filter((row) => {
+    if (searchMode === 'brand' || searchMode === 'group') {
+      return !query || visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName);
+    }
+
+    return matchesReceivables(row, searchMode, query);
+  });
   const kpis = dashboardKpis(monthSales, receivables, data.monthlyPlans, month);
   const topClients = topClientsByTurnover(monthSales, 12);
   const topClientsChart = topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover }));
@@ -121,8 +135,15 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
   const groupGaps = clientGroupShareGaps(data.groupPlans, monthSales);
   const visibleGroupGaps = groupGapMode === 'deficit' ? groupGaps.filter((row) => row.missingGroups > 0) : groupGaps;
   const groupShareTargets = groupPlanAudit(data.groupPlans, monthSales)
-    .sort((a, b) => b.shareOfGrossPlan - a.shareOfGrossPlan)
-    .map((row) => ({ name: row.productGroup, value: row.shareOfGrossPlan }))
+    .map((row) => ({
+      name: row.productGroup,
+      turnover: row.factFromSales,
+      turnoverShare: kpis.totalTurnover > 0 ? (row.factFromSales / kpis.totalTurnover) * 100 : 0,
+      targetShare: row.productGroup === PROFIT_GROUP_NAME ? row.planPercent : row.shareOfGrossPlan,
+      completionPercent: row.completionPercent
+    }))
+    .filter((row) => row.turnover > 0)
+    .sort((a, b) => b.turnover - a.turnover)
     .slice(0, 10);
   const activeClients = new Set(monthSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
   const avgDailyTurnover = daily.length ? avg(daily.map((row) => row.turnover)) : 0;
@@ -232,7 +253,23 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <SimpleBarChart barColor="#2dd4bf" data={groupShareTargets} title="Планові долі груп" valueFormatter={percent} valueLabel="Цільова доля" />
+        <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
+          <div className="mb-1 text-sm font-semibold text-[var(--ink)]">Планові долі груп</div>
+          <div className="text-xs text-muted">Показуємо реальну долю від обороту та ціль по кожній групі, включно з окремою групою PROFIT.</div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {groupShareTargets.map((row) => (
+              <div className="rounded-[16px] border border-line bg-[rgba(8,15,28,0.74)] px-3 py-3" key={row.name}>
+                <div className="truncate text-[13px] font-semibold text-white" title={row.name}>{row.name}</div>
+                <div className="mt-1 text-[11px] leading-4 text-muted">
+                  {money(row.turnover)} · {percent(row.turnoverShare)} · {percent(row.targetShare)}
+                </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(141,162,199,0.16)]">
+                  <div className="h-full rounded-full bg-[linear-gradient(90deg,#4ea1ff,#2dd4bf)]" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         <SimpleBarChart barColor="#fb7185" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
       </section>
 
@@ -273,9 +310,9 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                   {[...row.coveredGroupStats, ...row.coveredBrandStats.map((brand) => ({ ...brand, planShare: null }))].map((item) => (
                     <div className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
-                      <div className="mt-1 text-xs text-muted">
-                        {money(item.amount)} · {percent(item.turnoverShare)} клієнта
-                        {'planShare' in item && typeof item.planShare === 'number' ? ` · ціль ${percent(item.planShare)}` : ''}
+                      <div className="mt-1 text-[11px] leading-4 text-muted">
+                        {money(item.amount)} · {percent(item.turnoverShare)}
+                        {'planShare' in item && typeof item.planShare === 'number' ? ` · ${percent(item.planShare)}` : ''}
                       </div>
                     </div>
                   ))}
