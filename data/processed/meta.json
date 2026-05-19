@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-19T06:16:58.638Z",
+  "updatedAt": "2026-05-19T06:32:38.396Z",
   "status": "ok",
   "sourceFiles": [
     "data/raw/Олексієнко_01.05-18.05.xlsx"
@@ -81,11 +81,23 @@
       "sourceFile": "data/raw/Олексієнко_01.05-18.05.xlsx"
     },
     {
-      "name": "Профіт",
-      "rows": 4,
-      "detectedAs": "unknown",
+      "name": " Дебиторка ",
+      "rows": 141,
+      "detectedAs": "receivables",
+      "headerRow": 6,
       "columns": [
-        "Меры, Даты/Даты.Дата ГКМ"
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC",
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC",
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC",
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC",
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC",
+        "Сумма Дебит БАЛ",
+        "Сумма Дебит LOC"
       ],
       "sourceFile": "data/raw/Олексієнко_01.05-18.05.xlsx"
     }
@@ -93,7 +105,7 @@
   "counts": {
     "sales": 1114,
     "groupPlans": 12,
-    "receivables": 0
+    "receivables": 135
   },
   "dateRange": {
     "from": "2026-05-01",
@@ -103,9 +115,9 @@
     "2026-05"
   ],
   "unique": {
-    "clients": 88,
-    "clientCodes": 89,
-    "unifiedClientCodes": 72,
+    "clients": 158,
+    "clientCodes": 161,
+    "unifiedClientCodes": 163,
     "brands": 89,
     "productGroups": 31
   },
@@ -352,7 +364,248 @@
         "discountPercent": 29.993089149965403
       }
     ],
-    "receivables": [],
+    "receivables": [
+      {
+        "unifiedClientCode": "00470",
+        "clientCode": "00470",
+        "clientName": "ТРАВЕРС-ЛТД",
+        "totalDebt": 1982.73,
+        "currentDebt": 0,
+        "overdueDebt": 1982.73,
+        "bucket0To10": 0,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 1982.73
+      },
+      {
+        "unifiedClientCode": "09253",
+        "clientCode": "09253",
+        "clientName": "Ситко Віталій Васильович",
+        "totalDebt": 1845.42,
+        "currentDebt": 801.01,
+        "overdueDebt": 1044.41,
+        "bucket0To10": 1044.41,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "26061",
+        "clientCode": "26061",
+        "clientName": "ДЕЛЛА ТРАНС",
+        "totalDebt": 630.59,
+        "currentDebt": 0,
+        "overdueDebt": 630.59,
+        "bucket0To10": 397.58,
+        "bucket11To20": 233.01,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "00130",
+        "clientCode": "00130",
+        "clientName": "Транспеле",
+        "totalDebt": 533.67,
+        "currentDebt": 0,
+        "overdueDebt": 533.67,
+        "bucket0To10": 0,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 533.67
+      },
+      {
+        "unifiedClientCode": "00129",
+        "clientCode": "00129",
+        "clientName": "ЛАА Транс",
+        "totalDebt": 985.17,
+        "currentDebt": 475.84,
+        "overdueDebt": 509.33,
+        "bucket0To10": 509.33,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "00740",
+        "clientCode": "00740",
+        "clientName": "Овдиенко Александр Васильевич",
+        "totalDebt": 465.93,
+        "currentDebt": 0,
+        "overdueDebt": 465.93,
+        "bucket0To10": 465.93,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "16739",
+        "clientCode": "16739",
+        "clientName": "Европейская дорожно-строительная компания",
+        "totalDebt": 407.63,
+        "currentDebt": 0,
+        "overdueDebt": 407.63,
+        "bucket0To10": 407.63,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "17529",
+        "clientCode": "17529",
+        "clientName": "Натина Алексей Степанович",
+        "totalDebt": 287,
+        "currentDebt": 0,
+        "overdueDebt": 287,
+        "bucket0To10": 287,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "31855",
+        "clientCode": "31855",
+        "clientName": "Аква Фудз",
+        "totalDebt": 275.96,
+        "currentDebt": 0,
+        "overdueDebt": 275.96,
+        "bucket0To10": 275.96,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "06282",
+        "clientCode": "06282",
+        "clientName": "МТС МАГИСТРАЛЬ",
+        "totalDebt": 269.92,
+        "currentDebt": 0,
+        "overdueDebt": 269.92,
+        "bucket0To10": 230.27,
+        "bucket11To20": 39.65,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "29901",
+        "clientCode": "29901",
+        "clientName": "ЯСЕНСВІТ",
+        "totalDebt": 228.81,
+        "currentDebt": 0,
+        "overdueDebt": 228.81,
+        "bucket0To10": 228.81,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "20875",
+        "clientCode": "20875",
+        "clientName": "Терновой Алексей Михайлович",
+        "totalDebt": 189.32,
+        "currentDebt": 0,
+        "overdueDebt": 189.32,
+        "bucket0To10": 0,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 189.32
+      },
+      {
+        "unifiedClientCode": "02186",
+        "clientCode": "02186",
+        "clientName": "Делиция",
+        "totalDebt": 155.58,
+        "currentDebt": 0,
+        "overdueDebt": 155.58,
+        "bucket0To10": 0,
+        "bucket11To20": 155.58,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "23094",
+        "clientCode": "23094",
+        "clientName": "УКБР",
+        "totalDebt": 132.63,
+        "currentDebt": 0,
+        "overdueDebt": 132.63,
+        "bucket0To10": 0,
+        "bucket11To20": 132.63,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "03045",
+        "clientCode": "03045",
+        "clientName": "ВИЗИТ-АВТО",
+        "totalDebt": 128.42,
+        "currentDebt": 0,
+        "overdueDebt": 128.42,
+        "bucket0To10": 128.42,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "03738",
+        "clientCode": "03738",
+        "clientName": "МБК Макаров",
+        "totalDebt": 206.07,
+        "currentDebt": 113.33,
+        "overdueDebt": 92.74,
+        "bucket0To10": 92.74,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "07543",
+        "clientCode": "07543",
+        "clientName": "Дизель Транс",
+        "totalDebt": 184.57,
+        "currentDebt": 92.69,
+        "overdueDebt": 91.88,
+        "bucket0To10": 91.88,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "01737",
+        "clientCode": "01737",
+        "clientName": "МБИ Транс",
+        "totalDebt": 66.24,
+        "currentDebt": 0,
+        "overdueDebt": 66.24,
+        "bucket0To10": 0,
+        "bucket11To20": 66.24,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "00576",
+        "clientCode": "00576",
+        "clientName": "Техас ЛТД",
+        "totalDebt": 50.57,
+        "currentDebt": 0,
+        "overdueDebt": 50.57,
+        "bucket0To10": 50.57,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "26542",
+        "clientCode": "26542",
+        "clientName": "ТК ПОСТАЧАЛЬНИК",
+        "totalDebt": 540.89,
+        "currentDebt": 500.19,
+        "overdueDebt": 40.7,
+        "bucket0To10": 40.7,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      }
+    ],
     "groupPlans": [
       {
         "productGroup": "Все",
