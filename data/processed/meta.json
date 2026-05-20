@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-05-19T06:32:38.396Z",
+  "updatedAt": "2026-05-20T11:29:37.453Z",
   "status": "ok",
   "sourceFiles": [
-    "data/raw/Олексієнко_01.05-18.05.xlsx"
+    "data/raw/Олексієнко_01.05-20.05.xlsx"
   ],
   "sheets": [
     {
@@ -18,11 +18,11 @@
         "% долі вик",
         "Процент нетто маржа"
       ],
-      "sourceFile": "data/raw/Олексієнко_01.05-18.05.xlsx"
+      "sourceFile": "data/raw/Олексієнко_01.05-20.05.xlsx"
     },
     {
       "name": "Продажи 4 мес",
-      "rows": 1031,
+      "rows": 1186,
       "detectedAs": "sales",
       "headerRow": 2,
       "columns": [
@@ -47,6 +47,8 @@
         "Сумма с НДС",
         "Сумма с НДС",
         "Сумма с НДС",
+        "Сумма с НДС",
+        "Сумма с НДС",
         "Процент нетто маржа",
         "Процент нетто маржа",
         "Процент нетто маржа",
@@ -62,6 +64,10 @@
         "Процент нетто маржа",
         "Процент нетто маржа",
         "Процент нетто маржа",
+        "Процент нетто маржа",
+        "Процент нетто маржа",
+        "Скидка %",
+        "Скидка %",
         "Скидка %",
         "Скидка %",
         "Скидка %",
@@ -78,11 +84,11 @@
         "Скидка %",
         "Скидка %"
       ],
-      "sourceFile": "data/raw/Олексієнко_01.05-18.05.xlsx"
+      "sourceFile": "data/raw/Олексієнко_01.05-20.05.xlsx"
     },
     {
       "name": " Дебиторка ",
-      "rows": 141,
+      "rows": 143,
       "detectedAs": "receivables",
       "headerRow": 6,
       "columns": [
@@ -99,27 +105,27 @@
         "Сумма Дебит БАЛ",
         "Сумма Дебит LOC"
       ],
-      "sourceFile": "data/raw/Олексієнко_01.05-18.05.xlsx"
+      "sourceFile": "data/raw/Олексієнко_01.05-20.05.xlsx"
     }
   ],
   "counts": {
-    "sales": 1114,
+    "sales": 1291,
     "groupPlans": 12,
-    "receivables": 135
+    "receivables": 137
   },
   "dateRange": {
     "from": "2026-05-01",
-    "to": "2026-05-18"
+    "to": "2026-05-20"
   },
   "months": [
     "2026-05"
   ],
   "unique": {
-    "clients": 158,
-    "clientCodes": 161,
-    "unifiedClientCodes": 163,
-    "brands": 89,
-    "productGroups": 31
+    "clients": 160,
+    "clientCodes": 163,
+    "unifiedClientCodes": 168,
+    "brands": 91,
+    "productGroups": 32
   },
   "samples": {
     "sales": [
@@ -382,9 +388,9 @@
         "clientCode": "09253",
         "clientName": "Ситко Віталій Васильович",
         "totalDebt": 1845.42,
-        "currentDebt": 801.01,
-        "overdueDebt": 1044.41,
-        "bucket0To10": 1044.41,
+        "currentDebt": 0,
+        "overdueDebt": 1845.42,
+        "bucket0To10": 1845.42,
         "bucket11To20": 0,
         "bucket21To30": 0,
         "bucket31Plus": 0
@@ -421,18 +427,6 @@
         "currentDebt": 475.84,
         "overdueDebt": 509.33,
         "bucket0To10": 509.33,
-        "bucket11To20": 0,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
-        "unifiedClientCode": "00740",
-        "clientCode": "00740",
-        "clientName": "Овдиенко Александр Васильевич",
-        "totalDebt": 465.93,
-        "currentDebt": 0,
-        "overdueDebt": 465.93,
-        "bucket0To10": 465.93,
         "bucket11To20": 0,
         "bucket21To30": 0,
         "bucket31Plus": 0
@@ -510,18 +504,6 @@
         "bucket31Plus": 189.32
       },
       {
-        "unifiedClientCode": "02186",
-        "clientCode": "02186",
-        "clientName": "Делиция",
-        "totalDebt": 155.58,
-        "currentDebt": 0,
-        "overdueDebt": 155.58,
-        "bucket0To10": 0,
-        "bucket11To20": 155.58,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
         "unifiedClientCode": "23094",
         "clientCode": "23094",
         "clientName": "УКБР",
@@ -546,54 +528,6 @@
         "bucket31Plus": 0
       },
       {
-        "unifiedClientCode": "03738",
-        "clientCode": "03738",
-        "clientName": "МБК Макаров",
-        "totalDebt": 206.07,
-        "currentDebt": 113.33,
-        "overdueDebt": 92.74,
-        "bucket0To10": 92.74,
-        "bucket11To20": 0,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
-        "unifiedClientCode": "07543",
-        "clientCode": "07543",
-        "clientName": "Дизель Транс",
-        "totalDebt": 184.57,
-        "currentDebt": 92.69,
-        "overdueDebt": 91.88,
-        "bucket0To10": 91.88,
-        "bucket11To20": 0,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
-        "unifiedClientCode": "01737",
-        "clientCode": "01737",
-        "clientName": "МБИ Транс",
-        "totalDebt": 66.24,
-        "currentDebt": 0,
-        "overdueDebt": 66.24,
-        "bucket0To10": 0,
-        "bucket11To20": 66.24,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
-        "unifiedClientCode": "00576",
-        "clientCode": "00576",
-        "clientName": "Техас ЛТД",
-        "totalDebt": 50.57,
-        "currentDebt": 0,
-        "overdueDebt": 50.57,
-        "bucket0To10": 50.57,
-        "bucket11To20": 0,
-        "bucket21To30": 0,
-        "bucket31Plus": 0
-      },
-      {
         "unifiedClientCode": "26542",
         "clientCode": "26542",
         "clientName": "ТК ПОСТАЧАЛЬНИК",
@@ -604,6 +538,78 @@
         "bucket11To20": 0,
         "bucket21To30": 0,
         "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "20105",
+        "clientCode": "20105",
+        "clientName": "ЗИП ПОСТАВКА",
+        "totalDebt": 31.14,
+        "currentDebt": 0,
+        "overdueDebt": 31.14,
+        "bucket0To10": 31.14,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "00574",
+        "clientCode": "00574",
+        "clientName": "БАРАНОВСКИЙ СЕРГЕЙ НИКОЛАЕВИЧ",
+        "totalDebt": 22.4,
+        "currentDebt": 0,
+        "overdueDebt": 22.4,
+        "bucket0To10": 22.4,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "00712",
+        "clientCode": "00712",
+        "clientName": "ПРОМА ПЛЮС",
+        "totalDebt": 16.81,
+        "currentDebt": 0,
+        "overdueDebt": 16.81,
+        "bucket0To10": 16.81,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "22500",
+        "clientCode": "22500",
+        "clientName": "АГРО-ПРОГРЕС ГРУП",
+        "totalDebt": 5.03,
+        "currentDebt": 0,
+        "overdueDebt": 5.03,
+        "bucket0To10": 5.03,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "01723",
+        "clientCode": "01723",
+        "clientName": "Н-ТРАНС",
+        "totalDebt": 0.17,
+        "currentDebt": 0,
+        "overdueDebt": 0.17,
+        "bucket0To10": 0.17,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0
+      },
+      {
+        "unifiedClientCode": "13511",
+        "clientCode": "13511",
+        "clientName": "Бацман Сергей Иванович",
+        "totalDebt": 0.06,
+        "currentDebt": 0,
+        "overdueDebt": 0.06,
+        "bucket0To10": 0,
+        "bucket11To20": 0,
+        "bucket21To30": 0,
+        "bucket31Plus": 0.06
       }
     ],
     "groupPlans": [
@@ -611,97 +617,97 @@
         "productGroup": "Все",
         "planPercent": 100,
         "planAmount": 163000,
-        "factAmount": 83386.55,
-        "completionPercent": 88.694959851783,
-        "netPercent": 15.3285763711294
+        "factAmount": 100237.68,
+        "completionPercent": 96.01930372926371,
+        "netPercent": 15.056902953061199
       },
       {
         "productGroup": "АВТОХІМІЯ І ОЛИВИ",
         "planPercent": 10,
         "planAmount": 16300,
-        "factAmount": 6595.12,
-        "completionPercent": 70.1496708543154,
-        "netPercent": 13.7608170889991
+        "factAmount": 7362.9,
+        "completionPercent": 70.5304164490036,
+        "netPercent": 14.9409757025085
       },
       {
         "productGroup": "АМОРТИЗАЦІЯ",
         "planPercent": 4,
         "planAmount": 6520,
-        "factAmount": 1343.18,
-        "completionPercent": 35.717179861056096,
-        "netPercent": 7.37155854018076
+        "factAmount": 3028.1,
+        "completionPercent": 72.51665581809739,
+        "netPercent": 8.5689937584624
       },
       {
         "productGroup": "ГАЛЬМІВНА СИСТЕМА",
         "planPercent": 10,
         "planAmount": 16300,
-        "factAmount": 14182.88,
-        "completionPercent": 150.857658960906,
-        "netPercent": 13.1825778685288
+        "factAmount": 17629.23,
+        "completionPercent": 168.873261021509,
+        "netPercent": 12.7094944021945
       },
       {
         "productGroup": "ДВИГУН",
         "planPercent": 10,
         "planAmount": 16300,
-        "factAmount": 9208.4,
-        "completionPercent": 97.9460918216617,
-        "netPercent": 17.068348464445503
+        "factAmount": 10043.59,
+        "completionPercent": 96.2091818907017,
+        "netPercent": 17.9263112094381
       },
       {
         "productGroup": "ЕЛЕКТРИКА",
         "planPercent": 6,
         "planAmount": 9780,
-        "factAmount": 4046.98,
-        "completionPercent": 71.7435303057405,
-        "netPercent": 17.3575925752042
+        "factAmount": 5180.7,
+        "completionPercent": 82.7112796355949,
+        "netPercent": 17.3837608817341
       },
       {
         "productGroup": "ОХОЛОДЖЕННЯ",
         "planPercent": 4,
         "planAmount": 6520,
-        "factAmount": 3630.06,
-        "completionPercent": 96.5287645188473,
-        "netPercent": 18.865732246849902
+        "factAmount": 4664.95,
+        "completionPercent": 111.715786651244,
+        "netPercent": 17.935754938423802
       },
       {
         "productGroup": "ПІДВІСКА",
         "planPercent": 11,
         "planAmount": 17930,
-        "factAmount": 9682.85,
-        "completionPercent": 93.6296617708118,
-        "netPercent": 19.2236201118472
+        "factAmount": 11384.66,
+        "completionPercent": 99.1413722767725,
+        "netPercent": 19.3493701173333
       },
       {
         "productGroup": "ПНЕВМАТИКА",
         "planPercent": 9,
         "planAmount": 14670,
-        "factAmount": 3598.77,
-        "completionPercent": 42.531873900767096,
-        "netPercent": 12.1029796291511
+        "factAmount": 4124.47,
+        "completionPercent": 43.8988542756284,
+        "netPercent": 12.828116097340999
       },
       {
         "productGroup": "СИСТЕМА ЗЧЕПЛЕННЯ",
         "planPercent": 6,
         "planAmount": 9780,
-        "factAmount": 5824.7,
-        "completionPercent": 103.258365737376,
-        "netPercent": 12.2884732260889
+        "factAmount": 7821.82,
+        "completionPercent": 124.877476263688,
+        "netPercent": 10.4554809494466
       },
       {
         "productGroup": "ТРАНСМІСІЯ",
         "planPercent": 4,
         "planAmount": 6520,
-        "factAmount": 993.56,
-        "completionPercent": 26.4202573167788,
-        "netPercent": 14.158299448448
+        "factAmount": 1426.39,
+        "completionPercent": 34.159054421048204,
+        "netPercent": 12.954311233253199
       },
       {
         "productGroup": "ФІЛЬТР",
         "planPercent": 9,
         "planAmount": 14670,
-        "factAmount": 10230.21,
-        "completionPercent": 120.905198636858,
-        "netPercent": 16.765032193865
+        "factAmount": 11257.13,
+        "completionPercent": 119.815420995135,
+        "netPercent": 16.2271093964447
       }
     ]
   }
