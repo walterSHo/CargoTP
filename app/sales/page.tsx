@@ -3,11 +3,11 @@ import { PageHeader } from '@/components/PageHeader';
 import { readDashboardData } from '@/lib/data';
 
 export default function SalesPage() {
-  const { sales } = readDashboardData();
+  const data = readDashboardData();
   return (
     <div className="space-y-6">
-      <PageHeader description="Розділ для перегляду структури продажів, брендів і товарних груп з компактними фільтрами прямо в заголовках таблиці." title="Продажі" />
-      <SalesClient sales={sales} />
+      <PageHeader description="Робочий продажний екран: KPI, динаміка, ризики, можливості для росту і локальний todo-лист з тегами в одному місці." title="Продажі" />
+      <SalesClient data={data} />
     </div>
   );
 }

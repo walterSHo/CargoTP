@@ -473,6 +473,63 @@
       .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
       .insight .big { margin-top: 8px; color: white; font-size: 28px; font-weight: 900; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
+      .button-primary,
+      .button-danger {
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+      .button-primary {
+        border: 1px solid rgba(78, 161, 255, 0.42);
+        background: rgba(78, 161, 255, 0.16);
+        color: white;
+      }
+      .button-danger {
+        border: 1px solid rgba(251, 113, 133, 0.32);
+        background: rgba(251, 113, 133, 0.12);
+        color: var(--red);
+      }
+      .button-primary:hover,
+      .button-danger:hover { transform: translateY(-1px); }
+      .control-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .todo-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .todo-list { display: grid; gap: 12px; }
+      .todo-card {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(13, 23, 42, 0.9);
+        box-shadow: var(--shadow-soft);
+      }
+      .todo-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .todo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .todo-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+      .todo-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .todo-badge.status-todo { border-color: rgba(78, 161, 255, 0.42); background: rgba(78, 161, 255, 0.16); color: white; }
+      .todo-badge.status-doing { border-color: rgba(245, 158, 11, 0.42); background: rgba(245, 158, 11, 0.14); color: var(--amber); }
+      .todo-badge.status-done { border-color: rgba(52, 211, 153, 0.42); background: rgba(52, 211, 153, 0.14); color: var(--green); }
+      .todo-badge.priority-high { border-color: rgba(251, 113, 133, 0.38); background: rgba(251, 113, 133, 0.14); color: var(--red); }
+      .todo-badge.priority-medium { border-color: rgba(45, 212, 191, 0.38); background: rgba(45, 212, 191, 0.14); color: var(--teal); }
+      .todo-badge.priority-low { background: rgba(8, 15, 28, 0.72); color: var(--muted); }
       @media (min-width: 980px) {
         .app-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); }
         .sidebar { display: block; }
@@ -555,7 +612,8 @@
       const AGGREGATE_PLAN_GROUP = 'Все';
       const HIGHLIGHT_GROUP_GAP_BRANDS = ['PROFIT'];
       const PROFIT_GROUP_NAME = 'PROFIT';
-      const PROFIT_PLAN_PERCENT = 11;
+      const PROFIT_PLAN_PERCENT = 9;
+      const TODO_STORAGE_KEY = 'cargotp-sales-todos-v1';
       const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
       let state = {
         data: null,
@@ -568,6 +626,8 @@
           topClients: { key: 'turnover', dir: 'desc' },
           groupGaps: { key: 'missingPlanShare', dir: 'desc' },
           sales: { key: 'clientCode', dir: 'asc' },
+          salesOpportunities: { key: 'missingPlanShare', dir: 'desc' },
+          salesRisks: { key: 'discountPercent', dir: 'desc' },
           groups: { key: 'planAmount', dir: 'desc' },
           receivables: { key: 'totalDebt', dir: 'desc' },
           tires: { key: 'clientCode', dir: 'asc' }
@@ -577,7 +637,20 @@
         openFilterPanel: null,
         filterPanelQuery: '',
         groupGapMode: 'all',
-        searchSuggestionsOpen: false
+        searchSuggestionsOpen: false,
+        salesTodos: [],
+        salesTodoDraft: {
+          title: '',
+          clientName: '',
+          tags: '',
+          priority: 'medium'
+        },
+        salesTodoFilters: {
+          search: '',
+          status: 'all',
+          priority: 'all',
+          tag: 'all'
+        }
       };
       const pageTitles = {
         overview: 'Огляд',
@@ -753,6 +826,98 @@
         };
         document.getElementById('search').placeholder = `Пошук за ${modeLabel[state.searchMode]}...`;
         renderSearchSuggestions();
+      }
+
+      function createTodoId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+        return `todo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      function parseTodoTags(value) {
+        return [...new Set(String(value || '').split(',').map((tag) => tag.trim()).filter(Boolean))];
+      }
+
+      function loadSalesTodos() {
+        try {
+          const raw = window.localStorage.getItem(TODO_STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(parsed)) return [];
+          return parsed.map((todo) => ({
+            id: todo.id || createTodoId(),
+            title: String(todo.title || ''),
+            clientName: String(todo.clientName || ''),
+            tags: Array.isArray(todo.tags) ? todo.tags.filter((tag) => typeof tag === 'string') : [],
+            priority: ['high', 'low'].includes(todo.priority) ? todo.priority : 'medium',
+            status: ['doing', 'done'].includes(todo.status) ? todo.status : 'todo',
+            createdAt: String(todo.createdAt || new Date().toISOString())
+          })).filter((todo) => todo.title);
+        } catch {
+          return [];
+        }
+      }
+
+      function saveSalesTodos() {
+        window.localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(state.salesTodos));
+      }
+
+      function nextTodoStatus(status) {
+        if (status === 'todo') return 'doing';
+        if (status === 'doing') return 'done';
+        return 'todo';
+      }
+
+      function todoStatusLabel(status) {
+        if (status === 'doing') return 'В процесі';
+        if (status === 'done') return 'Готово';
+        return 'До роботи';
+      }
+
+      function todoPriorityLabel(priority) {
+        if (priority === 'high') return 'Високий';
+        if (priority === 'low') return 'Низький';
+        return 'Середній';
+      }
+
+      function todoPriorityWeight(priority) {
+        if (priority === 'high') return 3;
+        if (priority === 'medium') return 2;
+        return 1;
+      }
+
+      function addSalesTodo(todo) {
+        state.salesTodos = [
+          {
+            id: createTodoId(),
+            title: String(todo.title || '').trim(),
+            clientName: String(todo.clientName || '').trim(),
+            tags: Array.isArray(todo.tags) ? todo.tags.filter(Boolean) : [],
+            priority: ['high', 'low'].includes(todo.priority) ? todo.priority : 'medium',
+            status: 'todo',
+            createdAt: new Date().toISOString()
+          },
+          ...state.salesTodos
+        ].filter((item) => item.title);
+        saveSalesTodos();
+      }
+
+      function filteredSalesTodos() {
+        const search = String(state.salesTodoFilters.search || '').trim().toLowerCase();
+        return [...state.salesTodos]
+          .filter((todo) => state.salesTodoFilters.status === 'all' || todo.status === state.salesTodoFilters.status)
+          .filter((todo) => state.salesTodoFilters.priority === 'all' || todo.priority === state.salesTodoFilters.priority)
+          .filter((todo) => state.salesTodoFilters.tag === 'all' || todo.tags.includes(state.salesTodoFilters.tag))
+          .filter((todo) => !search || [todo.title, todo.clientName, todo.tags.join(' ')].join(' ').toLowerCase().includes(search))
+          .sort((left, right) => {
+            const statusRank = { todo: 0, doing: 1, done: 2 };
+            if (statusRank[left.status] !== statusRank[right.status]) return statusRank[left.status] - statusRank[right.status];
+            const priorityDelta = todoPriorityWeight(right.priority) - todoPriorityWeight(left.priority);
+            if (priorityDelta !== 0) return priorityDelta;
+            return right.createdAt.localeCompare(left.createdAt);
+          });
+      }
+
+      function salesTodoTags() {
+        return [...new Set(state.salesTodos.flatMap((todo) => todo.tags))].sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' }));
       }
 
       function visibleSearchSuggestions() {
@@ -1268,7 +1433,7 @@
             <div class="two-up">
               <div class="chart-shell">
                 <div class="chart-title">Планові долі груп</div>
-                <div class="small" style="margin-bottom:12px;">Факт показано як долю від обороту місяця, праворуч ціль групи. PROFIT рахується окремо з ціллю 11%.</div>
+                <div class="small" style="margin-bottom:12px;">Факт показано як долю від обороту місяця, праворуч ціль групи. PROFIT рахується окремо з ціллю 9%.</div>
                 <div class="search-suggestions-grid">
                   ${groupShareTargets.map((row) => `
                     <div class="filter-option" style="cursor:default;">
@@ -1369,14 +1534,264 @@
           { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
         ];
         const tableRows = filteredTableRows('sales', rows, salesColumns);
+        const visibleClientKeys = new Set(tableRows.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+        const receivables = state.data.receivables.filter((row) => {
+          if (state.searchMode === 'brand' || state.searchMode === 'group') {
+            return !state.search || visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName);
+          }
+          return visibleClientKeys.size ? visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName) && matchesReceivableSearch(row) : matchesReceivableSearch(row);
+        });
+        const total = sum(tableRows, (row) => row.amountEur);
+        const planTurnover = sum(tableRows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
+        const grossPlan = Number(state.grossPlan || 0);
+        const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
+        const profitTurnover = sum(tableRows.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
+        const profitShare = total ? profitTurnover / total * 100 : 0;
+        const profitGap = Math.max(PROFIT_PLAN_PERCENT - profitShare, 0);
+        const avgMarginValue = avg(tableRows, (row) => row.netMargin);
+        const avgDiscountValue = avg(tableRows, (row) => row.discountPercent);
+        const discountThreshold = Math.max(avgDiscountValue, 8);
+        const marginThreshold = avgMarginValue > 0 ? Math.min(avgMarginValue, PROFIT_PLAN_PERCENT + 3) : PROFIT_PLAN_PERCENT + 3;
+        const concentrationShare = total ? topClientsByTurnover(tableRows, 3).reduce((sumValue, row) => sumValue + row.turnover, 0) / total * 100 : 0;
+        const deficitClients = clientGroupShareGaps(tableRows).filter((row) => row.missingGroups > 0);
+        const riskyRows = [...tableRows]
+          .filter((row) => row.discountPercent >= discountThreshold || row.netMargin <= marginThreshold)
+          .sort((left, right) => (right.discountPercent - left.discountPercent) || (left.netMargin - right.netMargin) || (right.amountEur - left.amountEur))
+          .slice(0, 12);
+        const discountPressureTurnover = sum(riskyRows, (row) => row.amountEur);
+        const totalDebt = sum(receivables, (row) => row.totalDebt);
+        const share31Plus = totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0;
+        const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
+        const actionSignals = [
+          {
+            title: 'PROFIT vs ціль',
+            value: `${pct(profitShare)} / ${pct(PROFIT_PLAN_PERCENT)}`,
+            tone: profitGap > 0 ? 'warning' : 'success',
+            description: profitGap > 0
+              ? `Бракує ${pct(profitGap)} до цілі PROFIT. Є сенс посилити клієнтів, де бренд вже присутній або ще не закритий у матриці.`
+              : 'Ціль PROFIT виконана. Можна утримувати частку та переносити фокус на інші резерви росту.'
+          },
+          {
+            title: 'Cross-sell резерв',
+            value: `${deficitClients.length} клієнтів`,
+            tone: deficitClients.length ? 'teal' : 'success',
+            description: deficitClients.length
+              ? `${deficitClients[0].clientName} має найбільший дефіцит по планових групах. Це перша точка для допродажу.`
+              : 'У видимому зрізі активні клієнти вже закривають планові групи без явного дефіциту.'
+          },
+          {
+            title: 'Знижка тисне на маржу',
+            value: money(discountPressureTurnover),
+            tone: riskyRows.length ? 'danger' : 'success',
+            description: riskyRows.length
+              ? `${riskyRows.length} продажів потребують рев'ю: висока знижка або маржа нижче бази ${pct(marginThreshold)}.`
+              : 'Критичних рядків по знижці та маржі в поточному зрізі не видно.'
+          },
+          {
+            title: 'Дебіторка в продажах',
+            value: money(sum(receivables, (row) => row.overdueDebt)),
+            tone: sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success',
+            description: sum(receivables, (row) => row.overdueDebt) > 0
+              ? `${topOverdueClients[0]?.name || 'Клієнт'} має найбільшу прострочку серед видимих продажів.`
+              : 'По видимих клієнтах немає прострочки, яка прямо блокує продажну активність.'
+          }
+        ];
+        const todoSuggestions = [
+          ...(profitGap > 0 ? [{ title: `Дотягнути PROFIT до ${pct(PROFIT_PLAN_PERCENT)}`, clientName: '', tags: ['profit', 'план'], priority: 'high' }] : []),
+          ...(deficitClients[0] ? [{ title: `Розширити матрицю для ${deficitClients[0].clientName}`, clientName: deficitClients[0].clientName, tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)], priority: 'high' }] : []),
+          ...(topOverdueClients[0] ? [{ title: `Закрити прострочку по ${topOverdueClients[0].name}`, clientName: topOverdueClients[0].name, tags: ['дебіторка', 'контроль оплат'], priority: 'high' }] : []),
+          ...(riskyRows[0] ? [{ title: `Перевірити знижку/маржу по ${riskyRows[0].clientName}`, clientName: riskyRows[0].clientName, tags: ['маржа', riskyRows[0].brand || 'знижка'], priority: 'medium' }] : [])
+        ];
+        const todoRows = filteredSalesTodos();
+        const todoTags = salesTodoTags();
+        const openTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done').length;
+        const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
+        const topClientsChart = byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8);
+        const topBrandsChart = byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8);
+        const topGroupsChart = byTop(tableRows, (row) => row.productGroup || 'Без групи', (row) => row.amountEur, 8);
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
-            <div class="three-up">
-              <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8))}</div>
-              <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8))}</div>
-              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(byTop(tableRows, (row) => row.productGroup, (row) => row.amountEur, 8))}</div>
+            <div class="grid">
+              ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
+              ${kpi('Валовий план', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger')}
+              ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
+              ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'teal')}
+              ${kpi('Середня знижка', pct(avgDiscountValue), `Зона уваги від ${pct(discountThreshold)}`, avgDiscountValue >= 8 ? 'warning' : 'success')}
+              ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від дебіторки`, sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success')}
             </div>
+
+            <div class="three-up">
+              <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(topClientsChart)}</div>
+              <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(topBrandsChart)}</div>
+              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(topGroupsChart)}</div>
+            </div>
+
+            <div class="insight-grid">
+              ${actionSignals.map((signal) => `
+                <article class="insight">
+                  <div class="meta">${escapeHtml(signal.title)}</div>
+                  <div class="big ${signal.tone === 'danger' ? 'danger' : signal.tone === 'warning' ? 'status-red' : signal.tone === 'success' ? 'ok' : ''}">${escapeHtml(signal.value)}</div>
+                  <div class="copy">${escapeHtml(signal.description)}</div>
+                </article>
+              `).join('')}
+            </div>
+
+            <div class="three-up">
+              <div class="chart-shell">
+                <div class="chart-title">Концентрація клієнтів</div>
+                <div class="card">
+                  <div class="big" style="color:white;font-size:28px;font-weight:900;">${escapeHtml(pct(concentrationShare))}</div>
+                  <div class="copy" style="margin-top:10px;">Частка топ-3 клієнтів у видимому обороті. Якщо вона росте, результат стає більш крихким до зсуву одного клієнта.</div>
+                </div>
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Клієнти для допродажу</div>
+                ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#2dd4bf')}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Найбільша прострочка</div>
+                ${bars(topOverdueClients, money, '#fb7185')}
+              </div>
+            </div>
+
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">Клієнти для розширення матриці</div>
+                ${table('salesOpportunities', deficitClients.slice(0, 10), [
+                  { title: 'Код клієнта', key: 'clientCode' },
+                  { title: 'Клієнт', key: 'clientName' },
+                  { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
+                  { title: 'Втрачена частка', key: 'missingPlanShare', sortValue: (row) => row.missingPlanShare, render: (row) => pct(row.missingPlanShare) },
+                  { title: 'Немає груп', key: 'missingGroups', sortValue: (row) => row.missingGroups },
+                  {
+                    title: 'Що відкрити',
+                    key: 'missingGroupNames',
+                    sortValue: (row) => row.missingGroupNames.join(', '),
+                    render: (row) => {
+                      const value = row.missingGroupNames.join(', ');
+                      const preview = value.length > 52 ? `${value.slice(0, 49)}...` : value;
+                      return `<span title="${escapeHtml(value)}">${escapeHtml(preview || 'Усі групи закриті')}</span>`;
+                    }
+                  }
+                ], {
+                  rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName,
+                  expandContent: (row) => `
+                    <div class="expand-card">
+                      <div><strong>${escapeHtml(row.clientName)}</strong> (${escapeHtml(row.clientCode || row.unifiedClientCode || 'без коду')})</div>
+                      <div class="small">Покрита частка плану: <strong>${escapeHtml(pct(row.coveredPlanShare))}</strong>. Втрачена частка: <strong>${escapeHtml(pct(row.missingPlanShare))}</strong>.</div>
+                      <div class="chips">
+                        ${row.missingGroupStats.map((item) => `<span class="chip">${escapeHtml(item.name)} · ${escapeHtml(pct(item.planShare))}</span>`).join('') || '<span class="chip">усі групи закриті</span>'}
+                      </div>
+                    </div>
+                  `
+                })}
+              </div>
+
+              <div class="chart-shell">
+                <div class="chart-title">Продажі з тиском на маржу</div>
+                ${table('salesRisks', riskyRows, [
+                  { title: 'Дата', key: 'date' },
+                  { title: 'Клієнт', key: 'clientName' },
+                  { title: 'Бренд', key: 'brand' },
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'Оборот', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+                  { title: 'Маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+                  { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+                ], {
+                  rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
+                })}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-head" style="margin-bottom:14px;">
+                <h2>Dashboard + todo-лист продажів</h2>
+                <p class="muted">Todo зберігається локально в браузері. Можна швидко створювати задачі з аналітики, ставити теги і фільтрувати список по статусу та пріоритету.</p>
+              </div>
+              <div class="filter-summary" style="margin-bottom:14px;">
+                <span class="filter-summary-chip" style="cursor:default;">Активні: ${escapeHtml(String(openTodoCount))}</span>
+                <span class="filter-summary-chip" style="cursor:default;border-color:rgba(52,211,153,0.42);background:rgba(52,211,153,0.14);color:var(--green);">Готово: ${escapeHtml(String(doneTodoCount))}</span>
+              </div>
+              <div class="todo-grid">
+                <div class="section-stack">
+                  <div class="card">
+                    <div class="small" style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);">Швидке додавання</div>
+                    <div class="control-grid" style="margin-top:12px;">
+                      <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
+                      <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
+                      <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка" value="${escapeHtml(state.salesTodoDraft.tags)}" />
+                      <select data-sales-todo-draft="priority">
+                        <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
+                        <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                        <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
+                      </select>
+                    </div>
+                    <div class="todo-actions" style="margin-top:12px;">
+                      <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="small" style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);">Швидкі задачі з аналітики</div>
+                    <div class="control-grid" style="margin-top:12px;">
+                      ${todoSuggestions.map((todo) => `
+                        <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
+                          <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
+                          <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
+                          <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
+                        </button>
+                      `).join('') || '<div class="empty">Немає швидких задач для поточного зрізу.</div>'}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="section-stack">
+                  <div class="card">
+                    <div class="control-grid">
+                      <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
+                      <select data-sales-todo-filter="status">
+                        <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
+                        <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
+                        <option value="doing" ${state.salesTodoFilters.status === 'doing' ? 'selected' : ''}>В процесі</option>
+                        <option value="done" ${state.salesTodoFilters.status === 'done' ? 'selected' : ''}>Готово</option>
+                      </select>
+                      <select data-sales-todo-filter="priority">
+                        <option value="all" ${state.salesTodoFilters.priority === 'all' ? 'selected' : ''}>Усі пріоритети</option>
+                        <option value="high" ${state.salesTodoFilters.priority === 'high' ? 'selected' : ''}>Високий</option>
+                        <option value="medium" ${state.salesTodoFilters.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                        <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
+                      </select>
+                      <select data-sales-todo-filter="tag">
+                        <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
+                        ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="todo-list">
+                    ${todoRows.map((todo) => `
+                      <article class="todo-card">
+                        <div class="todo-head">
+                          <div>
+                            <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
+                            <div class="small" style="margin-top:6px;">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
+                          </div>
+                          <div class="todo-badges">
+                            <span class="todo-badge status-${escapeHtml(todo.status)}">${escapeHtml(todoStatusLabel(todo.status))}</span>
+                            <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
+                          </div>
+                        </div>
+                        ${todo.tags.length ? `<div class="chips">${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}</div>` : ''}
+                        <div class="todo-actions">
+                          <button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" type="button">Перемкнути: ${escapeHtml(todoStatusLabel(nextTodoStatus(todo.status)))}</button>
+                          <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
+                        </div>
+                      </article>
+                    `).join('') || '<div class="empty">Немає задач за активними фільтрами. Створіть нову або додайте швидку задачу з аналітики.</div>'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             ${table('sales', rows, salesColumns, {
               maxHeight: true,
               rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
@@ -1549,6 +1964,7 @@
         monthSelect.innerHTML = months.map((month) => `<option value="${month}">${month}</option>`).join('');
         monthSelect.value = state.month;
         state.grossPlan = state.data.monthlyPlans.find((plan) => plan.month === state.month)?.grossPlan || 0;
+        state.salesTodos = loadSalesTodos();
         document.getElementById('grossPlan').value = state.grossPlan;
         document.getElementById('updated').textContent = state.data.updatedAt ? `Дані оновлено: ${new Date(state.data.updatedAt).toLocaleString('uk-UA')}` : 'Дані завантажено з Excel';
         renderAll();
@@ -1562,6 +1978,59 @@
           state.searchSuggestionsOpen = false;
           renderSearchSuggestions();
           renderAll();
+          return;
+        }
+
+        const todoSuggest = event.target.closest('[data-sales-todo-suggest]');
+        if (todoSuggest) {
+          try {
+            const payload = JSON.parse(todoSuggest.dataset.salesTodoSuggest || '{}');
+            addSalesTodo(payload);
+            renderSales();
+          } catch {
+            return;
+          }
+          return;
+        }
+
+        const todoSubmit = event.target.closest('[data-sales-todo-submit]');
+        if (todoSubmit) {
+          if (String(state.salesTodoDraft.title || '').trim()) {
+            addSalesTodo({
+              title: state.salesTodoDraft.title,
+              clientName: state.salesTodoDraft.clientName,
+              tags: parseTodoTags(state.salesTodoDraft.tags),
+              priority: state.salesTodoDraft.priority
+            });
+            state.salesTodoDraft = { title: '', clientName: '', tags: '', priority: 'medium' };
+            renderSales();
+          }
+          return;
+        }
+
+        const todoStatus = event.target.closest('[data-sales-todo-status]');
+        if (todoStatus) {
+          const id = todoStatus.dataset.salesTodoStatus;
+          state.salesTodos = state.salesTodos.map((todo) => todo.id === id ? { ...todo, status: nextTodoStatus(todo.status) } : todo);
+          saveSalesTodos();
+          renderSales();
+          return;
+        }
+
+        const todoDelete = event.target.closest('[data-sales-todo-delete]');
+        if (todoDelete) {
+          const id = todoDelete.dataset.salesTodoDelete;
+          state.salesTodos = state.salesTodos.filter((todo) => todo.id !== id);
+          saveSalesTodos();
+          renderSales();
+          return;
+        }
+
+        const todoTag = event.target.closest('[data-sales-todo-tag]');
+        if (todoTag) {
+          const tag = todoTag.dataset.salesTodoTag || 'all';
+          state.salesTodoFilters.tag = state.salesTodoFilters.tag === tag ? 'all' : tag;
+          renderSales();
           return;
         }
 
@@ -1712,6 +2181,21 @@
         renderSearchSuggestions();
       });
       document.addEventListener('input', (event) => {
+        const todoDraftInput = event.target.closest('[data-sales-todo-draft]');
+        if (todoDraftInput) {
+          const field = todoDraftInput.dataset.salesTodoDraft;
+          state.salesTodoDraft[field] = todoDraftInput.value;
+          return;
+        }
+
+        const todoFilterInput = event.target.closest('[data-sales-todo-filter]');
+        if (todoFilterInput) {
+          const field = todoFilterInput.dataset.salesTodoFilter;
+          state.salesTodoFilters[field] = todoFilterInput.value;
+          renderSales();
+          return;
+        }
+
         const filterInput = event.target.closest('[data-filter-panel-search]');
         if (!filterInput) return;
         state.filterPanelQuery = filterInput.value;
