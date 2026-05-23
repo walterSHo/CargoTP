@@ -98,6 +98,10 @@
       .page-header h1 { margin: 0; }
       .toolbar {
         display: grid;
+        position: relative;
+        z-index: 40;
+        isolation: isolate;
+        overflow: visible;
         gap: 14px;
         margin: 18px 0;
         border: 1px solid var(--line);
@@ -154,13 +158,13 @@
         background: rgba(78,161,255,0.16);
         color: white;
       }
-      .search-wrap { position: relative; }
+      .search-wrap { position: relative; z-index: 80; }
       .search-suggestions {
         position: absolute;
         left: 0;
         right: 0;
         top: calc(100% + 8px);
-        z-index: 20;
+        z-index: 120;
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: 14px;
@@ -583,7 +587,7 @@
           <div class="toolbar">
             <div class="toolbar-grid">
               <label>Місяць <select id="month"></select></label>
-              <label>Пошук <div class="search-wrap"><input id="search" placeholder="Фільтр за активним режимом..." /><div class="search-suggestions" id="search-suggestions" hidden></div></div></label>
+              <label>Пошук <div class="search-wrap"><input id="search" placeholder="Фільтр за активним режимом..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="search" /><div class="search-suggestions" id="search-suggestions" hidden></div></div></label>
               <label>Валовий план місяця <input id="grossPlan" type="number" min="0" step="100" /></label>
             </div>
             <div>
@@ -742,6 +746,7 @@
             productGroup: PROFIT_GROUP_NAME,
             planPercent: PROFIT_PLAN_PERCENT,
             planAmount: basePlanAmount * PROFIT_PLAN_PERCENT / 100,
+            tempoAmount: 0,
             factAmount: 0,
             completionPercent: 0,
             netPercent: 0
@@ -1813,6 +1818,7 @@
               { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
               { title: 'Частка від плану', titleHtml: infoLabel('Частка від плану', 'Цільовий відсоток валового плану, який має дати ця товарна група.'), key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
               { title: 'План', key: 'planAmount', sortValue: (row) => row.planAmount, render: (row) => money(row.planAmount) },
+              { title: 'Темп', key: 'tempoAmount', sortValue: (row) => row.tempoAmount, render: (row) => money(row.tempoAmount) },
               { title: 'Факт із продажів', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
               { title: '% виконання', key: 'completionPercent', sortValue: (row) => row.completionPercent, render: (row) => `<span class="${completionClass(row.completionPercent)}">${escapeHtml(pct(row.completionPercent))}</span>` }
             ], { rowKey: (row) => row.productGroup })}

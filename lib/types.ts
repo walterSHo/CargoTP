@@ -17,6 +17,7 @@ export type GroupPlanRecord = {
   productGroup: string;
   planPercent: number;
   planAmount: number;
+  tempoAmount: number;
   factAmount: number;
   completionPercent: number;
   netPercent: number;

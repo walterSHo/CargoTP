@@ -507,17 +507,22 @@ export function SalesClient({ data }: { data: ProcessedData }) {
               {months.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
-          <div className="grid gap-2" ref={searchRef}>
+          <div className={`search-shell grid gap-2 ${searchOpen ? 'search-shell-open' : ''}`} ref={searchRef}>
             <span className="filter-label">Пошук</span>
             <div className="relative">
               <input
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
                 className="filter-input"
+                inputMode="search"
                 onChange={(event) => {
                   setQuery(event.target.value);
                   setSearchOpen(true);
                 }}
                 onFocus={() => setSearchOpen(true)}
                 placeholder={`Фільтр за полем: ${searchModes.find((item) => item.value === searchMode)?.label.toLowerCase()}`}
+                spellCheck={false}
                 value={query}
               />
               {searchOpen && visibleSuggestions.length ? (

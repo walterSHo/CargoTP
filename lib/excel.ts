@@ -30,6 +30,7 @@ const aliases: FieldMap = {
   discountPercent: ['процент скидки', '% скидки', 'відсоток знижки', '% знижки', 'скидка', 'знижка'],
   planPercent: ['план группы в %', 'план групи в %', 'план %', 'доля %', 'частка %'],
   planAmount: ['план группы в деньгах', 'план групи в грошах', 'план сумма', 'план сума', 'план'],
+  tempoAmount: ['темп', 'план група_темп', 'темп сумма', 'темп сума'],
   factAmount: ['факт', 'факт сумма', 'факт сума', 'факт продаж'],
   completionPercent: ['% выполнения', '% виконання', 'выполнение %', 'виконання %', '% вып'],
   netPercent: ['процент net', 'відсоток net', '% net', 'net %'],
@@ -49,7 +50,7 @@ const required: Record<FileType, string[]> = {
 };
 
 const salesSchema = z.object({ date: z.string(), unifiedClientCode: z.string(), clientCode: z.string(), clientName: z.string(), brand: z.string(), productGroup: z.string(), productCode: z.string(), amountEur: z.number(), netMargin: z.number(), discountPercent: z.number() });
-const groupPlanSchema = z.object({ productGroup: z.string(), planPercent: z.number(), planAmount: z.number(), factAmount: z.number(), completionPercent: z.number(), netPercent: z.number() });
+const groupPlanSchema = z.object({ productGroup: z.string(), planPercent: z.number(), planAmount: z.number(), tempoAmount: z.number(), factAmount: z.number(), completionPercent: z.number(), netPercent: z.number() });
 const receivableSchema = z.object({ unifiedClientCode: z.string(), clientCode: z.string(), clientName: z.string(), totalDebt: z.number(), currentDebt: z.number(), overdueDebt: z.number(), bucket0To10: z.number(), bucket11To20: z.number(), bucket21To30: z.number(), bucket31Plus: z.number() });
 
 function normalizeHeader(value: unknown) {
@@ -212,6 +213,7 @@ function parsePivotGroupPlan(rows: unknown[][]): GroupPlanRecord[] | null {
         productGroup,
         planPercent: ratioPercentValue(row[3]),
         planAmount: numberValue(row[4]),
+        tempoAmount: numberValue(row[5]),
         factAmount: numberValue(row[6]),
         completionPercent: ratioPercentValue(row[7]),
         netPercent: ratioPercentValue(row[8])
@@ -311,6 +313,7 @@ export function parseWorkbook(filePath: string): ParsedWorkbook {
         productGroup: stringValue(cell(row, detected.headerMap, 'productGroup')),
         planPercent: percentValue(cell(row, detected.headerMap, 'planPercent')),
         planAmount: numberValue(cell(row, detected.headerMap, 'planAmount')),
+        tempoAmount: numberValue(cell(row, detected.headerMap, 'tempoAmount')),
         factAmount: numberValue(cell(row, detected.headerMap, 'factAmount')),
         completionPercent: percentValue(cell(row, detected.headerMap, 'completionPercent')),
         netPercent: percentValue(cell(row, detected.headerMap, 'netPercent'))

@@ -11,6 +11,7 @@ type Row = {
   planPercent: number;
   shareOfGrossPlan: number;
   planAmount: number;
+  tempoAmount: number;
   factFromSales: number;
   completionPercent: number;
 };
@@ -26,6 +27,7 @@ const columns: ColumnDef<Row>[] = [
   { accessorKey: 'planPercent', header: 'План %', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'shareOfGrossPlan', header: 'Частка від валового плану', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'planAmount', header: 'План', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'tempoAmount', header: 'Темп', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'factFromSales', header: 'Факт із продажів', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'completionPercent', header: '% виконання', cell: (info) => <span className={statusClass(Number(info.getValue()))}>{percent(Number(info.getValue()))}</span> }
 ];

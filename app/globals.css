@@ -140,6 +140,10 @@
 
   .filter-bar {
     @apply border p-4 md:p-5;
+    position: relative;
+    z-index: 40;
+    isolation: isolate;
+    overflow: visible;
     border-radius: var(--radius-panel);
     border-color: var(--line);
     background: rgba(10, 18, 33, 0.9);
@@ -280,8 +284,17 @@
     color: var(--ink);
   }
 
+  .search-shell {
+    position: relative;
+    z-index: 1;
+  }
+
+  .search-shell-open {
+    z-index: 80;
+  }
+
   .search-suggestion-popover {
-    @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 border p-3;
+    @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] border p-3;
     border-radius: 14px;
     border-color: var(--line);
     background: rgba(8, 15, 28, 0.98);

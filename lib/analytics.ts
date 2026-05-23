@@ -104,6 +104,7 @@ function profitPlanRecord(groupPlans: GroupPlanRecord[]): GroupPlanRecord | null
     productGroup: PROFIT_GROUP_NAME,
     planPercent: PROFIT_PLAN_PERCENT,
     planAmount: (basePlanAmount * PROFIT_PLAN_PERCENT) / 100,
+    tempoAmount: 0,
     factAmount: 0,
     completionPercent: 0,
     netPercent: 0
