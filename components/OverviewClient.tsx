@@ -269,7 +269,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                   {money(row.turnover)} · {percent(row.turnoverShare)} · {percent(row.targetShare)}
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(141,162,199,0.16)]">
-                  <div className="h-full rounded-full bg-[linear-gradient(90deg,#4ea1ff,#2dd4bf)]" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
+                  <div className="h-full rounded-full bg-[var(--accent)] transition-all duration-300 ease-out" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
                 </div>
               </div>
             ))}

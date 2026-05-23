@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const links = [
   ['/', 'Огляд'],
   ['/sales', 'Продажі'],
+  ['/todo', 'Todo'],
   ['/group-plan', 'План груп'],
   ['/receivables', 'Дебіторка'],
   ['/tires', 'Шини'],

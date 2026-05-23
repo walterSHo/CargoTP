@@ -30,10 +30,7 @@
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        background:
-          radial-gradient(circle at top left, rgba(78, 161, 255, 0.08), transparent 24%),
-          radial-gradient(circle at top right, rgba(45, 212, 191, 0.06), transparent 22%),
-          var(--bg);
+        background: var(--bg);
         color: var(--ink);
         font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
       }
@@ -131,14 +128,6 @@
       }
       select {
         appearance: none;
-        background-image:
-          linear-gradient(45deg, transparent 50%, rgba(229, 238, 252, 0.86) 50%),
-          linear-gradient(135deg, rgba(229, 238, 252, 0.86) 50%, transparent 50%);
-        background-position:
-          calc(100% - 22px) calc(50% - 2px),
-          calc(100% - 16px) calc(50% - 2px);
-        background-repeat: no-repeat;
-        background-size: 6px 6px, 6px 6px;
         padding-right: 3rem;
       }
       .mode-pills { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -237,7 +226,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent 34%, transparent 72%, rgba(78,161,255,0.06));
+        background: rgba(255,255,255,0.04);
         opacity: 0;
         transition: opacity 180ms ease;
         pointer-events: none;
@@ -291,19 +280,19 @@
         background: rgba(78, 161, 255, 0.16);
         color: white;
       }
-      .filter-menu {
-        position: absolute;
-        right: 10px;
-        top: calc(100% + 10px);
-        z-index: 20;
-        width: 260px;
+      .filter-panel {
         display: grid;
         gap: 10px;
-        padding: 12px;
+        padding: 14px;
         border-radius: 14px;
         border: 1px solid var(--line);
         background: rgba(8, 15, 28, 0.98);
         box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+      }
+      .filter-panel-wrap {
+        position: relative;
+        z-index: 90;
+        margin-bottom: 12px;
       }
       .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--blue); }
       .filter-clear {
@@ -410,32 +399,33 @@
         font-size: 12px;
         font-weight: 700;
       }
-      .pie-wrap { display: grid; gap: 18px; align-items: center; grid-template-columns: minmax(180px, 220px) 1fr; }
+      .pie-wrap { display: grid; gap: 18px; align-items: start; grid-template-columns: minmax(220px, 280px) 1fr; }
       .pie-chart {
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        position: relative;
-        margin: 0 auto;
+        display: grid;
+        gap: 14px;
+        align-content: start;
         transition: transform 180ms ease, filter 180ms ease;
       }
-      .pie-chart:hover { transform: scale(1.02); filter: saturate(1.08); }
-      .pie-chart::after {
-        content: "";
-        position: absolute;
-        inset: 32px;
-        border-radius: 50%;
-        background: rgba(10, 18, 33, 0.96);
-        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
-      }
-      .pie-center {
-        position: absolute;
-        inset: 0;
+      .pie-chart:hover { transform: translateY(-2px); filter: saturate(1.06); }
+      .pie-stacked-bar {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 100%;
+        height: 18px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+      .pie-stacked-segment { height: 100%; min-width: 2px; transition: opacity 160ms ease, filter 160ms ease; }
+      .pie-stacked-bar:hover .pie-stacked-segment { opacity: 0.92; filter: saturate(1.08); }
+      .pie-center {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border-radius: 16px;
+        background: rgba(10, 18, 33, 0.96);
+        border: 1px solid var(--line);
         text-align: center;
-        z-index: 1;
       }
       .pie-center-stack { display: grid; gap: 4px; justify-items: center; line-height: 1.1; }
       .pie-center-value { color: white; font-size: 22px; font-weight: 900; }
@@ -534,6 +524,33 @@
       .todo-badge.priority-high { border-color: rgba(251, 113, 133, 0.38); background: rgba(251, 113, 133, 0.14); color: var(--red); }
       .todo-badge.priority-medium { border-color: rgba(45, 212, 191, 0.38); background: rgba(45, 212, 191, 0.14); color: var(--teal); }
       .todo-badge.priority-low { background: rgba(8, 15, 28, 0.72); color: var(--muted); }
+      .todo-board { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .todo-lane {
+        display: grid;
+        gap: 14px;
+        min-height: 24rem;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(11, 20, 36, 0.92);
+        box-shadow: var(--shadow-soft);
+      }
+      .todo-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .todo-lane-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(8, 15, 28, 0.72);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .todo-lane-list { display: grid; gap: 12px; align-content: start; }
       @media (min-width: 980px) {
         .app-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); }
         .sidebar { display: block; }
@@ -547,7 +564,6 @@
         .toolbar { gap: 10px; }
         .toolbar-grid { grid-template-columns: 1fr; }
         .table-meta { align-items: stretch; }
-        .filter-menu { left: 10px; right: 10px; width: auto; }
         th, td { padding: 10px 10px; }
       }
     </style>
@@ -559,6 +575,7 @@
         <nav class="sidebar-nav">
           <button class="tab active" data-tab="overview">Огляд</button>
           <button class="tab" data-tab="sales">Продажі</button>
+          <button class="tab" data-tab="todo">Todo</button>
           <button class="tab" data-tab="groups">План груп</button>
           <button class="tab" data-tab="receivables">Дебіторка</button>
           <button class="tab" data-tab="tires">Шини</button>
@@ -570,6 +587,7 @@
           <div class="mobile-tabs">
             <button class="tab active" data-tab="overview">Огляд</button>
             <button class="tab" data-tab="sales">Продажі</button>
+            <button class="tab" data-tab="todo">Todo</button>
             <button class="tab" data-tab="groups">План груп</button>
             <button class="tab" data-tab="receivables">Дебіторка</button>
             <button class="tab" data-tab="tires">Шини</button>
@@ -603,6 +621,7 @@
 
           <section class="section active" id="overview"></section>
           <section class="section" id="sales"></section>
+          <section class="section" id="todo"></section>
           <section class="section" id="groups"></section>
           <section class="section" id="receivables"></section>
           <section class="section" id="tires"></section>
@@ -632,6 +651,9 @@
           sales: { key: 'clientCode', dir: 'asc' },
           salesOpportunities: { key: 'missingPlanShare', dir: 'desc' },
           salesRisks: { key: 'discountPercent', dir: 'desc' },
+          salesTempo: { key: 'tempoDelta', dir: 'asc' },
+          profitClients: { key: 'hasProfit', dir: 'asc' },
+          profitGroups: { key: 'penetrationPercent', dir: 'asc' },
           groups: { key: 'planAmount', dir: 'desc' },
           receivables: { key: 'totalDebt', dir: 'desc' },
           tires: { key: 'clientCode', dir: 'asc' }
@@ -659,6 +681,7 @@
       const pageTitles = {
         overview: 'Огляд',
         sales: 'Продажі',
+        todo: 'Todo',
         groups: 'План груп',
         receivables: 'Дебіторка',
         tires: 'Шини'
@@ -1098,6 +1121,123 @@
         });
       }
 
+      function monthProgress(referenceDate = new Date().toISOString().slice(0, 10)) {
+        const [year, monthNumber] = String(state.month || '').split('-').map(Number);
+        if (!year || !monthNumber) return { totalDays: 0, elapsedDays: 0, remainingDays: 0, elapsedShare: 0 };
+        const totalDays = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+        const referenceMonth = referenceDate.slice(0, 7);
+        const referenceDay = Number(referenceDate.slice(8, 10)) || 0;
+        const elapsedDays = referenceMonth < state.month
+          ? 0
+          : referenceMonth > state.month
+            ? totalDays
+            : Math.min(Math.max(referenceDay, 0), totalDays);
+        return {
+          totalDays,
+          elapsedDays,
+          remainingDays: Math.max(totalDays - elapsedDays, 0),
+          elapsedShare: totalDays > 0 ? elapsedDays / totalDays : 0
+        };
+      }
+
+      function monthPaceSnapshot(rows) {
+        const actualTurnover = sum(rows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
+        const grossPlan = Number(state.grossPlan || 0);
+        const progress = monthProgress();
+        const expectedTurnoverToDate = grossPlan * progress.elapsedShare;
+        const projectedTurnover = progress.elapsedShare > 0 ? actualTurnover / progress.elapsedShare : 0;
+        return {
+          ...progress,
+          actualTurnover,
+          expectedTurnoverToDate,
+          varianceToTempo: actualTurnover - expectedTurnoverToDate,
+          requiredPerDay: progress.remainingDays > 0 ? Math.max(grossPlan - actualTurnover, 0) / progress.remainingDays : 0,
+          projectedTurnover,
+          projectedCompletionPercent: grossPlan > 0 ? projectedTurnover / grossPlan * 100 : 0
+        };
+      }
+
+      function groupTempoRows(rows) {
+        const progress = monthProgress();
+        return groupPlanRows(rows)
+          .filter((row) => isGrossPlanGroup(row.productGroup))
+          .map((row) => ({
+            ...row,
+            tempoDelta: row.factFromSales - Number(row.tempoAmount || 0),
+            tempoCompletionPercent: Number(row.tempoAmount || 0) > 0 ? row.factFromSales / Number(row.tempoAmount || 0) * 100 : 0,
+            requiredPerDay: progress.remainingDays > 0 ? Math.max(row.planAmount - row.factFromSales, 0) / progress.remainingDays : 0,
+            projectedCompletionPercent: row.planAmount > 0 && progress.elapsedShare > 0 ? (row.factFromSales / progress.elapsedShare) / row.planAmount * 100 : 0
+          }))
+          .sort((a, b) => a.tempoDelta - b.tempoDelta || b.planAmount - a.planAmount);
+      }
+
+      function profitClientPenetration(rows, limit = 12) {
+        const map = new Map();
+        rows.forEach((row) => {
+          const key = clientKey(row);
+          const entry = map.get(key) || {
+            unifiedClientCode: row.unifiedClientCode,
+            clientCode: row.clientCode,
+            clientName: row.clientName,
+            turnover: 0,
+            profitTurnover: 0,
+            productGroups: new Set()
+          };
+          entry.turnover += Number(row.amountEur || 0);
+          if (row.productGroup) entry.productGroups.add(normalizeProductGroup(row.productGroup));
+          if (isProfitBrand(row.brand)) entry.profitTurnover += Number(row.amountEur || 0);
+          map.set(key, entry);
+        });
+        return [...map.values()]
+          .map((row) => ({
+            unifiedClientCode: row.unifiedClientCode,
+            clientCode: row.clientCode,
+            clientName: row.clientName,
+            turnover: row.turnover,
+            profitTurnover: row.profitTurnover,
+            profitShare: row.turnover > 0 ? row.profitTurnover / row.turnover * 100 : 0,
+            productGroups: row.productGroups.size,
+            hasProfit: row.profitTurnover > 0
+          }))
+          .filter((row) => row.turnover > 0)
+          .sort((a, b) => Number(a.hasProfit) - Number(b.hasProfit) || b.turnover - a.turnover || String(a.clientName).localeCompare(String(b.clientName), 'uk', { sensitivity: 'base' }))
+          .slice(0, limit);
+      }
+
+      function profitGroupPenetration(rows, limit = 10) {
+        const profitClients = new Set(rows.filter((row) => isProfitBrand(row.brand)).map((row) => clientKey(row)));
+        const map = new Map();
+        rows
+          .filter((row) => isGrossPlanGroup(row.productGroup))
+          .forEach((row) => {
+            const normalizedGroup = normalizeProductGroup(row.productGroup);
+            const key = clientKey(row);
+            const entry = map.get(normalizedGroup) || {
+              productGroup: row.productGroup,
+              turnover: 0,
+              clients: new Set(),
+              clientsWithProfit: new Set(),
+              potentialTurnover: 0
+            };
+            entry.turnover += Number(row.amountEur || 0);
+            entry.clients.add(key);
+            if (profitClients.has(key)) entry.clientsWithProfit.add(key);
+            else entry.potentialTurnover += Number(row.amountEur || 0);
+            map.set(normalizedGroup, entry);
+          });
+        return [...map.values()]
+          .map((row) => ({
+            productGroup: row.productGroup,
+            turnover: row.turnover,
+            clients: row.clients.size,
+            clientsWithProfit: row.clientsWithProfit.size,
+            penetrationPercent: row.clients.size > 0 ? row.clientsWithProfit.size / row.clients.size * 100 : 0,
+            potentialTurnover: row.potentialTurnover
+          }))
+          .sort((a, b) => a.penetrationPercent - b.penetrationPercent || b.potentialTurnover - a.potentialTurnover || String(a.productGroup).localeCompare(String(b.productGroup), 'uk', { sensitivity: 'base' }))
+          .slice(0, limit);
+      }
+
       function kpi(title, value, hint = '', tone = 'info') {
         return `<article class="card kpi ${escapeHtml(tone)}"><div class="label">${escapeHtml(title)}</div><div class="value">${escapeHtml(value)}</div>${hint ? `<div class="muted">${escapeHtml(hint)}</div>` : ''}</article>`;
       }
@@ -1173,8 +1313,28 @@
         const sorted = sortedRows(tableId, filtered, columns);
         const expandable = typeof options.expandContent === 'function';
         const activeFilters = activeTableFilters(tableId);
+        const openFilterKey = state.openFilterPanel?.tableId === tableId ? state.openFilterPanel.filterKey : '';
+        const openFilterOptions = openFilterKey ? (availableFilterOptions[openFilterKey] || []) : [];
+        const filterPanel = openFilterKey ? `
+          <div class="filter-panel-wrap" data-table-filter-root="true">
+            <div class="filter-panel">
+              <div class="filter-menu-head">
+                <span>Вибір значень: ${escapeHtml(tableColumnTitle(columns, openFilterKey))}</span>
+                <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${openFilterKey}" type="button">Очистити</button>
+              </div>
+              <input data-filter-panel-search="${tableId}" placeholder="Пошук значення..." value="${escapeHtml(state.filterPanelQuery)}" />
+              <div class="filter-options">
+                ${openFilterOptions.filter((option) => option.toLowerCase().includes(String(state.filterPanelQuery || '').toLowerCase())).map((option) => {
+                  const active = (state.tableFilters[tableId]?.[openFilterKey] || []).includes(option);
+                  return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${openFilterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
+                }).join('') || '<div class="empty">Немає значень</div>'}
+              </div>
+            </div>
+          </div>
+        ` : '';
         if (!filtered.length) {
           return `
+            ${filterPanel}
             ${activeFilters.length ? `
               <div class="card" style="margin-bottom:12px;">
                 <div class="table-meta">
@@ -1190,6 +1350,7 @@
           `;
         }
         return `
+          ${filterPanel}
           ${activeFilters.length ? `
             <div class="card" style="margin-bottom:12px;">
               <div class="table-meta">
@@ -1219,22 +1380,7 @@
                         <span>${selectedCount || '▾'}</span>
                       </button>
                     ` : '';
-                    const filterMenu = state.openFilterPanel?.tableId === tableId && state.openFilterPanel?.filterKey === filterKey ? `
-                      <div class="filter-menu" data-table-filter-root="true">
-                        <div class="filter-menu-head">
-                          <span>Вибір значень</span>
-                          <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${filterKey}" type="button">Очистити</button>
-                        </div>
-                        <input data-filter-panel-search="${tableId}" placeholder="Пошук значення..." value="${escapeHtml(state.filterPanelQuery)}" />
-                        <div class="filter-options">
-                          ${filterOptions.filter((option) => option.toLowerCase().includes(String(state.filterPanelQuery || '').toLowerCase())).map((option) => {
-                            const active = (state.tableFilters[tableId]?.[filterKey] || []).includes(option);
-                            return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${filterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
-                          }).join('') || '<div class="empty">Немає значень</div>'}
-                        </div>
-                      </div>
-                    ` : '';
-                    return `<th><div class="th-wrap">${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}${filterButton}</div>${filterMenu}</th>`;
+                    return `<th><div class="th-wrap">${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}${filterButton}</div></th>`;
                   }).join('')}
                 </tr>
               </thead>
@@ -1276,17 +1422,12 @@
         const total = sum(rows, (row) => row.value);
         if (!total) return empty();
 
-        let current = 0;
-        const gradient = rows.map((row, index) => {
-          const start = current / total * 100;
-          current += row.value;
-          const end = current / total * 100;
-          return `${COLORS[index % COLORS.length]} ${start}% ${end}%`;
-        }).join(', ');
-
         return `
           <div class="card pie-wrap">
-            <div class="pie-chart" style="background: conic-gradient(${gradient});">
+            <div class="pie-chart">
+              <div class="pie-stacked-bar">
+                ${rows.map((row, index) => `<span class="pie-stacked-segment" style="width:${Math.max(row.value / total * 100, 2)}%;background:${COLORS[index % COLORS.length]};"></span>`).join('')}
+              </div>
               <div class="pie-center">
                 <div class="pie-center-stack">
                   <div class="pie-center-value">${escapeHtml(money(total))}</div>
@@ -1417,12 +1558,14 @@
         const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
         const completionTone = completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger';
         const debtTone = sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success';
+        const pace = monthPaceSnapshot(sales);
 
         document.getElementById('overview').innerHTML = `
           <div class="section-stack">
             <div class="grid">
               ${kpi('Загальний оборот', money(total), `Валовий оборот за ${state.month}`, 'info')}
               ${kpi('Виконання валового плану', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completionTone)}
+              ${kpi('Темп місяця', money(pace.varianceToTempo), `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}`, pace.varianceToTempo >= 0 ? 'success' : 'warning')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від усієї дебіторки`, debtTone)}
               ${kpi('Активні клієнти', String(activeClients), `Середній день: ${money(avgDailyTurnover)}`, 'teal')}
             </div>
@@ -1445,7 +1588,7 @@
                       <div style="font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
                       <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(row.turnover))} · ${escapeHtml(pct(row.turnoverShare))} · ${escapeHtml(pct(row.targetShare))}</div>
                       <div style="margin-top:10px;height:8px;overflow:hidden;border-radius:999px;background:rgba(141,162,199,0.16);">
-                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;border-radius:999px;background:linear-gradient(90deg,#4ea1ff,#2dd4bf);"></div>
+                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;border-radius:999px;background:#4ea1ff;"></div>
                       </div>
                     </div>
                   `).join('') || empty('Немає планових груп')}
@@ -1550,6 +1693,7 @@
         const planTurnover = sum(tableRows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
         const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
+        const monthPace = monthPaceSnapshot(tableRows);
         const profitTurnover = sum(tableRows.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
         const profitShare = total ? profitTurnover / total * 100 : 0;
         const profitGap = Math.max(PROFIT_PLAN_PERCENT - profitShare, 0);
@@ -1567,6 +1711,9 @@
         const totalDebt = sum(receivables, (row) => row.totalDebt);
         const share31Plus = totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0;
         const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
+        const tempoRows = groupTempoRows(tableRows);
+        const profitClients = profitClientPenetration(tableRows, 12);
+        const profitGroups = profitGroupPenetration(tableRows, 10);
         const actionSignals = [
           {
             title: 'PROFIT vs ціль',
@@ -1585,6 +1732,12 @@
               : 'У видимому зрізі активні клієнти вже закривають планові групи без явного дефіциту.'
           },
           {
+            title: 'Темп місяця',
+            value: money(monthPace.varianceToTempo),
+            tone: monthPace.varianceToTempo >= 0 ? 'success' : 'warning',
+            description: `Пройдено ${pct(monthPace.elapsedShare * 100)} місяця. Порівняння йде з очікуваним оборотом до поточного дня.`
+          },
+          {
             title: 'Знижка тисне на маржу',
             value: money(discountPressureTurnover),
             tone: riskyRows.length ? 'danger' : 'success',
@@ -1601,16 +1754,6 @@
               : 'По видимих клієнтах немає прострочки, яка прямо блокує продажну активність.'
           }
         ];
-        const todoSuggestions = [
-          ...(profitGap > 0 ? [{ title: `Дотягнути PROFIT до ${pct(PROFIT_PLAN_PERCENT)}`, clientName: '', tags: ['profit', 'план'], priority: 'high' }] : []),
-          ...(deficitClients[0] ? [{ title: `Розширити матрицю для ${deficitClients[0].clientName}`, clientName: deficitClients[0].clientName, tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)], priority: 'high' }] : []),
-          ...(topOverdueClients[0] ? [{ title: `Закрити прострочку по ${topOverdueClients[0].name}`, clientName: topOverdueClients[0].name, tags: ['дебіторка', 'контроль оплат'], priority: 'high' }] : []),
-          ...(riskyRows[0] ? [{ title: `Перевірити знижку/маржу по ${riskyRows[0].clientName}`, clientName: riskyRows[0].clientName, tags: ['маржа', riskyRows[0].brand || 'знижка'], priority: 'medium' }] : [])
-        ];
-        const todoRows = filteredSalesTodos();
-        const todoTags = salesTodoTags();
-        const openTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done').length;
-        const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
         const topClientsChart = byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8);
         const topBrandsChart = byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8);
         const topGroupsChart = byTop(tableRows, (row) => row.productGroup || 'Без групи', (row) => row.amountEur, 8);
@@ -1620,9 +1763,10 @@
             <div class="grid">
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
               ${kpi('Валовий план', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger')}
+              ${kpi('Темп місяця', money(monthPace.varianceToTempo), `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}`, monthPace.varianceToTempo >= 0 ? 'success' : 'warning')}
               ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
               ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'teal')}
-              ${kpi('Середня знижка', pct(avgDiscountValue), `Зона уваги від ${pct(discountThreshold)}`, avgDiscountValue >= 8 ? 'warning' : 'success')}
+              ${kpi('Потрібно в день', money(monthPace.requiredPerDay), `Прогноз виконання: ${pct(monthPace.projectedCompletionPercent)}`, monthPace.projectedCompletionPercent >= 100 ? 'success' : 'warning')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від дебіторки`, sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success')}
             </div>
 
@@ -1655,8 +1799,59 @@
                 ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#2dd4bf')}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">Найбільша прострочка</div>
-                ${bars(topOverdueClients, money, '#fb7185')}
+                <div class="chart-title">Структура груп у зрізі</div>
+                ${pie(topGroupsChart, 'Зріз продажів')}
+              </div>
+            </div>
+
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">Темп по групах</div>
+                ${table('salesTempo', tempoRows, [
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
+                  { title: 'Темп %', key: 'tempoCompletionPercent', sortValue: (row) => row.tempoCompletionPercent, render: (row) => pct(row.tempoCompletionPercent) },
+                  { title: 'Темп сума', key: 'tempoAmount', sortValue: (row) => row.tempoAmount, render: (row) => money(row.tempoAmount) },
+                  { title: 'Факт', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+                  { title: 'Факт - темп', key: 'tempoDelta', sortValue: (row) => row.tempoDelta, render: (row) => money(row.tempoDelta) },
+                  { title: 'Треба / день', key: 'requiredPerDay', sortValue: (row) => row.requiredPerDay, render: (row) => money(row.requiredPerDay) }
+                ], { rowKey: (row) => row.productGroup })}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">PROFIT penetration по клиентам</div>
+                ${table('profitClients', profitClients, [
+                  { title: 'Код клієнта', key: 'clientCode' },
+                  { title: 'Клієнт', key: 'clientName' },
+                  { title: 'Оборот', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) },
+                  { title: 'PROFIT оборот', key: 'profitTurnover', sortValue: (row) => row.profitTurnover, render: (row) => money(row.profitTurnover) },
+                  { title: 'PROFIT %', key: 'profitShare', sortValue: (row) => row.profitShare, render: (row) => pct(row.profitShare) },
+                  { title: 'Статус', key: 'hasProfit', sortValue: (row) => Number(row.hasProfit), render: (row) => row.hasProfit ? 'Є PROFIT' : 'Немає PROFIT' }
+                ], { rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName })}
+              </div>
+            </div>
+
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">PROFIT penetration по группам</div>
+                ${table('profitGroups', profitGroups, [
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'Клієнтів', key: 'clients', sortValue: (row) => row.clients },
+                  { title: 'З PROFIT', key: 'clientsWithProfit', sortValue: (row) => row.clientsWithProfit },
+                  { title: 'Penetration %', key: 'penetrationPercent', sortValue: (row) => row.penetrationPercent, render: (row) => pct(row.penetrationPercent) },
+                  { title: 'Потенціал без PROFIT', key: 'potentialTurnover', sortValue: (row) => row.potentialTurnover, render: (row) => money(row.potentialTurnover) },
+                  { title: 'Оборот групи', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) }
+                ], { rowKey: (row) => row.productGroup })}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Todo винесено окремо</div>
+                <div class="card">
+                  <div class="big" style="color:white;font-size:28px;font-weight:900;">${escapeHtml(String(state.salesTodos.filter((todo) => todo.status !== 'done').length))}</div>
+                  <div class="copy" style="margin-top:10px;">Окрема дошка todo / doing / done, локальні задачі з тегами, фільтрами та швидкими підказками тепер живе у вкладці <strong>Todo</strong>.</div>
+                </div>
+                <div class="chart-shell" style="margin-top:14px;">
+                  <div class="chart-title">Найбільша прострочка</div>
+                  ${bars(topOverdueClients, money, '#fb7185')}
+                </div>
               </div>
             </div>
 
@@ -1709,94 +1904,6 @@
               </div>
             </div>
 
-            <div class="card">
-              <div class="section-head" style="margin-bottom:14px;">
-                <h2>Dashboard + todo-лист продажів</h2>
-                <p class="muted">Todo зберігається локально в браузері. Можна швидко створювати задачі з аналітики, ставити теги і фільтрувати список по статусу та пріоритету.</p>
-              </div>
-              <div class="filter-summary" style="margin-bottom:14px;">
-                <span class="filter-summary-chip" style="cursor:default;">Активні: ${escapeHtml(String(openTodoCount))}</span>
-                <span class="filter-summary-chip" style="cursor:default;border-color:rgba(52,211,153,0.42);background:rgba(52,211,153,0.14);color:var(--green);">Готово: ${escapeHtml(String(doneTodoCount))}</span>
-              </div>
-              <div class="todo-grid">
-                <div class="section-stack">
-                  <div class="card">
-                    <div class="small" style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);">Швидке додавання</div>
-                    <div class="control-grid" style="margin-top:12px;">
-                      <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
-                      <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
-                      <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка" value="${escapeHtml(state.salesTodoDraft.tags)}" />
-                      <select data-sales-todo-draft="priority">
-                        <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
-                        <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
-                        <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
-                      </select>
-                    </div>
-                    <div class="todo-actions" style="margin-top:12px;">
-                      <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="small" style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);">Швидкі задачі з аналітики</div>
-                    <div class="control-grid" style="margin-top:12px;">
-                      ${todoSuggestions.map((todo) => `
-                        <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
-                          <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
-                          <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
-                          <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
-                        </button>
-                      `).join('') || '<div class="empty">Немає швидких задач для поточного зрізу.</div>'}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="section-stack">
-                  <div class="card">
-                    <div class="control-grid">
-                      <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
-                      <select data-sales-todo-filter="status">
-                        <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
-                        <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
-                        <option value="doing" ${state.salesTodoFilters.status === 'doing' ? 'selected' : ''}>В процесі</option>
-                        <option value="done" ${state.salesTodoFilters.status === 'done' ? 'selected' : ''}>Готово</option>
-                      </select>
-                      <select data-sales-todo-filter="priority">
-                        <option value="all" ${state.salesTodoFilters.priority === 'all' ? 'selected' : ''}>Усі пріоритети</option>
-                        <option value="high" ${state.salesTodoFilters.priority === 'high' ? 'selected' : ''}>Високий</option>
-                        <option value="medium" ${state.salesTodoFilters.priority === 'medium' ? 'selected' : ''}>Середній</option>
-                        <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
-                      </select>
-                      <select data-sales-todo-filter="tag">
-                        <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
-                        ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="todo-list">
-                    ${todoRows.map((todo) => `
-                      <article class="todo-card">
-                        <div class="todo-head">
-                          <div>
-                            <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
-                            <div class="small" style="margin-top:6px;">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
-                          </div>
-                          <div class="todo-badges">
-                            <span class="todo-badge status-${escapeHtml(todo.status)}">${escapeHtml(todoStatusLabel(todo.status))}</span>
-                            <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
-                          </div>
-                        </div>
-                        ${todo.tags.length ? `<div class="chips">${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}</div>` : ''}
-                        <div class="todo-actions">
-                          <button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" type="button">Перемкнути: ${escapeHtml(todoStatusLabel(nextTodoStatus(todo.status)))}</button>
-                          <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
-                        </div>
-                      </article>
-                    `).join('') || '<div class="empty">Немає задач за активними фільтрами. Створіть нову або додайте швидку задачу з аналітики.</div>'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
             ${table('sales', rows, salesColumns, {
               maxHeight: true,
               rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
@@ -1806,7 +1913,7 @@
       }
 
       function renderGroups() {
-        const rows = groupPlanRows(filteredSales()).filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP));
+        const rows = groupTempoRows(filteredSales());
         document.getElementById('groups').innerHTML = `
           <div class="section-stack">
             <div class="chart-shell">
@@ -1818,10 +1925,159 @@
               { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
               { title: 'Частка від плану', titleHtml: infoLabel('Частка від плану', 'Цільовий відсоток валового плану, який має дати ця товарна група.'), key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
               { title: 'План', key: 'planAmount', sortValue: (row) => row.planAmount, render: (row) => money(row.planAmount) },
+              { title: 'Темп %', key: 'tempoCompletionPercent', sortValue: (row) => row.tempoCompletionPercent, render: (row) => pct(row.tempoCompletionPercent) },
               { title: 'Темп', key: 'tempoAmount', sortValue: (row) => row.tempoAmount, render: (row) => money(row.tempoAmount) },
               { title: 'Факт із продажів', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+              { title: 'Факт - темп', key: 'tempoDelta', sortValue: (row) => row.tempoDelta, render: (row) => money(row.tempoDelta) },
+              { title: 'Треба в день', key: 'requiredPerDay', sortValue: (row) => row.requiredPerDay, render: (row) => money(row.requiredPerDay) },
+              { title: 'Прогноз %', key: 'projectedCompletionPercent', sortValue: (row) => row.projectedCompletionPercent, render: (row) => pct(row.projectedCompletionPercent) },
               { title: '% виконання', key: 'completionPercent', sortValue: (row) => row.completionPercent, render: (row) => `<span class="${completionClass(row.completionPercent)}">${escapeHtml(pct(row.completionPercent))}</span>` }
             ], { rowKey: (row) => row.productGroup })}
+          </div>
+        `;
+      }
+
+      function renderTodo() {
+        const salesColumns = [
+          { title: 'Дата', key: 'date' },
+          { title: 'Єдиний код', key: 'unifiedClientCode' },
+          { title: 'Код клієнта', key: 'clientCode' },
+          { title: 'Клієнт', key: 'clientName' },
+          { title: 'Бренд', key: 'brand' },
+          { title: 'Група', key: 'productGroup' },
+          { title: 'Товар', key: 'productCode' },
+          { title: 'Сума', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+          { title: 'Нетто-маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+          { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+        ];
+        const visibleSales = filteredTableRows('sales', filteredSales(), salesColumns);
+        const visibleClientKeys = new Set(visibleSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+        const receivables = state.data.receivables.filter((row) => visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName));
+        const deficitClients = clientGroupShareGaps(visibleSales).filter((row) => row.missingGroups > 0);
+        const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
+        const profitClients = profitClientPenetration(visibleSales, 12);
+        const noProfitClient = profitClients.find((row) => !row.hasProfit);
+        const total = sum(visibleSales, (row) => row.amountEur);
+        const profitTurnover = sum(visibleSales.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
+        const profitShare = total ? profitTurnover / total * 100 : 0;
+        const profitGap = Math.max(PROFIT_PLAN_PERCENT - profitShare, 0);
+        const todoRows = filteredSalesTodos();
+        const todoTags = salesTodoTags();
+        const openTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done').length;
+        const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
+        const lanes = ['todo', 'doing', 'done'];
+        const todoSuggestions = [
+          ...(profitGap > 0 ? [{ title: `Дотягнути PROFIT до ${pct(PROFIT_PLAN_PERCENT)}`, clientName: '', tags: ['profit', 'план'], priority: 'high' }] : []),
+          ...(deficitClients[0] ? [{ title: `Розширити матрицю для ${deficitClients[0].clientName}`, clientName: deficitClients[0].clientName, tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)], priority: 'high' }] : []),
+          ...(noProfitClient ? [{ title: `Запустити PROFIT у ${noProfitClient.clientName}`, clientName: noProfitClient.clientName, tags: ['profit', 'penetration'], priority: 'high' }] : []),
+          ...(topOverdueClients[0] ? [{ title: `Закрити прострочку по ${topOverdueClients[0].name}`, clientName: topOverdueClients[0].name, tags: ['дебіторка', 'контроль оплат'], priority: 'medium' }] : [])
+        ];
+
+        document.getElementById('todo').innerHTML = `
+          <div class="section-stack">
+            <div class="grid">
+              ${kpi('Активні задачі', String(openTodoCount), 'Todo з локальним збереженням у браузері', 'info')}
+              ${kpi('Готово', String(doneTodoCount), 'Закриті задачі поточного списку', 'success')}
+              ${kpi('Cross-sell резерв', String(deficitClients.length), 'Клієнти з незакритими плановими групами', deficitClients.length ? 'teal' : 'success')}
+              ${kpi('PROFIT gap', pct(profitGap), `Ціль PROFIT: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
+            </div>
+
+            <div class="two-up">
+              <div class="card">
+                <div class="section-head" style="margin-bottom:14px;">
+                  <h2>Швидке додавання</h2>
+                  <p class="muted">Окрема робоча дошка для задач по продажах, темпу, PROFIT і дебіторці.</p>
+                </div>
+                <div class="control-grid">
+                  <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
+                  <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
+                  <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка, cross-sell" value="${escapeHtml(state.salesTodoDraft.tags)}" />
+                  <select data-sales-todo-draft="priority">
+                    <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
+                    <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                    <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
+                  </select>
+                </div>
+                <div class="todo-actions" style="margin-top:12px;">
+                  <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="section-head" style="margin-bottom:14px;">
+                  <h2>Швидкі задачі з аналітики</h2>
+                  <p class="muted">Підказки формуються з поточного зрізу продажів, темпу, cross-sell, penetration і дебіторки.</p>
+                </div>
+                <div class="control-grid">
+                  ${todoSuggestions.map((todo) => `
+                    <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
+                      <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
+                      <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
+                      <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
+                    </button>
+                  `).join('') || '<div class="empty">Немає швидких задач для поточного зрізу.</div>'}
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="control-grid">
+                <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
+                <select data-sales-todo-filter="status">
+                  <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
+                  <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
+                  <option value="doing" ${state.salesTodoFilters.status === 'doing' ? 'selected' : ''}>В процесі</option>
+                  <option value="done" ${state.salesTodoFilters.status === 'done' ? 'selected' : ''}>Готово</option>
+                </select>
+                <select data-sales-todo-filter="priority">
+                  <option value="all" ${state.salesTodoFilters.priority === 'all' ? 'selected' : ''}>Усі пріоритети</option>
+                  <option value="high" ${state.salesTodoFilters.priority === 'high' ? 'selected' : ''}>Високий</option>
+                  <option value="medium" ${state.salesTodoFilters.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                  <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
+                </select>
+                <select data-sales-todo-filter="tag">
+                  <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
+                  ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div class="todo-grid">
+              ${lanes.map((status) => {
+                const laneRows = todoRows.filter((todo) => todo.status === status);
+                return `
+                  <div class="card">
+                    <div class="todo-head">
+                      <div>
+                        <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todoStatusLabel(status))}</div>
+                        <div class="small" style="margin-top:6px;">Задач: ${escapeHtml(String(laneRows.length))}</div>
+                      </div>
+                      <span class="todo-badge status-${escapeHtml(status)}">${escapeHtml(todoStatusLabel(status))}</span>
+                    </div>
+                    <div class="todo-list" style="margin-top:14px;">
+                      ${laneRows.map((todo) => `
+                        <article class="todo-card">
+                          <div class="todo-head">
+                            <div>
+                              <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
+                              <div class="small" style="margin-top:6px;">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
+                            </div>
+                            <div class="todo-badges">
+                              <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
+                            </div>
+                          </div>
+                          ${todo.tags.length ? `<div class="chips">${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}</div>` : ''}
+                          <div class="todo-actions">
+                            <button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" type="button">Перемкнути: ${escapeHtml(todoStatusLabel(nextTodoStatus(todo.status)))}</button>
+                            <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
+                          </div>
+                        </article>
+                      `).join('') || '<div class="empty">Немає задач у цій колонці за активними фільтрами.</div>'}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
           </div>
         `;
       }
@@ -1915,6 +2171,7 @@
       function renderAll() {
         renderOverview();
         renderSales();
+        renderTodo();
         renderGroups();
         renderReceivables();
         renderTires();
@@ -1992,7 +2249,7 @@
           try {
             const payload = JSON.parse(todoSuggest.dataset.salesTodoSuggest || '{}');
             addSalesTodo(payload);
-            renderSales();
+            renderTodo();
           } catch {
             return;
           }
@@ -2009,7 +2266,7 @@
               priority: state.salesTodoDraft.priority
             });
             state.salesTodoDraft = { title: '', clientName: '', tags: '', priority: 'medium' };
-            renderSales();
+            renderTodo();
           }
           return;
         }
@@ -2019,7 +2276,7 @@
           const id = todoStatus.dataset.salesTodoStatus;
           state.salesTodos = state.salesTodos.map((todo) => todo.id === id ? { ...todo, status: nextTodoStatus(todo.status) } : todo);
           saveSalesTodos();
-          renderSales();
+          renderTodo();
           return;
         }
 
@@ -2028,7 +2285,7 @@
           const id = todoDelete.dataset.salesTodoDelete;
           state.salesTodos = state.salesTodos.filter((todo) => todo.id !== id);
           saveSalesTodos();
-          renderSales();
+          renderTodo();
           return;
         }
 
@@ -2036,7 +2293,7 @@
         if (todoTag) {
           const tag = todoTag.dataset.salesTodoTag || 'all';
           state.salesTodoFilters.tag = state.salesTodoFilters.tag === tag ? 'all' : tag;
-          renderSales();
+          renderTodo();
           return;
         }
 
@@ -2198,7 +2455,7 @@
         if (todoFilterInput) {
           const field = todoFilterInput.dataset.salesTodoFilter;
           state.salesTodoFilters[field] = todoFilterInput.value;
-          renderSales();
+          renderTodo();
           return;
         }
 

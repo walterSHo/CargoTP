@@ -1,43 +1,35 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DailySalesChart, SimpleBarChart, SimplePieChart } from './Charts';
 import { DataTable } from './DataTable';
 import { KpiCard } from './KpiCard';
 import { AGGREGATE_PLAN_GROUP, PROFIT_GROUP_NAME, PROFIT_PLAN_PERCENT } from '@/lib/constants';
-import { availableMonths, avg, byTop, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, type ClientGroupGapRow } from '@/lib/analytics';
+import {
+  availableMonths,
+  byTop,
+  clientGroupShareGaps,
+  dailySalesSeries,
+  dashboardKpis,
+  groupPlanAudit,
+  groupTempoRows,
+  monthPaceSnapshot,
+  profitClientPenetration,
+  profitGroupPenetration,
+  salesForMonth,
+  topClientsByTurnover,
+  type ClientGroupGapRow,
+  type GroupTempoRow,
+  type ProfitClientPenetrationRow,
+  type ProfitGroupPenetrationRow
+} from '@/lib/analytics';
 import { money, percent } from '@/lib/format';
 import { normalizeProductGroup } from '@/lib/product-groups';
 import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
 
 type SearchMode = 'code' | 'client' | 'brand' | 'group';
-type TodoPriority = 'high' | 'medium' | 'low';
-type TodoStatus = 'todo' | 'doing' | 'done';
-
-type SalesTodo = {
-  id: string;
-  title: string;
-  clientName: string;
-  tags: string[];
-  priority: TodoPriority;
-  status: TodoStatus;
-  createdAt: string;
-};
-
-type TodoDraft = {
-  title: string;
-  clientName: string;
-  tags: string;
-  priority: TodoPriority;
-};
-
-type SuggestedTodo = {
-  title: string;
-  clientName: string;
-  tags: string[];
-  priority: TodoPriority;
-};
 
 type ActionSignal = {
   title: string;
@@ -46,39 +38,12 @@ type ActionSignal = {
   description: string;
 };
 
-const TODO_STORAGE_KEY = 'cargotp-sales-todos-v1';
-
 const searchModes: Array<{ value: SearchMode; label: string }> = [
   { value: 'code', label: 'Код' },
   { value: 'client', label: 'Клієнт' },
   { value: 'brand', label: 'Бренд' },
   { value: 'group', label: 'Група' }
 ];
-
-const priorityOptions: Array<{ value: TodoPriority; label: string }> = [
-  { value: 'high', label: 'Високий' },
-  { value: 'medium', label: 'Середній' },
-  { value: 'low', label: 'Низький' }
-];
-
-const statusOptions: Array<{ value: TodoStatus | 'all'; label: string }> = [
-  { value: 'all', label: 'Усі' },
-  { value: 'todo', label: 'До роботи' },
-  { value: 'doing', label: 'В процесі' },
-  { value: 'done', label: 'Готово' }
-];
-
-const statusLabels: Record<TodoStatus, string> = {
-  todo: 'До роботи',
-  doing: 'В процесі',
-  done: 'Готово'
-};
-
-const priorityLabels: Record<TodoPriority, string> = {
-  high: 'Високий',
-  medium: 'Середній',
-  low: 'Низький'
-};
 
 const salesColumns: ColumnDef<SalesRecord>[] = [
   { accessorKey: 'date', header: 'Дата' },
@@ -121,6 +86,38 @@ const riskColumns: ColumnDef<SalesRecord>[] = [
   { accessorKey: 'discountPercent', header: 'Знижка', cell: (info) => percent(Number(info.getValue())) }
 ];
 
+const groupTempoColumns: ColumnDef<GroupTempoRow>[] = [
+  { accessorKey: 'productGroup', header: 'Група' },
+  { accessorKey: 'planPercent', header: 'План %', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'tempoCompletionPercent', header: 'Темп %', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'tempoAmount', header: 'Темп сума', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'factFromSales', header: 'Факт', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'tempoDelta', header: 'Факт - темп', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'requiredPerDay', header: 'Треба / день', cell: (info) => money(Number(info.getValue())) }
+];
+
+const profitClientColumns: ColumnDef<ProfitClientPenetrationRow>[] = [
+  { accessorKey: 'clientCode', header: 'Код клієнта' },
+  { accessorKey: 'clientName', header: 'Клієнт' },
+  { accessorKey: 'turnover', header: 'Оборот', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'profitTurnover', header: 'PROFIT оборот', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'profitShare', header: 'PROFIT %', cell: (info) => percent(Number(info.getValue())) },
+  {
+    accessorKey: 'hasProfit',
+    header: 'Статус',
+    cell: (info) => Number(info.getValue()) ? 'Є PROFIT' : 'Немає PROFIT'
+  }
+];
+
+const profitGroupColumns: ColumnDef<ProfitGroupPenetrationRow>[] = [
+  { accessorKey: 'productGroup', header: 'Група' },
+  { accessorKey: 'clients', header: 'Клієнтів' },
+  { accessorKey: 'clientsWithProfit', header: 'З PROFIT' },
+  { accessorKey: 'penetrationPercent', header: 'Penetration %', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'potentialTurnover', header: 'Потенціал без PROFIT', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'turnover', header: 'Оборот групи', cell: (info) => money(Number(info.getValue())) }
+];
+
 function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
   if (!query) return true;
   const value = query.toLowerCase();
@@ -158,51 +155,6 @@ function suggestionValues(data: ProcessedData, mode: SearchMode) {
   return [...values].sort((a, b) => a.localeCompare(b, 'uk', { numeric: true, sensitivity: 'base' }));
 }
 
-function createTodoId() {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return `todo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function parseTags(value: string) {
-  return [...new Set(
-    value
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter(Boolean)
-  )];
-}
-
-function loadTodos() {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = window.localStorage.getItem(TODO_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as SalesTodo[];
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((todo) => todo && typeof todo.title === 'string')
-      .map((todo) => ({
-        id: todo.id || createTodoId(),
-        title: todo.title,
-        clientName: todo.clientName || '',
-        tags: Array.isArray(todo.tags) ? todo.tags.filter((tag) => typeof tag === 'string') : [],
-        priority: todo.priority === 'high' || todo.priority === 'low' ? todo.priority : 'medium',
-        status: todo.status === 'doing' || todo.status === 'done' ? todo.status : 'todo',
-        createdAt: todo.createdAt || new Date().toISOString()
-      }));
-  } catch {
-    return [];
-  }
-}
-
-function nextStatus(status: TodoStatus): TodoStatus {
-  if (status === 'todo') return 'doing';
-  if (status === 'doing') return 'done';
-  return 'todo';
-}
-
 function applyColumnFilters(rows: SalesRecord[], filters: Record<string, string[]>) {
   const keys = salesColumns
     .map((column) => typeof column.accessorKey === 'string' ? column.accessorKey : '')
@@ -215,24 +167,6 @@ function applyColumnFilters(rows: SalesRecord[], filters: Record<string, string[
   }));
 }
 
-function todoPriorityWeight(priority: TodoPriority) {
-  if (priority === 'high') return 3;
-  if (priority === 'medium') return 2;
-  return 1;
-}
-
-function statusBadgeClassName(status: TodoStatus) {
-  if (status === 'done') return 'border-[rgba(52,211,153,0.4)] bg-[rgba(52,211,153,0.14)] text-[var(--success)]';
-  if (status === 'doing') return 'border-[rgba(245,158,11,0.42)] bg-[rgba(245,158,11,0.14)] text-[var(--warning)]';
-  return 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white';
-}
-
-function priorityBadgeClassName(priority: TodoPriority) {
-  if (priority === 'high') return 'border-[rgba(251,113,133,0.4)] bg-[rgba(251,113,133,0.14)] text-[var(--danger)]';
-  if (priority === 'low') return 'border-line bg-[rgba(8,15,28,0.72)] text-muted';
-  return 'border-[rgba(45,212,191,0.4)] bg-[rgba(45,212,191,0.14)] text-[var(--accent-2)]';
-}
-
 export function SalesClient({ data }: { data: ProcessedData }) {
   const months = availableMonths(data.sales).sort().reverse();
   const [month, setMonth] = useState(months[0] ?? '');
@@ -240,18 +174,6 @@ export function SalesClient({ data }: { data: ProcessedData }) {
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [todos, setTodos] = useState<SalesTodo[]>([]);
-  const [todosLoaded, setTodosLoaded] = useState(false);
-  const [todoDraft, setTodoDraft] = useState<TodoDraft>({
-    title: '',
-    clientName: '',
-    tags: '',
-    priority: 'medium'
-  });
-  const [todoStatusFilter, setTodoStatusFilter] = useState<TodoStatus | 'all'>('all');
-  const [todoPriorityFilter, setTodoPriorityFilter] = useState<TodoPriority | 'all'>('all');
-  const [todoTagFilter, setTodoTagFilter] = useState('all');
-  const [todoSearch, setTodoSearch] = useState('');
   const searchRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -263,16 +185,6 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     document.addEventListener('mousedown', handlePointerDown);
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, []);
-
-  useEffect(() => {
-    setTodos(loadTodos());
-    setTodosLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    if (!todosLoaded || typeof window === 'undefined') return;
-    window.localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
-  }, [todos, todosLoaded]);
 
   const suggestions = useMemo(() => suggestionValues(data, searchMode), [data, searchMode]);
   const normalizedQuery = query.trim().toLowerCase();
@@ -301,6 +213,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
   }), [data.receivables, filters, month, query, searchMode, visibleClientKeys]);
 
   const kpis = useMemo(() => dashboardKpis(visibleSales, receivables, data.monthlyPlans, month), [data.monthlyPlans, month, receivables, visibleSales]);
+  const monthPace = useMemo(() => monthPaceSnapshot(visibleSales, data.monthlyPlans, month), [data.monthlyPlans, month, visibleSales]);
   const topClients = useMemo(() => topClientsByTurnover(visibleSales, 10), [visibleSales]);
   const topClientsChart = useMemo(() => topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover })), [topClients]);
   const topBrandsChart = useMemo(() => byTop(visibleSales, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8), [visibleSales]);
@@ -319,6 +232,9 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     .slice(0, 6), [data.groupPlans, visibleSales]);
   const topGroupsPie = useMemo(() => groupShareTargets.map((row) => ({ name: row.name, value: row.turnover })).filter((row) => row.value > 0), [groupShareTargets]);
   const topOverdueClients = useMemo(() => byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), [receivables]);
+  const tempoRows = useMemo(() => groupTempoRows(data.groupPlans, visibleSales, month), [data.groupPlans, month, visibleSales]);
+  const profitClients = useMemo(() => profitClientPenetration(visibleSales, 12), [visibleSales]);
+  const profitGroups = useMemo(() => profitGroupPenetration(visibleSales, 10), [visibleSales]);
 
   const totalDebt = receivables.reduce((sum, row) => sum + row.totalDebt, 0);
   const share31Plus = receivables.length
@@ -342,22 +258,29 @@ export function SalesClient({ data }: { data: ProcessedData }) {
   const concentrationShare = topClients.length
     ? (topClients.slice(0, 3).reduce((sum, row) => sum + row.turnover, 0) / Math.max(kpis.totalTurnover, 1)) * 100
     : 0;
+
   const actionSignals: ActionSignal[] = [
     {
       title: 'PROFIT vs ціль',
       value: `${percent(profitShare)} / ${percent(PROFIT_PLAN_PERCENT)}`,
       tone: profitGap > 0 ? 'warning' : 'success',
       description: profitGap > 0
-        ? `Бракує ${percent(profitGap)} до цілі PROFIT. Варто підсилити клієнтів, де цей бренд вже присутній або відсутній у планових групах.`
-        : 'Ціль PROFIT виконана. Можна втримувати частку та перенести фокус на інші групи.'
+        ? `Бракує ${percent(profitGap)} до цілі PROFIT. Найкраще тиснути через клієнтів і групи з низьким penetration.`
+        : 'Ціль PROFIT виконана. Можна утримувати частку та переносити фокус на інші резерви.'
     },
     {
       title: 'Cross-sell резерв',
       value: `${deficitClients.length} клієнтів`,
       tone: deficitClients.length ? 'teal' : 'success',
       description: deficitClients.length
-        ? `${deficitClients[0]?.clientName || 'Клієнт'} має найбільший дефіцит по планових групах. Це найшвидший простір для допродажу.`
-        : 'У видимому зрізі всі активні клієнти вже закривають планові групи без дефіциту.'
+        ? `${deficitClients[0]?.clientName || 'Клієнт'} має найбільший дефіцит по планових групах. Це швидкий резерв росту.`
+        : 'У видимому зрізі активні клієнти вже добре закривають планові групи.'
+    },
+    {
+      title: 'Темп місяця',
+      value: money(monthPace.varianceToTempo),
+      tone: monthPace.varianceToTempo >= 0 ? 'success' : 'warning',
+      description: `На зараз пройдено ${percent(monthPace.elapsedShare * 100)} місяця. Порівняння йде з очікуваним оборотом до сьогодні.`
     },
     {
       title: 'Знижка тисне на маржу',
@@ -366,127 +289,11 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       description: riskyRows.length
         ? `${riskyRows.length} продажів потребують уваги: висока знижка або маржа нижче робочої бази ${percent(marginThreshold)}.`
         : 'Немає рядків, де знижка або маржа зараз виглядають ризиково для цього зрізу.'
-    },
-    {
-      title: 'Дебіторка в продажах',
-      value: money(kpis.overdueDebt),
-      tone: kpis.overdueDebt > 0 ? 'danger' : 'success',
-      description: kpis.overdueDebt > 0
-        ? `${topOverdueClients[0]?.name || 'Клієнт'} тримає найбільшу прострочку серед видимих продажів. Є сенс зв'язати продажі з оплатою.`
-        : 'Серед видимих клієнтів немає простроченої дебіторки, яка блокує продажну активність.'
     }
   ];
 
-  const suggestedTodos = useMemo(() => {
-    const items: SuggestedTodo[] = [];
-
-    if (profitGap > 0) {
-      items.push({
-        title: `Дотягнути PROFIT до ${percent(PROFIT_PLAN_PERCENT)}`,
-        clientName: '',
-        tags: ['profit', 'план'],
-        priority: 'high'
-      });
-    }
-
-    if (deficitClients[0]) {
-      items.push({
-        title: `Розширити матрицю для ${deficitClients[0].clientName}`,
-        clientName: deficitClients[0].clientName,
-        tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)],
-        priority: 'high'
-      });
-    }
-
-    if (topOverdueClients[0]) {
-      items.push({
-        title: `Закрити прострочку по ${topOverdueClients[0].name}`,
-        clientName: topOverdueClients[0].name,
-        tags: ['дебіторка', 'контроль оплат'],
-        priority: 'high'
-      });
-    }
-
-    if (riskyRows[0]) {
-      items.push({
-        title: `Перевірити знижку/маржу по ${riskyRows[0].clientName}`,
-        clientName: riskyRows[0].clientName,
-        tags: ['маржа', riskyRows[0].brand || 'знижка'],
-        priority: 'medium'
-      });
-    }
-
-    return items;
-  }, [deficitClients, profitGap, riskyRows, topOverdueClients]);
-
-  const allTodoTags = useMemo(
-    () => [...new Set(todos.flatMap((todo) => todo.tags))].sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })),
-    [todos]
-  );
-  const filteredTodos = useMemo(() => {
-    const normalized = todoSearch.trim().toLowerCase();
-    return [...todos]
-      .filter((todo) => todoStatusFilter === 'all' || todo.status === todoStatusFilter)
-      .filter((todo) => todoPriorityFilter === 'all' || todo.priority === todoPriorityFilter)
-      .filter((todo) => todoTagFilter === 'all' || todo.tags.includes(todoTagFilter))
-      .filter((todo) => {
-        if (!normalized) return true;
-        return [todo.title, todo.clientName, todo.tags.join(' ')].join(' ').toLowerCase().includes(normalized);
-      })
-      .sort((left, right) => {
-        if (left.status !== right.status) {
-          const leftRank = left.status === 'todo' ? 0 : left.status === 'doing' ? 1 : 2;
-          const rightRank = right.status === 'todo' ? 0 : right.status === 'doing' ? 1 : 2;
-          return leftRank - rightRank;
-        }
-        const priorityDelta = todoPriorityWeight(right.priority) - todoPriorityWeight(left.priority);
-        if (priorityDelta !== 0) return priorityDelta;
-        return right.createdAt.localeCompare(left.createdAt);
-      });
-  }, [todoPriorityFilter, todoSearch, todoStatusFilter, todoTagFilter, todos]);
-
-  const openTodoCount = todos.filter((todo) => todo.status !== 'done').length;
-  const doneTodoCount = todos.filter((todo) => todo.status === 'done').length;
-  const completionTone = kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger';
-  const debtTone = kpis.overdueDebt > 0 ? 'danger' : 'success';
-  const profitTone = profitGap > 0 ? 'warning' : 'success';
-
   function handleFilterChange(columnId: string, values: string[]) {
     setFilters((current) => ({ ...current, [columnId]: values }));
-  }
-
-  function addTodo(todo: SuggestedTodo) {
-    setTodos((current) => [
-      {
-        id: createTodoId(),
-        title: todo.title.trim(),
-        clientName: todo.clientName.trim(),
-        tags: todo.tags.filter(Boolean),
-        priority: todo.priority,
-        status: 'todo',
-        createdAt: new Date().toISOString()
-      },
-      ...current
-    ]);
-  }
-
-  function submitTodo() {
-    if (!todoDraft.title.trim()) return;
-    addTodo({
-      title: todoDraft.title,
-      clientName: todoDraft.clientName,
-      tags: parseTags(todoDraft.tags),
-      priority: todoDraft.priority
-    });
-    setTodoDraft({ title: '', clientName: '', tags: '', priority: 'medium' });
-  }
-
-  function updateTodoStatus(id: string) {
-    setTodos((current) => current.map((todo) => todo.id === id ? { ...todo, status: nextStatus(todo.status) } : todo));
-  }
-
-  function removeTodo(id: string) {
-    setTodos((current) => current.filter((todo) => todo.id !== id));
   }
 
   if (!month) {
@@ -499,7 +306,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
   return (
     <div className="space-y-6">
-      <section className="filter-bar">
+      <section className="filter-bar motion-fade-up">
         <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto]">
           <label className="grid gap-2">
             <span className="filter-label">Місяць</span>
@@ -570,11 +377,11 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <KpiCard hint={`Видимий оборот за ${month}`} title="Оборот зрізу" tone="info" value={money(kpis.totalTurnover)} />
-        <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Валовий план" tone={completionTone} value={percent(kpis.grossPlanCompletion)} />
-        <KpiCard hint={`Ціль PROFIT: ${percent(PROFIT_PLAN_PERCENT)}`} title="Частка PROFIT" tone={profitTone} value={percent(profitShare)} />
+        <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Валовий план" tone={kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger'} value={percent(kpis.grossPlanCompletion)} />
+        <KpiCard hint={`На поточну дату очікувалось ${money(monthPace.expectedTurnoverToDate)}`} title="Темп місяця" tone={monthPace.varianceToTempo >= 0 ? 'success' : 'warning'} value={money(monthPace.varianceToTempo)} />
+        <KpiCard hint={`Ціль PROFIT: ${percent(PROFIT_PLAN_PERCENT)}`} title="Частка PROFIT" tone={profitGap > 0 ? 'warning' : 'success'} value={percent(profitShare)} />
         <KpiCard hint={`Робоча база маржі в цьому зрізі`} title="Середня маржа" tone="teal" value={percent(avgMargin)} />
-        <KpiCard hint={`Високі знижки починаються від ${percent(discountThreshold)}`} title="Середня знижка" tone={avgDiscount >= 8 ? 'warning' : 'success'} value={percent(avgDiscount)} />
-        <KpiCard hint={`31+ днів: ${percent(share31Plus)} від дебіторки видимих клієнтів`} title="Прострочена дебіторка" tone={debtTone} value={money(kpis.overdueDebt)} />
+        <KpiCard hint={`31+ днів: ${percent(share31Plus)} від дебіторки видимих клієнтів`} title="Прострочена дебіторка" tone={kpis.overdueDebt > 0 ? 'danger' : 'success'} value={money(kpis.overdueDebt)} />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
@@ -589,12 +396,12 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <div className="panel-card p-4">
+        <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Робочі сигнали для росту</div>
-          <div className="text-xs text-muted">Тут зібрані показники, які найбільше впливають на план, cross-sell, контроль знижок і оплат.</div>
+          <div className="text-xs text-muted">Тут зібрані показники, які найбільше впливають на план, темп, cross-sell, контроль знижок і оплат.</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {actionSignals.map((signal) => (
-              <div className="insight-tile" key={signal.title}>
+              <div className="insight-tile interactive-lift" key={signal.title}>
                 <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">{signal.title}</div>
                 <div className={`mt-2 text-2xl font-black ${
                   signal.tone === 'danger'
@@ -614,38 +421,38 @@ export function SalesClient({ data }: { data: ProcessedData }) {
           </div>
         </div>
 
-        <div className="panel-card p-4">
-          <div className="mb-1 text-sm font-semibold text-white">На чому легко втратити темп</div>
-          <div className="text-xs text-muted">Концентрація на кількох клієнтах, борги та агресивні знижки найчастіше з'їдають підсумковий результат ще до кінця місяця.</div>
+        <div className="panel-card interactive-lift p-4">
+          <div className="mb-1 text-sm font-semibold text-white">Ритм місяця і фокус дій</div>
+          <div className="text-xs text-muted">Блок показує, як ідемо относительно пройденных дней месяца и что нужно закрывать быстрее всего.</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="soft-panel p-4">
+            <div className="soft-panel interactive-lift p-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Пройдено місяця</div>
+              <div className="mt-2 text-2xl font-black text-white">{percent(monthPace.elapsedShare * 100)}</div>
+              <div className="mt-2 text-sm text-muted">{monthPace.elapsedDays} з {monthPace.totalDays} днів.</div>
+            </div>
+            <div className="soft-panel interactive-lift p-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Потрібно в день</div>
+              <div className="mt-2 text-2xl font-black text-white">{money(monthPace.requiredPerDay)}</div>
+              <div className="mt-2 text-sm text-muted">Скільки треба добирати щодня, щоб закрити валовий план місяця.</div>
+            </div>
+            <div className="soft-panel interactive-lift p-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Топ-3 клієнти</div>
               <div className="mt-2 text-2xl font-black text-white">{percent(concentrationShare)}</div>
-              <div className="mt-2 text-sm text-muted">Частка обороту трьох найбільших клієнтів. Чим вона вища, тим сильніше результат залежить від одного сегмента.</div>
+              <div className="mt-2 text-sm text-muted">Частка обороту трьох найбільших клієнтів.</div>
             </div>
-            <div className="soft-panel p-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Рядки під тиском</div>
-              <div className="mt-2 text-2xl font-black text-white">{String(riskyRows.length)}</div>
-              <div className="mt-2 text-sm text-muted">Продажі з високою знижкою або низькою маржею. Це найпростіша точка для ручного рев'ю перед закриттям місяця.</div>
-            </div>
-            <div className="soft-panel p-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Клієнти з дефіцитом</div>
-              <div className="mt-2 text-2xl font-black text-white">{String(deficitClients.length)}</div>
-              <div className="mt-2 text-sm text-muted">Кого варто вести в ширину: саме там зростає шанс підняти і оборот, і частку планових груп без пошуку нових клієнтів.</div>
-            </div>
-            <div className="soft-panel p-4">
+            <div className="soft-panel interactive-lift p-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Видима дебіторка</div>
               <div className="mt-2 text-2xl font-black text-white">{money(totalDebt)}</div>
-              <div className="mt-2 text-sm text-muted">Сума всієї дебіторки по клієнтах у цьому продажному зрізі. Добре допомагає не втратити контроль між активністю і оплатами.</div>
+              <div className="mt-2 text-sm text-muted">Щоб продажі не відривались від оплат.</div>
             </div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <div className="panel-card p-4">
+        <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Клієнти для допродажу і розширення матриці</div>
-          <div className="text-xs text-muted">Найкращі кандидати, де планові групи ще не закриті. Рядок можна розгорнути, щоб побачити, що вже купують і чого бракує.</div>
+          <div className="text-xs text-muted">Де клієнт вже купує, але не закрив усі потрібні групи. Це прямий cross-sell резерв.</div>
           <div className="mt-4">
             <DataTable
               columns={opportunityColumns}
@@ -690,9 +497,9 @@ export function SalesClient({ data }: { data: ProcessedData }) {
           </div>
         </div>
 
-        <div className="panel-card p-4">
+        <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Продажі, де маржа або знижка потребують уваги</div>
-          <div className="text-xs text-muted">Це не помилки автоматично, а короткий робочий список для перевірки домовленостей, умов і потенціалу перегляду ціни.</div>
+          <div className="text-xs text-muted">Короткий список для ручного рев'ю перед закриттям місяця.</div>
           <div className="mt-4">
             <DataTable
               columns={riskColumns}
@@ -704,182 +511,73 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
-      <section className="panel-card p-4">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-          <div className="max-w-3xl">
-            <div className="text-sm font-semibold text-white">Dashboard + todo-лист продажів</div>
-            <div className="mt-1 text-xs leading-6 text-muted">Todo зберігається локально в браузері. Можна швидко завести задачі з аналітики, помітити їх тегами та фільтрувати за пріоритетом, статусом або клієнтом.</div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-[10px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-3 py-2 text-xs font-semibold text-white">Активні: {openTodoCount}</span>
-            <span className="rounded-[10px] border border-[rgba(52,211,153,0.42)] bg-[rgba(52,211,153,0.14)] px-3 py-2 text-xs font-semibold text-[var(--success)]">Готово: {doneTodoCount}</span>
+      <section className="grid gap-4 xl:grid-cols-2">
+        <div className="panel-card interactive-lift p-4">
+          <div className="mb-1 text-sm font-semibold text-white">Отставание или опережение темпа по группам</div>
+          <div className="text-xs text-muted">Темп показан в процентах, а отдельной колонкой вынесено `факт - темп` в деньгах.</div>
+          <div className="mt-4">
+            <DataTable
+              columns={groupTempoColumns}
+              data={tempoRows}
+              initialSorting={[{ id: 'tempoDelta', desc: false }]}
+              maxHeightClassName="max-h-[30rem]"
+            />
           </div>
         </div>
 
-        <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-          <div className="space-y-4">
-            <div className="soft-panel p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Швидке додавання</div>
-              <div className="mt-3 grid gap-3 md:grid-cols-2">
-                <input
-                  className="filter-input"
-                  onChange={(event) => setTodoDraft((current) => ({ ...current, title: event.target.value }))}
-                  placeholder="Назва задачі"
-                  value={todoDraft.title}
-                />
-                <input
-                  className="filter-input"
-                  onChange={(event) => setTodoDraft((current) => ({ ...current, clientName: event.target.value }))}
-                  placeholder="Клієнт або сегмент"
-                  value={todoDraft.clientName}
-                />
-                <input
-                  className="filter-input md:col-span-2"
-                  onChange={(event) => setTodoDraft((current) => ({ ...current, tags: event.target.value }))}
-                  placeholder="Теги через кому: profit, дебіторка, cross-sell"
-                  value={todoDraft.tags}
-                />
-              </div>
-              <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <label className="grid gap-2 md:min-w-[220px]">
-                  <span className="filter-label">Пріоритет</span>
-                  <select
-                    className="filter-select"
-                    onChange={(event) => setTodoDraft((current) => ({ ...current, priority: event.target.value as TodoPriority }))}
-                    value={todoDraft.priority}
-                  >
-                    {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </label>
-                <button
-                  className="rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-3 text-sm font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)] hover:bg-[rgba(78,161,255,0.22)]"
-                  onClick={submitTodo}
-                  type="button"
-                >
-                  Додати задачу
-                </button>
-              </div>
-            </div>
-
-            <div className="soft-panel p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Швидкі задачі з аналітики</div>
-              <div className="mt-3 grid gap-2 md:grid-cols-2">
-                {suggestedTodos.map((todo) => (
-                  <button
-                    className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] p-3 text-left transition hover:border-[rgba(78,161,255,0.38)] hover:bg-[rgba(78,161,255,0.1)]"
-                    key={`${todo.title}-${todo.clientName}`}
-                    onClick={() => addTodo(todo)}
-                    type="button"
-                  >
-                    <div className="text-sm font-semibold text-white">{todo.title}</div>
-                    <div className="mt-1 text-xs text-muted">{todo.clientName || 'Загальна задача'} · {priorityLabels[todo.priority]}</div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {todo.tags.map((tag) => (
-                        <span className="rounded-[999px] border border-line px-2 py-1 text-[11px] text-muted" key={`${todo.title}-${tag}`}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="soft-panel p-4">
-              <div className="grid gap-3">
-                <input
-                  className="filter-input"
-                  onChange={(event) => setTodoSearch(event.target.value)}
-                  placeholder="Пошук по задачах, клієнту або тегах"
-                  value={todoSearch}
-                />
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <select className="filter-select" onChange={(event) => setTodoStatusFilter(event.target.value as TodoStatus | 'all')} value={todoStatusFilter}>
-                    {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                  <select className="filter-select" onChange={(event) => setTodoPriorityFilter(event.target.value as TodoPriority | 'all')} value={todoPriorityFilter}>
-                    <option value="all">Усі пріоритети</option>
-                    {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                  <select className="filter-select" onChange={(event) => setTodoTagFilter(event.target.value)} value={todoTagFilter}>
-                    <option value="all">Усі теги</option>
-                    {allTodoTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {filteredTodos.length ? filteredTodos.map((todo) => (
-                <div className="soft-panel p-4" key={todo.id}>
-                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-white">{todo.title}</div>
-                      <div className="mt-1 text-xs text-muted">
-                        {todo.clientName ? `${todo.clientName} · ` : ''}
-                        Створено {new Date(todo.createdAt).toLocaleString('uk-UA')}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${statusBadgeClassName(todo.status)}`}>{statusLabels[todo.status]}</span>
-                      <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
-                    </div>
-                  </div>
-                  {todo.tags.length ? (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {todo.tags.map((tag) => (
-                        <button
-                          className={`rounded-[999px] border px-2 py-1 text-[11px] transition ${
-                            todoTagFilter === tag
-                              ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
-                              : 'border-line bg-[rgba(8,15,28,0.72)] text-muted hover:text-white'
-                          }`}
-                          key={`${todo.id}-${tag}`}
-                          onClick={() => setTodoTagFilter((current) => current === tag ? 'all' : tag)}
-                          type="button"
-                        >
-                          {tag}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      className="rounded-[10px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-3 py-2 text-xs font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)]"
-                      onClick={() => updateTodoStatus(todo.id)}
-                      type="button"
-                    >
-                      Перемкнути: {statusLabels[nextStatus(todo.status)]}
-                    </button>
-                    <button
-                      className="rounded-[10px] border border-[rgba(251,113,133,0.32)] bg-[rgba(251,113,133,0.12)] px-3 py-2 text-xs font-semibold text-[var(--danger)] transition hover:border-[rgba(251,113,133,0.5)]"
-                      onClick={() => removeTodo(todo.id)}
-                      type="button"
-                    >
-                      Видалити
-                    </button>
-                  </div>
-                </div>
-              )) : (
-                <div className="rounded-[18px] border border-dashed border-line bg-[rgba(10,18,33,0.88)] p-5 text-sm text-muted">
-                  Немає задач за активними фільтрами. Можна швидко створити задачу вручну або одним кліком з блоку вище.
-                </div>
-              )}
-            </div>
+        <div className="panel-card interactive-lift p-4">
+          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по клиентам</div>
+          <div className="text-xs text-muted">Сразу видно, где PROFIT уже есть, а где клиент даёт оборот, но бренд ещё не заведен.</div>
+          <div className="mt-4">
+            <DataTable
+              columns={profitClientColumns}
+              data={profitClients}
+              initialSorting={[{ id: 'hasProfit', desc: false }, { id: 'turnover', desc: true }]}
+              maxHeightClassName="max-h-[30rem]"
+            />
           </div>
         </div>
       </section>
 
-      <section className="panel-card p-4">
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <div className="panel-card interactive-lift p-4">
+          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по группам</div>
+          <div className="text-xs text-muted">Показывает, в каких группах уже много клиентов с PROFIT, а где выше потенциал дотянуть бренд через существующий оборот.</div>
+          <div className="mt-4">
+            <DataTable
+              columns={profitGroupColumns}
+              data={profitGroups}
+              initialSorting={[{ id: 'penetrationPercent', desc: true }]}
+              maxHeightClassName="max-h-[30rem]"
+            />
+          </div>
+        </div>
+
+        <div className="panel-card interactive-lift p-4">
+          <div className="mb-1 text-sm font-semibold text-white">Todo-дошка вынесена отдельно</div>
+          <div className="text-sm leading-6 text-muted">
+            Для удобства todo теперь живёт в отдельной вкладке с доской, тегами, приоритетами и быстрыми задачами из аналитики.
+          </div>
+          <div className="mt-4 space-y-3">
+            <div className="soft-panel interactive-lift p-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Что там есть</div>
+              <div className="mt-2 text-sm text-muted">Отдельная доска `todo / doing / done`, локальное хранение, фильтры по тегам и приоритетам, автоподсказки по cross-sell, PROFIT и дебиторке.</div>
+            </div>
+            <Link className="inline-flex items-center justify-center rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-[1px] hover:border-[rgba(78,161,255,0.6)] hover:bg-[rgba(78,161,255,0.22)]" href="/todo">
+              Открыть todo-доску
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel-card interactive-lift p-4">
         <div className="mb-1 text-sm font-semibold text-white">Усі продажі в активному зрізі</div>
         <div className="text-xs text-muted">Графіки, KPI і таблиця дивляться на один і той самий filtered dataset: місяць, глобальний пошук і column filters більше не розходяться.</div>
         <div className="mt-4">
           <DataTable
             activeFilters={filters}
             columns={salesColumns}
-            data={baseSales}
+            data={visibleSales}
             initialSorting={[{ id: 'clientCode', desc: false }, { id: 'date', desc: false }]}
             maxHeightClassName="max-h-[42rem]"
             onFilterChange={handleFilterChange}

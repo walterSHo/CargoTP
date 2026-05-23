@@ -12,7 +12,11 @@ type Row = {
   shareOfGrossPlan: number;
   planAmount: number;
   tempoAmount: number;
+  tempoDelta?: number;
+  tempoCompletionPercent?: number;
   factFromSales: number;
+  requiredPerDay?: number;
+  projectedCompletionPercent?: number;
   completionPercent: number;
 };
 
@@ -27,8 +31,12 @@ const columns: ColumnDef<Row>[] = [
   { accessorKey: 'planPercent', header: 'План %', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'shareOfGrossPlan', header: 'Частка від валового плану', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'planAmount', header: 'План', cell: (info) => money(Number(info.getValue())) },
-  { accessorKey: 'tempoAmount', header: 'Темп', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'tempoCompletionPercent', header: 'Темп %', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'tempoAmount', header: 'Темп сума', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'tempoDelta', header: 'Факт - темп', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'factFromSales', header: 'Факт із продажів', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'requiredPerDay', header: 'Треба в день', cell: (info) => money(Number(info.getValue())) },
+  { accessorKey: 'projectedCompletionPercent', header: 'Прогноз %', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'completionPercent', header: '% виконання', cell: (info) => <span className={statusClass(Number(info.getValue()))}>{percent(Number(info.getValue()))}</span> }
 ];
 

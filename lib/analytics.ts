@@ -41,10 +41,50 @@ export type ClientGroupGapRow = {
   missingGroupStats: Array<{ name: string; planShare: number }>;
 };
 
-type GroupPlanAuditRow = GroupPlanRecord & {
+export type GroupPlanAuditRow = GroupPlanRecord & {
   factFromSales: number;
   variance: number;
   shareOfGrossPlan: number;
+};
+
+export type MonthPaceSnapshot = {
+  totalDays: number;
+  elapsedDays: number;
+  remainingDays: number;
+  elapsedShare: number;
+  actualTurnover: number;
+  expectedTurnoverToDate: number;
+  varianceToTempo: number;
+  requiredPerDay: number;
+  projectedTurnover: number;
+  projectedCompletionPercent: number;
+};
+
+export type GroupTempoRow = GroupPlanAuditRow & {
+  tempoDelta: number;
+  tempoCompletionPercent: number;
+  requiredPerDay: number;
+  projectedCompletionPercent: number;
+};
+
+export type ProfitClientPenetrationRow = {
+  unifiedClientCode: string;
+  clientCode: string;
+  clientName: string;
+  turnover: number;
+  profitTurnover: number;
+  profitShare: number;
+  productGroups: number;
+  hasProfit: boolean;
+};
+
+export type ProfitGroupPenetrationRow = {
+  productGroup: string;
+  turnover: number;
+  clients: number;
+  clientsWithProfit: number;
+  penetrationPercent: number;
+  potentialTurnover: number;
 };
 
 export function monthOf(date: string) {
@@ -74,6 +114,30 @@ export function salesForMonth(sales: SalesRecord[], month: string) {
 
 export function grossPlanTurnover(sales: SalesRecord[]) {
   return sum(sales.filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(EXCLUDED_GROSS_PLAN_GROUP) && !isTireGroup(row.productGroup)).map((row) => row.amountEur));
+}
+
+function monthProgress(month: string, referenceDate = new Date().toISOString().slice(0, 10)) {
+  const [year, monthNumber] = month.split('-').map(Number);
+  if (!year || !monthNumber) {
+    return { totalDays: 0, elapsedDays: 0, remainingDays: 0, elapsedShare: 0 };
+  }
+
+  const totalDays = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+  const referenceMonth = referenceDate.slice(0, 7);
+  const referenceDay = Number(referenceDate.slice(8, 10)) || 0;
+  const elapsedDays = referenceMonth < month
+    ? 0
+    : referenceMonth > month
+      ? totalDays
+      : Math.min(Math.max(referenceDay, 0), totalDays);
+  const remainingDays = Math.max(totalDays - elapsedDays, 0);
+
+  return {
+    totalDays,
+    elapsedDays,
+    remainingDays,
+    elapsedShare: totalDays > 0 ? elapsedDays / totalDays : 0
+  };
 }
 
 function clientKey(row: Pick<SalesRecord, 'unifiedClientCode' | 'clientCode' | 'clientName'>) {
@@ -139,6 +203,25 @@ export function dashboardKpis(sales: SalesRecord[], receivables: ReceivableRecor
     avgDiscount: avg(monthSales.map((row) => row.discountPercent)),
     overdueDebt: sum(receivables.map((row) => row.overdueDebt)),
     currentDebt: sum(receivables.map((row) => row.currentDebt))
+  };
+}
+
+export function monthPaceSnapshot(sales: SalesRecord[], plans: MonthlyPlan[], month: string, referenceDate?: string): MonthPaceSnapshot {
+  const monthSales = salesForMonth(sales, month);
+  const actualTurnover = grossPlanTurnover(monthSales);
+  const grossPlan = plans.find((plan) => plan.month === month)?.grossPlan ?? 0;
+  const progress = monthProgress(month, referenceDate);
+  const expectedTurnoverToDate = grossPlan * progress.elapsedShare;
+  const projectedTurnover = progress.elapsedShare > 0 ? actualTurnover / progress.elapsedShare : 0;
+
+  return {
+    ...progress,
+    actualTurnover,
+    expectedTurnoverToDate,
+    varianceToTempo: actualTurnover - expectedTurnoverToDate,
+    requiredPerDay: progress.remainingDays > 0 ? Math.max(grossPlan - actualTurnover, 0) / progress.remainingDays : 0,
+    projectedTurnover,
+    projectedCompletionPercent: grossPlan > 0 ? (projectedTurnover / grossPlan) * 100 : 0
   };
 }
 
@@ -335,6 +418,114 @@ export function groupPlanAudit(groupPlans: GroupPlanRecord[], sales: SalesRecord
       shareOfGrossPlan
     };
   });
+}
+
+export function groupTempoRows(groupPlans: GroupPlanRecord[], sales: SalesRecord[], month: string, referenceDate?: string): GroupTempoRow[] {
+  const progress = monthProgress(month, referenceDate);
+  return groupPlanAudit(groupPlans, sales)
+    .filter((row) => planRelevantGroup(row.productGroup) && normalizeProductGroup(row.productGroup) !== normalizeProductGroup(PROFIT_GROUP_NAME))
+    .map((row) => ({
+      ...row,
+      tempoDelta: row.factFromSales - row.tempoAmount,
+      tempoCompletionPercent: row.tempoAmount > 0 ? (row.factFromSales / row.tempoAmount) * 100 : 0,
+      requiredPerDay: progress.remainingDays > 0 ? Math.max(row.planAmount - row.factFromSales, 0) / progress.remainingDays : 0,
+      projectedCompletionPercent: row.planAmount > 0 && progress.elapsedShare > 0
+        ? ((row.factFromSales / progress.elapsedShare) / row.planAmount) * 100
+        : 0
+    }))
+    .sort((a, b) => a.tempoDelta - b.tempoDelta || b.planAmount - a.planAmount);
+}
+
+export function profitClientPenetration(sales: SalesRecord[], limit?: number): ProfitClientPenetrationRow[] {
+  const map = new Map<string, {
+    unifiedClientCode: string;
+    clientCode: string;
+    clientName: string;
+    turnover: number;
+    profitTurnover: number;
+    productGroups: Set<string>;
+  }>();
+
+  sales.forEach((row) => {
+    const key = clientKey(row);
+    const entry = map.get(key) ?? {
+      unifiedClientCode: row.unifiedClientCode,
+      clientCode: row.clientCode,
+      clientName: row.clientName,
+      turnover: 0,
+      profitTurnover: 0,
+      productGroups: new Set<string>()
+    };
+
+    entry.turnover += row.amountEur;
+    if (row.productGroup) entry.productGroups.add(normalizeProductGroup(row.productGroup));
+    if (isProfitBrand(row.brand)) entry.profitTurnover += row.amountEur;
+    map.set(key, entry);
+  });
+
+  const rows = [...map.values()]
+    .map((row) => ({
+      unifiedClientCode: row.unifiedClientCode,
+      clientCode: row.clientCode,
+      clientName: row.clientName,
+      turnover: row.turnover,
+      profitTurnover: row.profitTurnover,
+      profitShare: row.turnover > 0 ? (row.profitTurnover / row.turnover) * 100 : 0,
+      productGroups: row.productGroups.size,
+      hasProfit: row.profitTurnover > 0
+    }))
+    .filter((row) => row.turnover > 0)
+    .sort((a, b) => Number(a.hasProfit) - Number(b.hasProfit) || b.turnover - a.turnover || a.clientName.localeCompare(b.clientName, 'uk', { sensitivity: 'base' }));
+
+  return typeof limit === 'number' ? rows.slice(0, limit) : rows;
+}
+
+export function profitGroupPenetration(sales: SalesRecord[], limit?: number): ProfitGroupPenetrationRow[] {
+  const profitClients = new Set(
+    sales
+      .filter((row) => isProfitBrand(row.brand))
+      .map((row) => clientKey(row))
+  );
+  const map = new Map<string, {
+    productGroup: string;
+    turnover: number;
+    clients: Set<string>;
+    clientsWithProfit: Set<string>;
+    potentialTurnover: number;
+  }>();
+
+  sales
+    .filter((row) => planRelevantGroup(row.productGroup))
+    .forEach((row) => {
+      const normalizedGroup = normalizeProductGroup(row.productGroup);
+      const key = clientKey(row);
+      const entry = map.get(normalizedGroup) ?? {
+        productGroup: row.productGroup,
+        turnover: 0,
+        clients: new Set<string>(),
+        clientsWithProfit: new Set<string>(),
+        potentialTurnover: 0
+      };
+
+      entry.turnover += row.amountEur;
+      entry.clients.add(key);
+      if (profitClients.has(key)) entry.clientsWithProfit.add(key);
+      else entry.potentialTurnover += row.amountEur;
+      map.set(normalizedGroup, entry);
+    });
+
+  const rows = [...map.values()]
+    .map((row) => ({
+      productGroup: row.productGroup,
+      turnover: row.turnover,
+      clients: row.clients.size,
+      clientsWithProfit: row.clientsWithProfit.size,
+      penetrationPercent: row.clients.size > 0 ? (row.clientsWithProfit.size / row.clients.size) * 100 : 0,
+      potentialTurnover: row.potentialTurnover
+    }))
+    .sort((a, b) => a.penetrationPercent - b.penetrationPercent || b.potentialTurnover - a.potentialTurnover || a.productGroup.localeCompare(b.productGroup, 'uk', { sensitivity: 'base' }));
+
+  return typeof limit === 'number' ? rows.slice(0, limit) : rows;
 }
 
 export function byTop<T>(rows: T[], getKey: (row: T) => string, getValue: (row: T) => number, limit = 10) {

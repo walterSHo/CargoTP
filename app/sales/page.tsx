@@ -6,7 +6,7 @@ export default function SalesPage() {
   const data = readDashboardData();
   return (
     <div className="space-y-6">
-      <PageHeader description="Робочий продажний екран: KPI, динаміка, ризики, можливості для росту і локальний todo-лист з тегами в одному місці." title="Продажі" />
+      <PageHeader description="Робочий продажний екран: KPI, темп місяця, cross-sell, PROFIT penetration, ризики по маржі та повний фільтрований sales-зріз." title="Продажі" />
       <SalesClient data={data} />
     </div>
   );
