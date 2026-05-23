@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="app-backdrop">
         <div className="app-shell md:grid md:grid-cols-[220px_minmax(0,1fr)]">
           <Navigation />
-          <main className="app-main">{children}</main>
+          <main className="app-main app-frame">{children}</main>
         </div>
       </body>
     </html>

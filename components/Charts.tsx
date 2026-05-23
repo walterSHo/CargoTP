@@ -33,7 +33,7 @@ function BarChartTooltip({
 }: {
   active?: boolean;
   label?: string | number;
-  payload?: Array<{ name?: string; value?: number | string; dataKey?: string | number; color?: string }>;
+  payload?: Array<{ name?: string | number; value?: number | string; dataKey?: string | number; color?: string }>;
   valueFormatter: (value: number) => string;
   totalsByKey?: Record<string, number>;
 }) {
@@ -69,7 +69,7 @@ function DailyChartTooltip({
   turnoverTotal
 }: {
   active?: boolean;
-  payload?: Array<{ name?: string; value?: number | string; payload?: { clients?: number } }>;
+  payload?: Array<{ name?: string | number; value?: number | string; payload?: { clients?: number } }>;
   label?: string | number;
   turnoverTotal: number;
 }) {
@@ -135,7 +135,11 @@ export function SimpleBarChart({
           <XAxis dataKey="name" interval={0} minTickGap={12} stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} tickFormatter={(value) => shortLabel(value)} />
           <YAxis stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
           <Tooltip
-            content={(props) => <BarChartTooltip {...props} totalsByKey={totalsByKey} valueFormatter={valueFormatter} />}
+            content={(props: {
+              active?: boolean;
+              label?: string | number;
+              payload?: Array<{ name?: string | number; value?: number | string; dataKey?: string | number; color?: string }>;
+            }) => <BarChartTooltip {...props} totalsByKey={totalsByKey} valueFormatter={valueFormatter} />}
             cursor={{ fill: 'rgba(78,161,255,0.08)', radius: 10 }}
           />
           {bars.length > 1 ? <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{barLabels[String(value)] ?? String(value)}</span>} /> : null}
@@ -182,7 +186,7 @@ export function SimplePieChart({ data, title }: { data: Array<{ name: string; va
         <PieChart>
           <Pie
             activeIndex={activeIndex}
-            activeShape={(props) => (
+            activeShape={(props: { outerRadius?: number }) => (
               <g>
                 <Sector {...props} outerRadius={Number(props.outerRadius ?? 92) + 8} cornerRadius={8} />
                 <Sector {...props} fill="rgba(255,255,255,0.15)" innerRadius={Number(props.outerRadius ?? 92) + 11} outerRadius={Number(props.outerRadius ?? 92) + 13} />
@@ -206,13 +210,13 @@ export function SimplePieChart({ data, title }: { data: Array<{ name: string; va
                 if (!viewBox || !('cx' in viewBox) || !('cy' in viewBox)) return null;
                 return (
                   <g>
-                    <text fill="#f1f5ff" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={viewBox.cy - 16}>
+                    <text fill="#f1f5ff" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) - 16}>
                       {money(total)}
                     </text>
-                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={viewBox.cy + 2}>
+                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 2}>
                       -
                     </text>
-                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={viewBox.cy + 20}>
+                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 20}>
                       {title ?? 'Структура'}
                     </text>
                   </g>
@@ -263,7 +267,11 @@ export function DailySalesChart({ data, title }: { data: Array<{ label: string; 
           <XAxis dataKey="label" stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
           <YAxis stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
           <Tooltip
-            content={(props) => <DailyChartTooltip {...props} turnoverTotal={turnoverTotal} />}
+            content={(props: {
+              active?: boolean;
+              label?: string | number;
+              payload?: Array<{ name?: string | number; value?: number | string; payload?: { clients?: number } }>;
+            }) => <DailyChartTooltip {...props} turnoverTotal={turnoverTotal} />}
             cursor={{ stroke: 'rgba(78,161,255,0.35)', strokeWidth: 1.5, strokeDasharray: '4 4' }}
           />
           <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{String(value)}</span>} />

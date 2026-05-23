@@ -17,7 +17,7 @@ export default function ReceivablesPage() {
   const share31Plus = total > 0 ? (bucket31Plus / total) * 100 : 0;
   return (
     <div className="space-y-6">
-      <PageHeader description="Швидкий контроль загальної, простроченої та непростроченої дебіторки з акцентом на найбільш ризикових клієнтах." title="Дебіторська заборгованість" />
+      <PageHeader description="Швидкий контроль загальної, простроченої та непростроченої дебіторки з акцентом на найбільш ризикових клієнтах." kicker="Payment pressure" title="Дебіторська заборгованість" />
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard hint="Уся сума по клієнтській дебіторці" title="Загальна дебіторка" tone="info" value={money(total)} />
         <KpiCard hint={`${riskClients} клієнтів мають прострочення`} title="Прострочена" tone={overdue > 0 ? 'danger' : 'success'} value={money(overdue)} />

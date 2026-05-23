@@ -157,7 +157,7 @@ function suggestionValues(data: ProcessedData, mode: SearchMode) {
 
 function applyColumnFilters(rows: SalesRecord[], filters: Record<string, string[]>) {
   const keys = salesColumns
-    .map((column) => typeof column.accessorKey === 'string' ? column.accessorKey : '')
+    .map((column) => ('accessorKey' in column && typeof column.accessorKey === 'string' ? column.accessorKey : ''))
     .filter(Boolean);
 
   return rows.filter((row) => keys.every((key) => {
@@ -375,6 +375,39 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
+      <section className="page-hero motion-fade-up">
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <div className="signal-chip">
+              <strong>Filtered dataset</strong>
+              <span>KPI, charts, tables, risks</span>
+            </div>
+            <h2 className="hero-title">Продажі зібрані в один робочий контур: пошук і фільтри змінюють однаково і графіки, і ризики, і таблицю.</h2>
+            <p className="hero-note">
+              Екран фокусується на темпі місяця, group pace, PROFIT penetration, cross-sell і маржинальних ризиках.
+              Це дозволяє швидко перейти від сигналу до конкретного клієнта або рядка продажу.
+            </p>
+            <div className="hero-chip-row">
+              <span className="signal-chip"><strong>{money(monthPace.varianceToTempo)}</strong><span>факт проти темпу</span></span>
+              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>частка PROFIT</span></span>
+              <span className="signal-chip"><strong>{riskyRows.length}</strong><span>ризикових продажів</span></span>
+            </div>
+          </div>
+          <div className="hero-side">
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Потрібно / день</div>
+              <div className="metric-card-value">{money(monthPace.requiredPerDay)}</div>
+              <div className="metric-card-copy">Поточний run-rate, який потрібен, щоб закрити валовий план у {month}.</div>
+            </div>
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Тиск концентрації</div>
+              <div className="metric-card-value">{percent(concentrationShare)}</div>
+              <div className="metric-card-copy">Частка обороту, яка припадає на трьох найбільших клієнтів цього зрізу.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <KpiCard hint={`Видимий оборот за ${month}`} title="Оборот зрізу" tone="info" value={money(kpis.totalTurnover)} />
         <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Валовий план" tone={kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger'} value={percent(kpis.grossPlanCompletion)} />
@@ -423,7 +456,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
         <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Ритм місяця і фокус дій</div>
-          <div className="text-xs text-muted">Блок показує, як ідемо относительно пройденных дней месяца и что нужно закрывать быстрее всего.</div>
+          <div className="text-xs text-muted">Блок показує, як ідемо відносно пройдених днів місяця і що потрібно закривати швидше за все.</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="soft-panel interactive-lift p-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Пройдено місяця</div>
@@ -513,8 +546,8 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
       <section className="grid gap-4 xl:grid-cols-2">
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">Отставание или опережение темпа по группам</div>
-          <div className="text-xs text-muted">Темп показан в процентах, а отдельной колонкой вынесено `факт - темп` в деньгах.</div>
+          <div className="mb-1 text-sm font-semibold text-white">Відставання або випередження темпу по групах</div>
+          <div className="text-xs text-muted">Темп показаний у відсотках, а окремою колонкою винесено `факт - темп` у грошах.</div>
           <div className="mt-4">
             <DataTable
               columns={groupTempoColumns}
@@ -526,8 +559,8 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
 
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по клиентам</div>
-          <div className="text-xs text-muted">Сразу видно, где PROFIT уже есть, а где клиент даёт оборот, но бренд ещё не заведен.</div>
+          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по клієнтах</div>
+          <div className="text-xs text-muted">Одразу видно, де PROFIT вже є, а де клієнт дає оборот, але бренд ще не заведений.</div>
           <div className="mt-4">
             <DataTable
               columns={profitClientColumns}
@@ -541,8 +574,8 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по группам</div>
-          <div className="text-xs text-muted">Показывает, в каких группах уже много клиентов с PROFIT, а где выше потенциал дотянуть бренд через существующий оборот.</div>
+          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по групах</div>
+          <div className="text-xs text-muted">Показує, в яких групах вже багато клієнтів з PROFIT, а де вищий потенціал дотягнути бренд через існуючий оборот.</div>
           <div className="mt-4">
             <DataTable
               columns={profitGroupColumns}
@@ -554,17 +587,17 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
 
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">Todo-дошка вынесена отдельно</div>
+          <div className="mb-1 text-sm font-semibold text-white">Todo-дошка винесена окремо</div>
           <div className="text-sm leading-6 text-muted">
-            Для удобства todo теперь живёт в отдельной вкладке с доской, тегами, приоритетами и быстрыми задачами из аналитики.
+            Для зручності todo тепер живе в окремій вкладці з дошкою, тегами, пріоритетами і швидкими задачами з аналітики.
           </div>
           <div className="mt-4 space-y-3">
             <div className="soft-panel interactive-lift p-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Что там есть</div>
-              <div className="mt-2 text-sm text-muted">Отдельная доска `todo / doing / done`, локальное хранение, фильтры по тегам и приоритетам, автоподсказки по cross-sell, PROFIT и дебиторке.</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Що всередині</div>
+              <div className="mt-2 text-sm text-muted">Окрема дошка `todo / doing / done`, локальне зберігання, фільтри по тегах і пріоритетах, автопідказки по cross-sell, PROFIT і дебіторці.</div>
             </div>
             <Link className="inline-flex items-center justify-center rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-[1px] hover:border-[rgba(78,161,255,0.6)] hover:bg-[rgba(78,161,255,0.22)]" href="/todo">
-              Открыть todo-доску
+              Відкрити todo-дошку
             </Link>
           </div>
         </div>

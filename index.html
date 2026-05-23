@@ -7,14 +7,14 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg: #08101f;
-        --bg-top: #0d1630;
-        --card: rgba(10, 18, 33, 0.94);
-        --card-2: rgba(14, 24, 42, 0.96);
-        --ink: #e5eefc;
-        --muted: #8da2c7;
-        --line: rgba(148, 163, 184, 0.18);
-        --line-strong: rgba(148, 163, 184, 0.32);
+        --bg: #06080d;
+        --bg-top: #151b26;
+        --card: rgba(15, 20, 29, 0.96);
+        --card-2: rgba(19, 25, 36, 0.94);
+        --ink: #edf2fb;
+        --muted: #9eabbe;
+        --line: rgba(151, 163, 184, 0.14);
+        --line-strong: rgba(151, 163, 184, 0.24);
         --blue: #4ea1ff;
         --teal: #2dd4bf;
         --amber: #f59e0b;
@@ -22,9 +22,9 @@
         --red: #fb7185;
         --green: #34d399;
         --lime: #a3e635;
-        --shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-        --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.14);
-        --radius-panel: 18px;
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+        --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.18);
+        --radius-panel: 20px;
         --radius-control: 12px;
       }
       * { box-sizing: border-box; }
@@ -33,6 +33,7 @@
         background: var(--bg);
         color: var(--ink);
         font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
+        text-rendering: optimizeLegibility;
       }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation: none !important; transition-duration: 0ms !important; }
@@ -42,6 +43,21 @@
         to { opacity: 1; transform: translateY(0); }
       }
       .app-shell { min-height: 100vh; }
+      .content-shell {
+        min-width: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .content-shell::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.02), transparent 18%),
+          linear-gradient(90deg, rgba(255,255,255,0.02), transparent 12%, transparent 88%, rgba(255,255,255,0.02));
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
+      }
       .sidebar {
         display: none;
         position: sticky;
@@ -49,19 +65,59 @@
         height: 100vh;
         padding: 24px 14px;
         border-right: 1px solid var(--line);
-        background: rgba(6,12,24,.78);
+        background: rgba(11,14,20,.98);
         backdrop-filter: blur(18px);
       }
-      .sidebar-title {
-        margin: 0 0 10px;
-        color: var(--blue);
-        letter-spacing: .12em;
+      .sidebar-title,
+      .nav-section-label {
+        color: var(--muted);
+        letter-spacing: .16em;
         text-transform: uppercase;
         font-size: 11px;
         font-weight: 800;
       }
+      .nav-intro {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(18,24,34,0.8);
+        box-shadow: var(--shadow-soft);
+      }
+      .nav-intro-title {
+        margin-top: 8px;
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: -.03em;
+        color: white;
+      }
+      .nav-intro-copy {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
       .sidebar-nav { display: grid; gap: 8px; }
-      .content-shell { min-width: 0; }
+      .nav-logic {
+        margin-top: auto;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(18,24,34,0.72);
+      }
+      .nav-logic-title {
+        margin-top: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        color: white;
+      }
+      .nav-logic-list {
+        margin-top: 10px;
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
       main { padding: 18px 20px 22px; }
       .mobile-nav {
         position: sticky;
@@ -70,16 +126,38 @@
         display: block;
         padding: 14px;
         border-bottom: 1px solid var(--line);
-        background: rgba(6,12,24,.78);
+        background: rgba(11,14,20,.98);
         backdrop-filter: blur(16px);
+      }
+      .mobile-nav-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
       }
       .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
       button, select, input { font: inherit; }
+      .signal-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 12px;
+        background: rgba(14, 19, 28, 0.9);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+      }
+      .signal-chip strong { color: white; }
       .tab {
         border: 1px solid var(--line);
-        background: rgba(10, 18, 33, 0.84);
+        background: rgba(18,24,34,0.88);
         color: var(--muted);
-        border-radius: var(--radius-control);
+        border-radius: 16px;
         padding: 12px 14px;
         cursor: pointer;
         text-align: left;
@@ -91,8 +169,36 @@
         border-color: rgba(78,161,255,0.4);
         color: white;
       }
-      .page-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+      .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding: 22px 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(15, 20, 29, 0.98);
+        box-shadow: var(--shadow);
+        animation: fadeUp 420ms ease-out both;
+      }
       .page-header h1 { margin: 0; }
+      .page-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(78, 161, 255, 0.22);
+        background: rgba(78, 161, 255, 0.08);
+        color: #cfe1ff;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .16em;
+      }
       .toolbar {
         display: grid;
         position: relative;
@@ -104,7 +210,7 @@
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         padding: 18px;
-        background: rgba(10, 18, 33, 0.9);
+        background: rgba(15, 20, 29, 0.94);
         box-shadow: var(--shadow-soft);
         transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
         animation: fadeUp 420ms ease-out both;
@@ -119,7 +225,7 @@
       input, select {
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
-        background: rgba(8, 15, 28, 0.9);
+        background: rgba(11, 15, 22, 0.94);
         color: var(--ink);
         padding: 12px 14px;
         min-width: 0;
@@ -467,6 +573,70 @@
       .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
       .insight .big { margin-top: 8px; color: white; font-size: 28px; font-weight: 900; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
+      .hero-panel {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 18px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(15, 20, 29, 0.98);
+        box-shadow: var(--shadow);
+        animation: fadeUp 420ms ease-out both;
+      }
+      .hero-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+      }
+      .hero-title {
+        margin: 14px 0 0;
+        font-size: clamp(30px, 4vw, 42px);
+        line-height: 1.08;
+        letter-spacing: -.04em;
+        color: white;
+      }
+      .hero-copy {
+        margin-top: 14px;
+        max-width: 62ch;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 15px;
+      }
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .metric-stack { display: grid; gap: 12px; }
+      .metric-card {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(14, 19, 28, 0.9);
+        box-shadow: var(--shadow-soft);
+      }
+      .metric-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      .metric-value {
+        margin-top: 12px;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -.03em;
+        color: white;
+      }
+      .metric-copy {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
       .button-primary,
       .button-danger {
         border-radius: 12px;
@@ -532,7 +702,7 @@
         padding: 16px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: rgba(11, 20, 36, 0.92);
+        background: rgba(15, 20, 29, 0.94);
         box-shadow: var(--shadow-soft);
       }
       .todo-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -558,6 +728,7 @@
         main { padding: 24px 24px 28px; }
       }
       @media (max-width: 979px) {
+        .hero-grid { grid-template-columns: 1fr; }
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
         main { padding: 14px 14px 20px; }
@@ -571,7 +742,12 @@
   <body>
     <div class="app-shell">
       <aside class="sidebar">
-        <div class="sidebar-title">Меню</div>
+        <div class="nav-intro">
+          <div class="nav-section-label">CargoTP</div>
+          <div class="nav-intro-title">Operational cockpit</div>
+          <div class="nav-intro-copy">Щоденний ритм плану, продажів, дебіторки та задач в одному контурі.</div>
+        </div>
+        <div class="sidebar-title" style="margin:14px 0 10px;">Навігація</div>
         <nav class="sidebar-nav">
           <button class="tab active" data-tab="overview">Огляд</button>
           <button class="tab" data-tab="sales">Продажі</button>
@@ -580,10 +756,26 @@
           <button class="tab" data-tab="receivables">Дебіторка</button>
           <button class="tab" data-tab="tires">Шини</button>
         </nav>
+        <div class="nav-logic">
+          <div class="nav-section-label">Logic</div>
+          <div class="nav-logic-title">Three questions</div>
+          <div class="nav-logic-list">
+            <div>Where are we behind?</div>
+            <div>Why is it happening?</div>
+            <div>What should be done next?</div>
+          </div>
+        </div>
       </aside>
 
       <div class="content-shell">
         <div class="mobile-nav">
+          <div class="mobile-nav-head">
+            <div>
+              <div class="nav-section-label">CargoTP</div>
+              <div style="margin-top:4px;font-size:14px;font-weight:700;color:white;">Sales control system</div>
+            </div>
+            <div class="signal-chip"><strong>Live</strong><span>Ops</span></div>
+          </div>
           <div class="mobile-tabs">
             <button class="tab active" data-tab="overview">Огляд</button>
             <button class="tab" data-tab="sales">Продажі</button>
@@ -597,6 +789,7 @@
         <main>
           <section class="page-header">
             <div>
+              <div class="page-kicker">Control center · <span id="page-kicker-label">Огляд</span></div>
               <h1 id="page-title">Огляд</h1>
               <p class="muted" id="updated">Завантаження даних...</p>
             </div>
@@ -685,6 +878,14 @@
         groups: 'План груп',
         receivables: 'Дебіторка',
         tires: 'Шини'
+      };
+      const pageKickers = {
+        overview: 'Operations overview',
+        sales: 'Sales workspace',
+        todo: 'Action workspace',
+        groups: 'Group pace',
+        receivables: 'Payment pressure',
+        tires: 'Segment watch'
       };
 
       const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -1562,6 +1763,33 @@
 
         document.getElementById('overview').innerHTML = `
           <div class="section-stack">
+            <section class="hero-panel">
+              <div class="hero-grid">
+                <div>
+                  <div class="signal-chip"><strong>Where behind</strong><span>Темп, план, penetration, дебіторка</span></div>
+                  <h2 class="hero-title">Один екран для трьох питань: де відстаємо, чому це стається і яка дія потрібна наступною.</h2>
+                  <div class="hero-copy">Огляд побудований як щоденний control room: верхній шар тримає ритм місяця, середній показує групи та клієнтів, а нижній дає короткий список точок для переходу в продажі або в задачі.</div>
+                  <div class="hero-chips">
+                    <span class="signal-chip"><strong>${escapeHtml(pct(completion))}</strong><span>виконання валового плану</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(money(sum(receivables, (row) => row.overdueDebt)))}</strong><span>прострочка у фокусі</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(String(activeClients))}</strong><span>активних клієнтів</span></span>
+                  </div>
+                </div>
+                <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">Темп місяця</div>
+                    <div class="metric-value">${escapeHtml(money(pace.varianceToTempo))}</div>
+                    <div class="metric-copy">Порівняння факту з очікуваним оборотом на поточну дату.</div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Cross-sell резерв</div>
+                    <div class="metric-value">${escapeHtml(String(groupGaps.filter((row) => row.missingGroups > 0).length))}</div>
+                    <div class="metric-copy">Клієнтів мають незакриті планові групи у видимому зрізі.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             <div class="grid">
               ${kpi('Загальний оборот', money(total), `Валовий оборот за ${state.month}`, 'info')}
               ${kpi('Виконання валового плану', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completionTone)}
@@ -1760,6 +1988,33 @@
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
+            <section class="hero-panel">
+              <div class="hero-grid">
+                <div>
+                  <div class="signal-chip"><strong>Filtered dataset</strong><span>KPI, charts, tables, risks</span></div>
+                  <h2 class="hero-title">Продажі працюють як один контур: фільтри синхронно змінюють графіки, KPI, ризики та таблицю.</h2>
+                  <div class="hero-copy">Екран зібраний навколо темпу місяця, group pace, PROFIT penetration, cross-sell і контролю знижок, щоб швидко перейти від сигналу до конкретного клієнта або рядка продажу.</div>
+                  <div class="hero-chips">
+                    <span class="signal-chip"><strong>${escapeHtml(money(monthPace.varianceToTempo))}</strong><span>факт проти темпу</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>частка PROFIT</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(String(riskyRows.length))}</strong><span>ризикових продажів</span></span>
+                  </div>
+                </div>
+                <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">Потрібно / день</div>
+                    <div class="metric-value">${escapeHtml(money(monthPace.requiredPerDay))}</div>
+                    <div class="metric-copy">Поточний run-rate, який потрібен, щоб закрити валовий план у ${escapeHtml(state.month)}.</div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Тиск концентрації</div>
+                    <div class="metric-value">${escapeHtml(pct(concentrationShare))}</div>
+                    <div class="metric-copy">Частка обороту, яка припадає на трьох найбільших клієнтів поточного зрізу.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             <div class="grid">
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
               ${kpi('Валовий план', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger')}
@@ -1818,7 +2073,7 @@
                 ], { rowKey: (row) => row.productGroup })}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">PROFIT penetration по клиентам</div>
+                <div class="chart-title">PROFIT penetration по клієнтах</div>
                 ${table('profitClients', profitClients, [
                   { title: 'Код клієнта', key: 'clientCode' },
                   { title: 'Клієнт', key: 'clientName' },
@@ -1832,7 +2087,7 @@
 
             <div class="two-up">
               <div class="chart-shell">
-                <div class="chart-title">PROFIT penetration по группам</div>
+                <div class="chart-title">PROFIT penetration по групах</div>
                 ${table('profitGroups', profitGroups, [
                   { title: 'Група', key: 'productGroup' },
                   { title: 'Клієнтів', key: 'clients', sortValue: (row) => row.clients },
@@ -1975,6 +2230,33 @@
 
         document.getElementById('todo').innerHTML = `
           <div class="section-stack">
+            <section class="hero-panel">
+              <div class="hero-grid">
+                <div>
+                  <div class="signal-chip"><strong>Action board</strong><span>To do / In progress / Done</span></div>
+                  <h2 class="hero-title">Todo став окремим operational workspace, де аналітичні сигнали можна одразу перевести в задачі для команди.</h2>
+                  <div class="hero-copy">Тут зібрані quick add, теги, пріоритети, пошук і задачі з аналітики по PROFIT, cross-sell та дебіторці. Візуальна логіка та поверхні синхронізовані з основним dashboard.</div>
+                  <div class="hero-chips">
+                    <span class="signal-chip"><strong>${escapeHtml(String(todoSuggestions.length))}</strong><span>підказок з аналітики</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(String(state.salesTodos.length))}</strong><span>усього задач</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>поточна частка PROFIT</span></span>
+                  </div>
+                </div>
+                <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">PROFIT gap</div>
+                    <div class="metric-value">${escapeHtml(pct(profitGap))}</div>
+                    <div class="metric-copy">Скільки ще бракує до цільових ${escapeHtml(pct(PROFIT_PLAN_PERCENT))} у вибраному місяці.</div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Cross-sell клієнти</div>
+                    <div class="metric-value">${escapeHtml(String(deficitClients.length))}</div>
+                    <div class="metric-copy">Клієнтів з незакритою матрицею, які можна одразу перетворити в наступні кроки.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             <div class="grid">
               ${kpi('Активні задачі', String(openTodoCount), 'Todo з локальним збереженням у браузері', 'info')}
               ${kpi('Готово', String(doneTodoCount), 'Закриті задачі поточного списку', 'success')}
@@ -2181,6 +2463,7 @@
         document.querySelectorAll('.tab').forEach((button) => button.classList.toggle('active', button.dataset.tab === tabId));
         document.querySelectorAll('.section').forEach((element) => element.classList.toggle('active', element.id === tabId));
         document.getElementById('page-title').textContent = pageTitles[tabId] || 'Огляд';
+        document.getElementById('page-kicker-label').textContent = pageKickers[tabId] || pageTitles[tabId] || 'Огляд';
       }
 
       async function loadData() {

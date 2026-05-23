@@ -63,7 +63,7 @@ function parseTags(value: string) {
   )];
 }
 
-function loadTodos() {
+function loadTodos(): SalesTodo[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = window.localStorage.getItem(TODO_STORAGE_KEY);
@@ -278,6 +278,39 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
               {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
             </select>
           </label>
+        </div>
+      </section>
+
+      <section className="page-hero motion-fade-up">
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <div className="signal-chip">
+              <strong>Action board</strong>
+              <span>To do / In progress / Done</span>
+            </div>
+            <h2 className="hero-title">Todo став окремим operational workspace, де аналітичні сигнали можна відразу перевести в задачі для команди.</h2>
+            <p className="hero-note">
+              Тут зібрані quick add, теги, пріоритети, пошук і задачі з аналітики по PROFIT, cross-sell та дебіторці.
+              Візуальна логіка та поверхні синхронізовані з основним dashboard.
+            </p>
+            <div className="hero-chip-row">
+              <span className="signal-chip"><strong>{suggestedTodos.length}</strong><span>підказок з аналітики</span></span>
+              <span className="signal-chip"><strong>{todos.length}</strong><span>усього задач</span></span>
+              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>поточна частка PROFIT</span></span>
+            </div>
+          </div>
+          <div className="hero-side">
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">PROFIT gap</div>
+              <div className="metric-card-value">{percent(profitGap)}</div>
+              <div className="metric-card-copy">Скільки ще бракує до цільових {percent(PROFIT_PLAN_PERCENT)} у вибраному місяці.</div>
+            </div>
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Cross-sell клієнти</div>
+              <div className="metric-card-value">{deficitClients.length}</div>
+              <div className="metric-card-copy">Клієнтів з незакритою матрицею, які можна одразу перетворити в наступні кроки.</div>
+            </div>
+          </div>
         </div>
       </section>
 

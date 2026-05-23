@@ -173,8 +173,42 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
           </div>
         )}
         description="Більш контрастний робочий екран для щоденного контролю обороту, планових долей груп, дебіторки та ризикових клієнтів."
+        kicker="Operations overview"
         title="Огляд дашборду"
       />
+
+      <section className="page-hero motion-fade-up">
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <div className="signal-chip">
+              <strong>Where behind</strong>
+              <span>Темп, план, penetration, дебіторка</span>
+            </div>
+            <h2 className="hero-title">Один екран для трьох питань: де відстаємо, чому це стається і яка дія потрібна наступною.</h2>
+            <p className="hero-note">
+              Огляд тепер зібраний як щоденний control room: верхній шар тримає ритм місяця, середній показує групи та клієнтів,
+              а нижній дає короткий перелік точок, де потрібно переходити в продажі або в задачі.
+            </p>
+            <div className="hero-chip-row">
+              <span className="signal-chip"><strong>{percent(kpis.grossPlanCompletion)}</strong><span>виконання валового плану</span></span>
+              <span className="signal-chip"><strong>{money(kpis.overdueDebt)}</strong><span>прострочка у фокусі</span></span>
+              <span className="signal-chip"><strong>{String(activeClients)}</strong><span>активних клієнтів</span></span>
+            </div>
+          </div>
+          <div className="hero-side">
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Темп місяця</div>
+              <div className="metric-card-value">{percent(kpis.grossPlanCompletion)}</div>
+              <div className="metric-card-copy">Перший рівень контролю для валового плану на активний місяць {month}.</div>
+            </div>
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Cross-sell резерв</div>
+              <div className="metric-card-value">{visibleGroupGaps.filter((row) => row.missingGroups > 0).length}</div>
+              <div className="metric-card-copy">Клієнтів мають незакриті планові групи у поточному видимому зрізі.</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="filter-bar">
         <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto]">
@@ -258,12 +292,12 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
+        <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-[var(--ink)]">Планові долі груп</div>
           <div className="text-xs text-muted">Показуємо реальну долю від обороту та ціль по кожній групі, включно з окремою групою PROFIT.</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {groupShareTargets.map((row) => (
-              <div className="rounded-[16px] border border-line bg-[rgba(8,15,28,0.74)] px-3 py-3" key={row.name}>
+              <div className="soft-panel interactive-lift px-3 py-3" key={row.name}>
                 <div className="truncate text-[13px] font-semibold text-white" title={row.name}>{row.name}</div>
                 <div className="mt-1 text-[11px] leading-4 text-muted">
                   {money(row.turnover)} · {percent(row.turnoverShare)} · {percent(row.targetShare)}

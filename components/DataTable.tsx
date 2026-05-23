@@ -97,7 +97,7 @@ export function DataTable<T>({
     const options = resolvedFilterOptions[openFilterColumn] ?? [];
     const query = filterQuery.trim().toLowerCase();
     if (!query) return options;
-    return options.filter((option) => option.toLowerCase().includes(query));
+    return options.filter((option: string) => option.toLowerCase().includes(query));
   }, [filterQuery, openFilterColumn, resolvedFilterOptions]);
 
   const openFilterLabel = openFilterColumn ? (columnLabels[openFilterColumn] ?? openFilterColumn) : '';
@@ -174,7 +174,7 @@ export function DataTable<T>({
             value={filterQuery}
           />
           <div className="mt-3 max-h-64 space-y-1 overflow-auto pr-1">
-            {filteredOptions.length ? filteredOptions.map((option) => {
+            {filteredOptions.length ? filteredOptions.map((option: string) => {
               const checked = resolvedFilters[openFilterColumn]?.includes(option) ?? false;
               return (
                 <label className="flex cursor-pointer items-start gap-3 rounded-[10px] px-2 py-2 text-sm text-[var(--ink)] transition hover:bg-[rgba(78,161,255,0.08)]" key={option}>

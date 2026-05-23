@@ -6,7 +6,7 @@ export default function SettingsPage() {
   const { monthlyPlans } = readDashboardData();
   return (
     <div className="space-y-6">
-      <PageHeader description="Тут зберігається ручний валовий план по місяцях, який потім використовується у всьому дашборді." title="Налаштування / Вхідні дані" />
+      <PageHeader description="Тут зберігається ручний валовий план по місяцях, який потім використовується у всьому дашборді." kicker="System inputs" title="Налаштування / Вхідні дані" />
       <form className="filter-bar grid gap-4 md:grid-cols-3" action="/api/settings/monthly-plan" method="post">
         <label className="grid gap-2">
           <span className="filter-label">Місяць</span>
