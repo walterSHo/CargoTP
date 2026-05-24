@@ -118,7 +118,7 @@
         line-height: 1.5;
         color: var(--muted);
       }
-      main { padding: 18px 20px 22px; }
+      main { padding: 16px 18px 20px; }
       .mobile-nav {
         position: sticky;
         top: 0;
@@ -295,16 +295,16 @@
       .muted { color: var(--muted); }
       .section { display: none; }
       .section.active { display: block; }
-      .section-stack { display: grid; gap: 18px; }
+      .section-stack { display: grid; gap: 16px; }
       .section-head { display: grid; gap: 6px; }
-      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-      .two-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+      .two-up { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
       .three-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
       .card {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 18px;
+        padding: 15px;
         box-shadow: var(--shadow-soft);
         transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
         animation: fadeUp 420ms ease-out both;
@@ -575,9 +575,9 @@
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
       .hero-panel {
         display: grid;
-        gap: 16px;
-        margin-bottom: 18px;
-        padding: 24px;
+        gap: 14px;
+        margin-bottom: 16px;
+        padding: 18px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         background: rgba(15, 20, 29, 0.98);
@@ -586,34 +586,34 @@
       }
       .hero-grid {
         display: grid;
-        gap: 16px;
+        gap: 14px;
         grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
       }
       .hero-title {
-        margin: 14px 0 0;
-        font-size: clamp(30px, 4vw, 42px);
+        margin: 10px 0 0;
+        font-size: clamp(24px, 3.4vw, 34px);
         line-height: 1.08;
         letter-spacing: -.04em;
         color: white;
       }
       .hero-copy {
-        margin-top: 14px;
+        margin-top: 10px;
         max-width: 62ch;
         color: var(--muted);
-        line-height: 1.7;
-        font-size: 15px;
+        line-height: 1.6;
+        font-size: 14px;
       }
       .hero-chips {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 16px;
+        gap: 8px;
+        margin-top: 12px;
       }
-      .metric-stack { display: grid; gap: 12px; }
+      .metric-stack { display: grid; gap: 10px; }
       .metric-card {
-        padding: 14px;
+        padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-radius: 16px;
         background: rgba(14, 19, 28, 0.9);
         box-shadow: var(--shadow-soft);
       }
@@ -625,23 +625,23 @@
         text-transform: uppercase;
       }
       .metric-value {
-        margin-top: 12px;
-        font-size: 28px;
+        margin-top: 10px;
+        font-size: 24px;
         font-weight: 900;
         letter-spacing: -.03em;
         color: white;
       }
       .metric-copy {
-        margin-top: 8px;
+        margin-top: 6px;
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.6;
       }
       .button-primary,
       .button-danger {
         border-radius: 12px;
-        padding: 11px 14px;
-        font-size: 13px;
+        padding: 9px 12px;
+        font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
@@ -658,25 +658,61 @@
       }
       .button-primary:hover,
       .button-danger:hover { transform: translateY(-1px); }
-      .control-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      .todo-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-      .todo-list { display: grid; gap: 12px; }
-      .todo-card {
-        display: grid;
-        gap: 12px;
-        padding: 16px;
+      .control-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .todo-shell { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.45fr) 300px; align-items: start; }
+      .todo-main { display: grid; gap: 14px; }
+      .todo-list-shell {
         border: 1px solid var(--line);
-        border-radius: 16px;
-        background: rgba(13, 23, 42, 0.9);
+        border-radius: 18px;
+        background: rgba(15, 20, 29, 0.94);
         box-shadow: var(--shadow-soft);
+        padding: 14px;
       }
-      .todo-head {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
+      .todo-quick-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .todo-section-list { display: grid; gap: 14px; margin-top: 14px; }
+      .todo-section { display: grid; gap: 10px; }
+      .todo-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .todo-section-title { font-size: 14px; font-weight: 700; color: white; }
+      .todo-section-meta { margin-top: 4px; font-size: 11px; color: var(--muted); }
+      .todo-row {
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(18, 24, 35, 0.94);
+        box-shadow: var(--shadow-soft);
+        transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
       }
+      .todo-row:hover {
+        transform: translateY(-1px);
+        border-color: rgba(148, 163, 184, 0.24);
+        background: rgba(20, 27, 39, 0.96);
+      }
+      .todo-row-main { display: flex; align-items: flex-start; gap: 10px; }
+      .todo-row-check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+        border-radius: 999px;
+        border: 1px solid rgba(78, 161, 255, 0.34);
+        background: rgba(78, 161, 255, 0.08);
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .todo-row-check.done {
+        border-color: rgba(52, 211, 153, 0.34);
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--green);
+      }
+      .todo-row-copy { min-width: 0; flex: 1; }
+      .todo-row-title { font-size: 14px; font-weight: 700; color: white; line-height: 1.45; }
+      .todo-row-note { margin-top: 4px; font-size: 11px; line-height: 1.5; color: var(--muted); }
       .todo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
       .todo-badges { display: flex; flex-wrap: wrap; gap: 8px; }
       .todo-badge {
@@ -694,44 +730,20 @@
       .todo-badge.priority-high { border-color: rgba(251, 113, 133, 0.38); background: rgba(251, 113, 133, 0.14); color: var(--red); }
       .todo-badge.priority-medium { border-color: rgba(45, 212, 191, 0.38); background: rgba(45, 212, 191, 0.14); color: var(--teal); }
       .todo-badge.priority-low { background: rgba(8, 15, 28, 0.72); color: var(--muted); }
-      .todo-board { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-      .todo-lane {
-        display: grid;
-        gap: 14px;
-        min-height: 24rem;
-        padding: 16px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
-        background: rgba(15, 20, 29, 0.94);
-        box-shadow: var(--shadow-soft);
-      }
-      .todo-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-      .todo-lane-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
-        padding: 0 10px;
-        border-radius: 999px;
-        border: 1px solid var(--line);
-        background: rgba(8, 15, 28, 0.72);
-        color: white;
-        font-size: 12px;
-        font-weight: 800;
-      }
-      .todo-lane-list { display: grid; gap: 12px; align-content: start; }
+      .todo-sidebar { display: grid; gap: 14px; }
+      .todo-summary-list { display: grid; gap: 10px; margin-top: 12px; }
       @media (min-width: 980px) {
         .app-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); }
         .sidebar { display: block; }
         .mobile-nav { display: none; }
-        main { padding: 24px 24px 28px; }
+        main { padding: 20px 20px 24px; }
       }
       @media (max-width: 979px) {
         .hero-grid { grid-template-columns: 1fr; }
+        .todo-shell { grid-template-columns: 1fr; }
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
-        main { padding: 14px 14px 20px; }
+        main { padding: 12px 12px 18px; }
         .toolbar { gap: 10px; }
         .toolbar-grid { grid-template-columns: 1fr; }
         .table-meta { align-items: stretch; }
@@ -1089,10 +1101,8 @@
         window.localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(state.salesTodos));
       }
 
-      function nextTodoStatus(status) {
-        if (status === 'todo') return 'doing';
-        if (status === 'doing') return 'done';
-        return 'todo';
+      function toggleTodoDone(status) {
+        return status === 'done' ? 'todo' : 'done';
       }
 
       function todoStatusLabel(status) {
@@ -2233,132 +2243,151 @@
             <section class="hero-panel">
               <div class="hero-grid">
                 <div>
-                  <div class="signal-chip"><strong>Action board</strong><span>To do / In progress / Done</span></div>
-                  <h2 class="hero-title">Todo став окремим operational workspace, де аналітичні сигнали можна одразу перевести в задачі для команди.</h2>
-                  <div class="hero-copy">Тут зібрані quick add, теги, пріоритети, пошук і задачі з аналітики по PROFIT, cross-sell та дебіторці. Візуальна логіка та поверхні синхронізовані з основним dashboard.</div>
+                  <div class="signal-chip"><strong>Classic todo</strong><span>Список задач по статусам</span></div>
+                  <h2 class="hero-title">Класичний робочий список, де задачі легко додати, швидко знайти і без шуму провести від "до роботи" до "готово".</h2>
+                  <div class="hero-copy">Ми залишили аналітичні підказки, теги і пріоритети, але сам сценарій зробили ближчим до звичного todo-list: компактні секції, короткі дії по рядку і фокус на наступному кроці.</div>
                   <div class="hero-chips">
                     <span class="signal-chip"><strong>${escapeHtml(String(todoSuggestions.length))}</strong><span>підказок з аналітики</span></span>
                     <span class="signal-chip"><strong>${escapeHtml(String(state.salesTodos.length))}</strong><span>усього задач</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>поточна частка PROFIT</span></span>
+                    <span class="signal-chip"><strong>${escapeHtml(String(doneTodoCount))}</strong><span>вже завершено</span></span>
                   </div>
                 </div>
                 <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">Активні задачі</div>
+                    <div class="metric-value">${escapeHtml(String(openTodoCount))}</div>
+                    <div class="metric-copy">Скільки пунктів зараз залишилось у роботі або в черзі на старт.</div>
+                  </div>
                   <div class="metric-card">
                     <div class="metric-label">PROFIT gap</div>
                     <div class="metric-value">${escapeHtml(pct(profitGap))}</div>
                     <div class="metric-copy">Скільки ще бракує до цільових ${escapeHtml(pct(PROFIT_PLAN_PERCENT))} у вибраному місяці.</div>
                   </div>
-                  <div class="metric-card">
-                    <div class="metric-label">Cross-sell клієнти</div>
-                    <div class="metric-value">${escapeHtml(String(deficitClients.length))}</div>
-                    <div class="metric-copy">Клієнтів з незакритою матрицею, які можна одразу перетворити в наступні кроки.</div>
-                  </div>
                 </div>
               </div>
             </section>
 
-            <div class="grid">
-              ${kpi('Активні задачі', String(openTodoCount), 'Todo з локальним збереженням у браузері', 'info')}
-              ${kpi('Готово', String(doneTodoCount), 'Закриті задачі поточного списку', 'success')}
-              ${kpi('Cross-sell резерв', String(deficitClients.length), 'Клієнти з незакритими плановими групами', deficitClients.length ? 'teal' : 'success')}
-              ${kpi('PROFIT gap', pct(profitGap), `Ціль PROFIT: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
-            </div>
+            <div class="todo-shell">
+              <div class="todo-main">
+                <div class="todo-list-shell">
+                  <div class="section-head" style="margin-bottom:12px;">
+                    <h2>Швидке додавання</h2>
+                    <p class="muted">Короткий класичний ввід: задача, клієнт, теги і пріоритет.</p>
+                  </div>
+                  <div class="todo-quick-grid">
+                    <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
+                    <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
+                    <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка, cross-sell" value="${escapeHtml(state.salesTodoDraft.tags)}" />
+                    <select data-sales-todo-draft="priority">
+                      <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
+                      <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                      <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
+                    </select>
+                  </div>
+                  <div class="todo-actions" style="margin-top:12px; justify-content:space-between; align-items:center;">
+                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>частка PROFIT</span></span>
+                    <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
+                  </div>
+                </div>
 
-            <div class="two-up">
-              <div class="card">
-                <div class="section-head" style="margin-bottom:14px;">
-                  <h2>Швидке додавання</h2>
-                  <p class="muted">Окрема робоча дошка для задач по продажах, темпу, PROFIT і дебіторці.</p>
-                </div>
-                <div class="control-grid">
-                  <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
-                  <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
-                  <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка, cross-sell" value="${escapeHtml(state.salesTodoDraft.tags)}" />
-                  <select data-sales-todo-draft="priority">
-                    <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
-                    <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
-                    <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
-                  </select>
-                </div>
-                <div class="todo-actions" style="margin-top:12px;">
-                  <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="section-head" style="margin-bottom:14px;">
-                  <h2>Швидкі задачі з аналітики</h2>
-                  <p class="muted">Підказки формуються з поточного зрізу продажів, темпу, cross-sell, penetration і дебіторки.</p>
-                </div>
-                <div class="control-grid">
-                  ${todoSuggestions.map((todo) => `
-                    <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
-                      <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
-                      <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
-                      <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
-                    </button>
-                  `).join('') || '<div class="empty">Немає швидких задач для поточного зрізу.</div>'}
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="control-grid">
-                <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
-                <select data-sales-todo-filter="status">
-                  <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
-                  <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
-                  <option value="doing" ${state.salesTodoFilters.status === 'doing' ? 'selected' : ''}>В процесі</option>
-                  <option value="done" ${state.salesTodoFilters.status === 'done' ? 'selected' : ''}>Готово</option>
-                </select>
-                <select data-sales-todo-filter="priority">
-                  <option value="all" ${state.salesTodoFilters.priority === 'all' ? 'selected' : ''}>Усі пріоритети</option>
-                  <option value="high" ${state.salesTodoFilters.priority === 'high' ? 'selected' : ''}>Високий</option>
-                  <option value="medium" ${state.salesTodoFilters.priority === 'medium' ? 'selected' : ''}>Середній</option>
-                  <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
-                </select>
-                <select data-sales-todo-filter="tag">
-                  <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
-                  ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
-                </select>
-              </div>
-            </div>
-
-            <div class="todo-grid">
-              ${lanes.map((status) => {
-                const laneRows = todoRows.filter((todo) => todo.status === status);
-                return `
-                  <div class="card">
-                    <div class="todo-head">
-                      <div>
-                        <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todoStatusLabel(status))}</div>
-                        <div class="small" style="margin-top:6px;">Задач: ${escapeHtml(String(laneRows.length))}</div>
-                      </div>
-                      <span class="todo-badge status-${escapeHtml(status)}">${escapeHtml(todoStatusLabel(status))}</span>
-                    </div>
-                    <div class="todo-list" style="margin-top:14px;">
-                      ${laneRows.map((todo) => `
-                        <article class="todo-card">
-                          <div class="todo-head">
+                <div class="todo-list-shell">
+                  <div class="control-grid">
+                    <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
+                    <select data-sales-todo-filter="status">
+                      <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
+                      <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
+                      <option value="doing" ${state.salesTodoFilters.status === 'doing' ? 'selected' : ''}>В процесі</option>
+                      <option value="done" ${state.salesTodoFilters.status === 'done' ? 'selected' : ''}>Готово</option>
+                    </select>
+                    <select data-sales-todo-filter="priority">
+                      <option value="all" ${state.salesTodoFilters.priority === 'all' ? 'selected' : ''}>Усі пріоритети</option>
+                      <option value="high" ${state.salesTodoFilters.priority === 'high' ? 'selected' : ''}>Високий</option>
+                      <option value="medium" ${state.salesTodoFilters.priority === 'medium' ? 'selected' : ''}>Середній</option>
+                      <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
+                    </select>
+                    <select data-sales-todo-filter="tag">
+                      <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
+                      ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div class="todo-section-list">
+                    ${lanes.map((status) => {
+                      const laneRows = todoRows.filter((todo) => todo.status === status);
+                      return `
+                        <section class="todo-section">
+                          <div class="todo-section-head">
                             <div>
-                              <div style="font-size:15px;font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
-                              <div class="small" style="margin-top:6px;">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
+                              <div class="todo-section-title">${escapeHtml(todoStatusLabel(status))}</div>
+                              <div class="todo-section-meta">Задач: ${escapeHtml(String(laneRows.length))}</div>
                             </div>
-                            <div class="todo-badges">
-                              <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
-                            </div>
+                            <span class="todo-badge status-${escapeHtml(status)}">${escapeHtml(todoStatusLabel(status))}</span>
                           </div>
-                          ${todo.tags.length ? `<div class="chips">${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}</div>` : ''}
-                          <div class="todo-actions">
-                            <button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" type="button">Перемкнути: ${escapeHtml(todoStatusLabel(nextTodoStatus(todo.status)))}</button>
-                            <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
-                          </div>
-                        </article>
-                      `).join('') || '<div class="empty">Немає задач у цій колонці за активними фільтрами.</div>'}
+                          ${laneRows.map((todo) => `
+                            <article class="todo-row">
+                              <div class="todo-row-main">
+                                <button class="todo-row-check ${todo.status === 'done' ? 'done' : ''}" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="${escapeHtml(toggleTodoDone(todo.status))}" type="button">${todo.status === 'done' ? '✓' : '○'}</button>
+                                <div class="todo-row-copy">
+                                  <div class="todo-row-title">${escapeHtml(todo.title)}</div>
+                                  <div class="todo-row-note">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
+                                  <div class="todo-badges" style="margin-top:8px;">
+                                    <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
+                                    ${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="todo-actions">
+                                ${todo.status !== 'todo' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="todo" type="button">До роботи</button>` : ''}
+                                ${todo.status !== 'doing' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="doing" type="button">В процес</button>` : ''}
+                                ${todo.status !== 'done' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="done" type="button">Готово</button>` : ''}
+                                <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
+                              </div>
+                            </article>
+                          `).join('') || '<div class="empty">У цій секції немає задач за активними фільтрами.</div>'}
+                        </section>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              </div>
+
+              <aside class="todo-sidebar">
+                <div class="todo-list-shell">
+                  <div class="section-head" style="margin-bottom:12px;">
+                    <h2>Швидкі задачі з аналітики</h2>
+                    <p class="muted">Додаються одним кліком без ручного набору.</p>
+                  </div>
+                  <div class="control-grid">
+                    ${todoSuggestions.map((todo) => `
+                      <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
+                        <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
+                        <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
+                        <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
+                      </button>
+                    `).join('') || '<div class="empty">Немає автоматичних задач для цього зрізу. Можна створити власну задачу вручну.</div>'}
+                  </div>
+                </div>
+
+                <div class="todo-list-shell">
+                  <div class="section-head" style="margin-bottom:12px;">
+                    <h2>Короткий підсумок</h2>
+                    <p class="muted">Ключові цифри по задачах і аналітичному резерву.</p>
+                  </div>
+                  <div class="todo-summary-list">
+                    <div class="metric-card">
+                      <div class="metric-label">Всього задач</div>
+                      <div class="metric-value">${escapeHtml(String(state.salesTodos.length))}</div>
+                    </div>
+                    <div class="metric-card">
+                      <div class="metric-label">Завершено</div>
+                      <div class="metric-value">${escapeHtml(String(doneTodoCount))}</div>
+                    </div>
+                    <div class="metric-card">
+                      <div class="metric-label">Cross-sell клієнти</div>
+                      <div class="metric-value">${escapeHtml(String(deficitClients.length))}</div>
                     </div>
                   </div>
-                `;
-              }).join('')}
+                </div>
+              </aside>
             </div>
           </div>
         `;
@@ -2557,7 +2586,8 @@
         const todoStatus = event.target.closest('[data-sales-todo-status]');
         if (todoStatus) {
           const id = todoStatus.dataset.salesTodoStatus;
-          state.salesTodos = state.salesTodos.map((todo) => todo.id === id ? { ...todo, status: nextTodoStatus(todo.status) } : todo);
+          const nextStatus = todoStatus.dataset.salesTodoNextStatus || 'todo';
+          state.salesTodos = state.salesTodos.map((todo) => todo.id === id ? { ...todo, status: nextStatus } : todo);
           saveSalesTodos();
           renderTodo();
           return;

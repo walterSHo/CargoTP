@@ -31,8 +31,8 @@ export function KpiCard({
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{title}</div>
           <div className="kpi-icon">{iconForTitle(title)}</div>
         </div>
-        <div className="mt-3 text-[30px] font-black leading-none tracking-[-0.03em] text-white">{value}</div>
-        {hint ? <div className="mt-3 text-xs leading-5 text-muted">{hint}</div> : null}
+        <div className="mt-2.5 text-[26px] font-black leading-none tracking-[-0.03em] text-white">{value}</div>
+        {hint ? <div className="mt-2.5 text-xs leading-5 text-muted">{hint}</div> : null}
       </div>
     </div>
   );

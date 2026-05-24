@@ -86,10 +86,8 @@ function loadTodos(): SalesTodo[] {
   }
 }
 
-function nextStatus(status: TodoStatus): TodoStatus {
-  if (status === 'todo') return 'doing';
-  if (status === 'doing') return 'done';
-  return 'todo';
+function toggleDone(status: TodoStatus): TodoStatus {
+  return status === 'done' ? 'todo' : 'done';
 }
 
 function priorityBadgeClassName(priority: TodoPriority) {
@@ -202,6 +200,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
   }, [priorityFilter, search, statusFilter, tagFilter, todos]);
 
   const lanes: TodoStatus[] = ['todo', 'doing', 'done'];
+  const completedCount = todos.filter((todo) => todo.status === 'done').length;
 
   function addTodo(todo: SuggestedTodo) {
     setTodos((current) => [
@@ -229,8 +228,8 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
     setDraft({ title: '', clientName: '', tags: '', priority: 'medium' });
   }
 
-  function updateTodoStatus(id: string) {
-    setTodos((current) => current.map((todo) => todo.id === id ? { ...todo, status: nextStatus(todo.status) } : todo));
+  function setTodoStatus(id: string, status: TodoStatus) {
+    setTodos((current) => current.map((todo) => todo.id === id ? { ...todo, status } : todo));
   }
 
   function removeTodo(id: string) {
@@ -238,7 +237,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
   }
 
   if (!month) {
-    return <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-6 text-sm text-muted">Немає оброблених Excel-даних для todo-дошки.</div>;
+    return <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-6 text-sm text-muted">Немає оброблених Excel-даних для класичного todo-списку.</div>;
   }
 
   return (
@@ -285,126 +284,180 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
         <div className="hero-grid">
           <div className="hero-copy">
             <div className="signal-chip">
-              <strong>Action board</strong>
-              <span>To do / In progress / Done</span>
+              <strong>Classic todo</strong>
+              <span>Список задач по статусам</span>
             </div>
-            <h2 className="hero-title">Todo став окремим operational workspace, де аналітичні сигнали можна відразу перевести в задачі для команди.</h2>
+            <h2 className="hero-title">Класичний робочий список, де задачі легко додати, швидко знайти і без шуму провести від "до роботи" до "готово".</h2>
             <p className="hero-note">
-              Тут зібрані quick add, теги, пріоритети, пошук і задачі з аналітики по PROFIT, cross-sell та дебіторці.
-              Візуальна логіка та поверхні синхронізовані з основним dashboard.
+              Ми залишили аналітичні підказки, теги і пріоритети, але сам сценарій зробили ближчим до звичного todo-list:
+              компактні секції, короткі дії по рядку і швидкий фокус на наступному кроці.
             </p>
             <div className="hero-chip-row">
               <span className="signal-chip"><strong>{suggestedTodos.length}</strong><span>підказок з аналітики</span></span>
               <span className="signal-chip"><strong>{todos.length}</strong><span>усього задач</span></span>
-              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>поточна частка PROFIT</span></span>
+              <span className="signal-chip"><strong>{completedCount}</strong><span>вже завершено</span></span>
             </div>
           </div>
           <div className="hero-side">
+            <div className="metric-card metric-card-compact">
+              <div className="metric-card-label">Активні задачі</div>
+              <div className="metric-card-value">{todos.length - completedCount}</div>
+              <div className="metric-card-copy">Скільки пунктів зараз залишилось у роботі або в черзі на старт.</div>
+            </div>
             <div className="metric-card metric-card-compact">
               <div className="metric-card-label">PROFIT gap</div>
               <div className="metric-card-value">{percent(profitGap)}</div>
               <div className="metric-card-copy">Скільки ще бракує до цільових {percent(PROFIT_PLAN_PERCENT)} у вибраному місяці.</div>
             </div>
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Cross-sell клієнти</div>
-              <div className="metric-card-value">{deficitClients.length}</div>
-              <div className="metric-card-copy">Клієнтів з незакритою матрицею, які можна одразу перетворити в наступні кроки.</div>
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <div className="panel-card p-4">
-          <div className="text-sm font-semibold text-white">Швидке додавання</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))} placeholder="Назва задачі" value={draft.title} />
-            <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, clientName: event.target.value }))} placeholder="Клієнт або сегмент" value={draft.clientName} />
-            <input className="filter-input md:col-span-2" onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} placeholder="Теги через кому: profit, дебіторка, cross-sell" value={draft.tags} />
-          </div>
-          <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <label className="grid gap-2 md:min-w-[220px]">
-              <span className="filter-label">Пріоритет</span>
-              <select className="filter-select" onChange={(event) => setDraft((current) => ({ ...current, priority: event.target.value as TodoPriority }))} value={draft.priority}>
-                {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-              </select>
-            </label>
-            <button className="rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-3 text-sm font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)] hover:bg-[rgba(78,161,255,0.22)]" onClick={submitTodo} type="button">
-              Додати задачу
-            </button>
-          </div>
-        </div>
-
-        <div className="panel-card p-4">
-          <div className="text-sm font-semibold text-white">Швидкі задачі з аналітики</div>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            {suggestedTodos.length ? suggestedTodos.map((todo) => (
-              <button className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] p-3 text-left transition hover:border-[rgba(78,161,255,0.38)] hover:bg-[rgba(78,161,255,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
-                <div className="text-sm font-semibold text-white">{todo.title}</div>
-                <div className="mt-1 text-xs text-muted">{todo.clientName || 'Загальна задача'} · {priorityLabels[todo.priority]}</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {todo.tags.map((tag) => (
-                    <span className="rounded-[999px] border border-line px-2 py-1 text-[11px] text-muted" key={`${todo.title}-${tag}`}>{tag}</span>
-                  ))}
-                </div>
+      <section className="todo-shell">
+        <div className="todo-main">
+          <div className="panel-card p-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-white">Швидке додавання</div>
+                <div className="mt-1 text-xs text-muted">Короткий класичний ввід: задача, клієнт, теги і пріоритет.</div>
+              </div>
+              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>частка PROFIT</span></span>
+            </div>
+            <div className="todo-quick-grid mt-3">
+              <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))} placeholder="Назва задачі" value={draft.title} />
+              <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, clientName: event.target.value }))} placeholder="Клієнт або сегмент" value={draft.clientName} />
+              <input className="filter-input md:col-span-2" onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} placeholder="Теги через кому: profit, дебіторка, cross-sell" value={draft.tags} />
+            </div>
+            <div className="mt-3 flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
+              <label className="grid gap-2 md:min-w-[220px]">
+                <span className="filter-label">Пріоритет</span>
+                <select className="filter-select" onChange={(event) => setDraft((current) => ({ ...current, priority: event.target.value as TodoPriority }))} value={draft.priority}>
+                  {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
+              </label>
+              <button className="rounded-[10px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)] hover:bg-[rgba(78,161,255,0.22)]" onClick={submitTodo} type="button">
+                Додати задачу
               </button>
-            )) : (
-              <div className="rounded-[18px] border border-dashed border-line bg-[rgba(10,18,33,0.88)] p-5 text-sm text-muted md:col-span-2">
-                Немає автоматичних задач для цього зрізу. Можна створити власну задачу вручну.
+            </div>
+          </div>
+
+          <div className="todo-list-shell">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-white">Список задач</div>
+                <div className="mt-1 text-xs text-muted">Компактні секції по статусах і короткі дії прямо в рядку.</div>
               </div>
-            )}
+              <span className="text-xs text-muted">Показано: {filteredTodos.length}</span>
+            </div>
+            <div className="mt-4 grid gap-4">
+              {lanes.map((status) => {
+                const laneRows = filteredTodos.filter((todo) => todo.status === status);
+                return (
+                  <section className="todo-section" key={status}>
+                    <div className="todo-section-header">
+                      <div>
+                        <div className="todo-section-title">{statusLabels[status]}</div>
+                        <div className="todo-section-meta">Задач: {laneRows.length}</div>
+                      </div>
+                      <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${statusBadgeClassName(status)}`}>{statusLabels[status]}</span>
+                    </div>
+                    {laneRows.length ? laneRows.map((todo) => (
+                      <article className="todo-row" key={todo.id}>
+                        <div className="todo-row-main">
+                          <button
+                            aria-label={todo.status === 'done' ? 'Повернути в роботу' : 'Позначити як готово'}
+                            className={`todo-row-check ${todo.status === 'done' ? 'todo-row-check-done' : ''}`}
+                            onClick={() => setTodoStatus(todo.id, toggleDone(todo.status))}
+                            type="button"
+                          >
+                            {todo.status === 'done' ? '✓' : '○'}
+                          </button>
+                          <div className="todo-row-copy">
+                            <div className="todo-row-title">{todo.title}</div>
+                            <div className="todo-row-note">
+                              {todo.clientName ? `${todo.clientName} · ` : ''}
+                              Створено {new Date(todo.createdAt).toLocaleString('uk-UA')}
+                            </div>
+                            <div className="todo-row-meta">
+                              <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
+                              {todo.tags.map((tag) => (
+                                <button className={`rounded-[999px] border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white' : 'border-line bg-[rgba(8,15,28,0.72)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
+                                  {tag}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="todo-row-actions">
+                          {todo.status !== 'todo' ? (
+                            <button className="todo-action-button border-line bg-[rgba(11,15,22,0.86)] text-muted hover:text-white" onClick={() => setTodoStatus(todo.id, 'todo')} type="button">
+                              До роботи
+                            </button>
+                          ) : null}
+                          {todo.status !== 'doing' ? (
+                            <button className="todo-action-button border-[rgba(245,158,11,0.28)] bg-[rgba(245,158,11,0.1)] text-[var(--warning)] hover:border-[rgba(245,158,11,0.44)]" onClick={() => setTodoStatus(todo.id, 'doing')} type="button">
+                              В процес
+                            </button>
+                          ) : null}
+                          {todo.status !== 'done' ? (
+                            <button className="todo-action-button border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.1)] text-[var(--success)] hover:border-[rgba(52,211,153,0.44)]" onClick={() => setTodoStatus(todo.id, 'done')} type="button">
+                              Готово
+                            </button>
+                          ) : null}
+                          <button className="todo-action-button border-[rgba(251,113,133,0.32)] bg-[rgba(251,113,133,0.12)] text-[var(--danger)] hover:border-[rgba(251,113,133,0.5)]" onClick={() => removeTodo(todo.id)} type="button">
+                            Видалити
+                          </button>
+                        </div>
+                      </article>
+                    )) : (
+                      <div className="todo-empty">У цій секції немає задач за активними фільтрами.</div>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </section>
 
-      <section className="todo-board-grid">
-        {lanes.map((status) => {
-          const laneRows = filteredTodos.filter((todo) => todo.status === status);
-          return (
-            <div className="todo-lane" key={status}>
-              <div className="todo-lane-header">
-                <div>
-                  <div className="text-sm font-semibold text-white">{statusLabels[status]}</div>
-                  <div className="text-xs text-muted">Задач: {laneRows.length}</div>
-                </div>
-                <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${statusBadgeClassName(status)}`}>{statusLabels[status]}</span>
-              </div>
-              <div className="todo-lane-list">
-                {laneRows.length ? laneRows.map((todo) => (
-                  <div className="soft-panel p-4" key={todo.id}>
-                    <div className="flex flex-col gap-3">
-                      <div>
-                        <div className="text-sm font-semibold text-white">{todo.title}</div>
-                        <div className="mt-1 text-xs text-muted">
-                          {todo.clientName ? `${todo.clientName} · ` : ''}
-                          Створено {new Date(todo.createdAt).toLocaleString('uk-UA')}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
-                        {todo.tags.map((tag) => (
-                          <button className={`rounded-[999px] border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white' : 'border-line bg-[rgba(8,15,28,0.72)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <button className="rounded-[10px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-3 py-2 text-xs font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)]" onClick={() => updateTodoStatus(todo.id)} type="button">
-                          Перемкнути: {statusLabels[nextStatus(todo.status)]}
-                        </button>
-                        <button className="rounded-[10px] border border-[rgba(251,113,133,0.32)] bg-[rgba(251,113,133,0.12)] px-3 py-2 text-xs font-semibold text-[var(--danger)] transition hover:border-[rgba(251,113,133,0.5)]" onClick={() => removeTodo(todo.id)} type="button">
-                          Видалити
-                        </button>
-                      </div>
-                    </div>
+        <aside className="todo-sidebar">
+          <div className="panel-card p-3.5">
+            <div className="text-sm font-semibold text-white">Швидкі задачі з аналітики</div>
+            <div className="mt-1 text-xs text-muted">Додаються одним кліком без ручного набору.</div>
+            <div className="mt-3 grid gap-2">
+              {suggestedTodos.length ? suggestedTodos.map((todo) => (
+                <button className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] p-3 text-left transition hover:border-[rgba(78,161,255,0.38)] hover:bg-[rgba(78,161,255,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
+                  <div className="text-sm font-semibold text-white">{todo.title}</div>
+                  <div className="mt-1 text-xs text-muted">{todo.clientName || 'Загальна задача'} · {priorityLabels[todo.priority]}</div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {todo.tags.map((tag) => (
+                      <span className="rounded-[999px] border border-line px-2 py-1 text-[11px] text-muted" key={`${todo.title}-${tag}`}>{tag}</span>
+                    ))}
                   </div>
-                )) : (
-                  <div className="todo-lane-empty">Немає задач у цій колонці за активними фільтрами.</div>
-                )}
+                </button>
+              )) : (
+                <div className="todo-empty">Немає автоматичних задач для цього зрізу. Можна створити власну задачу вручну.</div>
+              )}
+            </div>
+          </div>
+
+          <div className="todo-list-shell">
+            <div className="text-sm font-semibold text-white">Короткий підсумок</div>
+            <div className="todo-summary-list mt-3">
+              <div className="soft-panel p-3">
+                <div className="text-[11px] uppercase tracking-[0.08em] text-muted">Всього задач</div>
+                <div className="mt-1 text-lg font-black text-white">{todos.length}</div>
+              </div>
+              <div className="soft-panel p-3">
+                <div className="text-[11px] uppercase tracking-[0.08em] text-muted">Завершено</div>
+                <div className="mt-1 text-lg font-black text-white">{completedCount}</div>
+              </div>
+              <div className="soft-panel p-3">
+                <div className="text-[11px] uppercase tracking-[0.08em] text-muted">Cross-sell клієнти</div>
+                <div className="mt-1 text-lg font-black text-white">{deficitClients.length}</div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        </aside>
       </section>
     </div>
   );

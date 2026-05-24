@@ -7,7 +7,7 @@ import { BarChartIcon, CircleAlertIcon, GaugeIcon, GridIcon, KanbanIcon, LayersI
 const links = [
   ['/', 'Огляд', 'Контроль місяця', GridIcon],
   ['/sales', 'Продажі', 'Фільтри і ризики', BarChartIcon],
-  ['/todo', 'Todo', 'Дії команди', KanbanIcon],
+  ['/todo', 'Todo', 'Класичний список', KanbanIcon],
   ['/group-plan', 'План груп', 'Темп та дельта', LayersIcon],
   ['/receivables', 'Дебіторка', 'Тиск оплат', WalletIcon],
   ['/tires', 'Шини', 'Окремий сегмент', GaugeIcon],
@@ -19,8 +19,8 @@ export function Navigation() {
 
   return (
     <>
-      <header className="nav-shell sticky top-0 z-40 border-b border-line px-4 py-4 backdrop-blur-xl md:hidden">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <header className="nav-shell sticky top-0 z-40 border-b border-line px-3 py-3 backdrop-blur-xl md:hidden">
+        <div className="mb-2.5 flex items-center justify-between gap-3">
           <div>
             <div className="nav-section-label">CargoTP</div>
             <div className="mt-1 text-sm font-semibold text-white">Sales control system</div>
@@ -35,7 +35,7 @@ export function Navigation() {
             const active = pathname === href;
             return (
               <Link
-                className={`interactive-lift shrink-0 rounded-[14px] border px-3 py-2 transition ${
+                className={`interactive-lift shrink-0 rounded-[13px] border px-2.5 py-2 transition ${
                   active
                     ? 'nav-link-active border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                     : 'border-line bg-[rgba(18,24,34,0.92)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
@@ -56,18 +56,18 @@ export function Navigation() {
         </nav>
       </header>
 
-      <aside className="nav-shell hidden border-r border-line md:sticky md:top-0 md:flex md:h-screen md:flex-col md:px-4 md:py-6">
-        <div className="rounded-[18px] border border-line bg-[rgba(18,24,34,0.8)] p-4">
+      <aside className="nav-shell hidden border-r border-line md:sticky md:top-0 md:flex md:h-screen md:flex-col md:px-3.5 md:py-5">
+        <div className="rounded-[18px] border border-line bg-[rgba(18,24,34,0.8)] p-3.5">
           <div className="nav-section-label">CargoTP</div>
           <div className="mt-2 text-lg font-black tracking-tight text-white">Operational cockpit</div>
           <div className="mt-2 text-sm leading-6 text-muted">Щоденний ритм плану, продажів, дебіторки та задач в одному контурі.</div>
         </div>
-        <nav className="mt-3 flex flex-1 flex-col gap-2 text-sm font-medium">
+        <nav className="mt-3 flex flex-1 flex-col gap-1.5 text-sm font-medium">
           {links.map(([href, label, meta, Icon]) => {
             const active = pathname === href;
             return (
               <Link
-                className={`interactive-lift group flex items-center justify-between rounded-[16px] border px-3 py-3 transition ${
+                className={`interactive-lift group flex items-center justify-between rounded-[15px] border px-3 py-2.5 transition ${
                   active
                     ? 'nav-link-active border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white'
                     : 'border-line bg-[rgba(18,24,34,0.88)] text-muted hover:border-[rgba(148,163,184,0.28)] hover:text-white'
@@ -87,7 +87,7 @@ export function Navigation() {
             );
           })}
         </nav>
-        <div className="rounded-[18px] border border-line bg-[rgba(18,24,34,0.72)] p-4">
+        <div className="rounded-[18px] border border-line bg-[rgba(18,24,34,0.72)] p-3.5">
           <div className="nav-section-label">Logic</div>
           <div className="mt-2 text-sm font-semibold text-white">Three questions</div>
           <div className="mt-2 space-y-2 text-sm leading-6 text-muted">

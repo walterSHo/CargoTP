@@ -6,7 +6,11 @@ export default function TodoPage() {
   const data = readDashboardData();
   return (
     <div className="space-y-6">
-      <PageHeader description="Окрема todo-дошка для продажів: quick add, теги, приоритети, фільтри і автоматичні задачі з аналітики." kicker="Action workspace" title="Todo" />
+      <PageHeader
+        description="Класичний і компактний todo-список для продажів: швидке додавання, теги, пріоритети, фільтри та автоматичні задачі з аналітики."
+        kicker="Action list"
+        title="Todo"
+      />
       <TodoBoardClient data={data} />
     </div>
   );

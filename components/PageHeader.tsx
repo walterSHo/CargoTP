@@ -21,7 +21,7 @@ export function PageHeader({
           <span>{title}</span>
         </div>
         <h1 className="page-header-title">{title}</h1>
-        {description ? <p className="page-header-note mt-3 max-w-3xl text-sm leading-6 md:text-base">{description}</p> : null}
+        {description ? <p className="page-header-note mt-2.5 max-w-3xl text-sm leading-6">{description}</p> : null}
       </div>
       {aside ? <div className="lg:min-w-[260px]">{aside}</div> : null}
     </section>
