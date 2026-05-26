@@ -687,10 +687,14 @@
         font-size: 12px;
         line-height: 1.45;
       }
-      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: transparent; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: none; }
+      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: transparent; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: none; cursor: grab; scrollbar-gutter: stable both-edges; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.28) rgba(255, 255, 255, 0.06); }
+      .table-wrap.dragging { cursor: grabbing; user-select: none; }
+      .table-wrap::-webkit-scrollbar { height: 10px; width: 10px; }
+      .table-wrap::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); }
+      .table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); border-radius: 999px; }
       .table-wrap.tall { max-height: 30rem; overflow-y: auto; }
-      table { width: 100%; border-collapse: collapse; font-size: 14px; }
-      th, td { padding: 12px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { position: relative; }
       th { background: #1d1d1d; font-weight: 750; color: var(--ink); }
       td { color: var(--ink); }
@@ -739,11 +743,13 @@
         border: 1px solid var(--line);
         background: #111111;
         box-shadow: var(--shadow);
+        min-width: 300px;
       }
       .filter-panel-wrap {
-        position: relative;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
         z-index: 90;
-        margin-bottom: 12px;
       }
       .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--accent); }
       .filter-clear {
@@ -2304,27 +2310,8 @@
         const expandable = typeof options.expandContent === 'function';
         const activeFilters = activeTableFilters(tableId);
         const openFilterKey = state.openFilterPanel?.tableId === tableId ? state.openFilterPanel.filterKey : '';
-        const openFilterOptions = openFilterKey ? (availableFilterOptions[openFilterKey] || []) : [];
-        const filterPanel = openFilterKey ? `
-          <div class="filter-panel-wrap" data-table-filter-root="true">
-            <div class="filter-panel">
-              <div class="filter-menu-head">
-                <span>Вибір значень: ${escapeHtml(tableColumnTitle(columns, openFilterKey))}</span>
-                <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${openFilterKey}" type="button">Очистити</button>
-              </div>
-              <input data-filter-panel-search="${tableId}" placeholder="Пошук значення..." value="${escapeHtml(state.filterPanelQuery)}" />
-              <div class="filter-options">
-                ${openFilterOptions.filter((option) => option.toLowerCase().includes(String(state.filterPanelQuery || '').toLowerCase())).map((option) => {
-                  const active = (state.tableFilters[tableId]?.[openFilterKey] || []).includes(option);
-                  return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${openFilterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
-                }).join('') || '<div class="empty">Немає значень</div>'}
-              </div>
-            </div>
-          </div>
-        ` : '';
         if (!filtered.length) {
           return `
-            ${filterPanel}
             ${activeFilters.length ? `
               <div class="card" style="margin-bottom:12px;">
                 <div class="table-meta">
@@ -2340,7 +2327,6 @@
           `;
         }
         return `
-          ${filterPanel}
           ${activeFilters.length ? `
             <div class="card" style="margin-bottom:12px;">
               <div class="table-meta">
@@ -2365,10 +2351,31 @@
                     const filterOptions = availableFilterOptions[filterKey] || [];
                     const selectedCount = (state.tableFilters[tableId]?.[filterKey] || []).length;
                     const filterButton = filterOptions.length ? `
-                      <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">
-                        <span>Фільтр</span>
-                        <span>${selectedCount || '▾'}</span>
-                      </button>
+                      <div style="position:relative;" data-table-filter-root="true">
+                        <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">
+                          <span>Фільтр</span>
+                          <span>${selectedCount || '▾'}</span>
+                        </button>
+                        ${openFilterKey === filterKey ? `
+                          <div class="filter-panel-wrap">
+                            <div class="filter-panel">
+                              <div class="filter-menu-head">
+                                <span>Вибір значень: ${escapeHtml(tableColumnTitle(columns, openFilterKey))}</span>
+                                <button class="filter-clear" data-table-filter-clear="${tableId}" data-filter-key="${openFilterKey}" type="button">Очистити</button>
+                              </div>
+                              <input data-filter-panel-search="${tableId}" placeholder="Пошук значення..." value="${escapeHtml(state.filterPanelQuery)}" />
+                              <div class="filter-options">
+                                ${(availableFilterOptions[openFilterKey] || [])
+                                  .filter((option) => option.toLowerCase().includes(String(state.filterPanelQuery || '').toLowerCase()))
+                                  .map((option) => {
+                                    const active = (state.tableFilters[tableId]?.[openFilterKey] || []).includes(option);
+                                    return `<button class="filter-option ${active ? 'active' : ''}" data-table-filter-option="${tableId}" data-filter-key="${openFilterKey}" data-filter-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`;
+                                  }).join('') || '<div class="empty">Немає значень</div>'}
+                              </div>
+                            </div>
+                          </div>
+                        ` : ''}
+                      </div>
                     ` : '';
                     return `<th><div class="th-wrap">${sortable ? `<button class="th-sort" data-table-sort="${tableId}" data-sort-key="${sortKey}">${titleHtml}<span class="sort-mark">${mark}</span></button>` : titleHtml}${filterButton}</div></th>`;
                   }).join('')}
@@ -2552,7 +2559,7 @@
             const severityDelta = Math.abs(b.shareDelta) - Math.abs(a.shareDelta);
             return severityDelta || b.planAmount - a.planAmount || a.productGroup.localeCompare(b.productGroup, 'uk', { sensitivity: 'base' });
           })
-          .slice(0, 8);
+          .slice(0, 12);
         const activeClients = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
         const avgDailyTurnover = daily.length ? avg(daily, (row) => row.turnover) : 0;
         const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
@@ -2752,13 +2759,6 @@
           { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
         ];
         const tableRows = filteredTableRows('sales', rows, salesColumns);
-        const visibleClientKeys = new Set(tableRows.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
-        const receivables = state.data.receivables.filter((row) => {
-          if (state.searchMode === 'brand' || state.searchMode === 'group') {
-            return !state.search || visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName);
-          }
-          return visibleClientKeys.size ? visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName) && matchesReceivableSearch(row) : matchesReceivableSearch(row);
-        });
         const total = sum(tableRows, (row) => row.amountEur);
         const planTurnover = sum(tableRows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
@@ -2779,9 +2779,6 @@
           .sort((left, right) => (right.discountPercent - left.discountPercent) || (left.netMargin - right.netMargin) || (right.amountEur - left.amountEur))
           .slice(0, 12);
         const discountPressureTurnover = sum(riskyRows, (row) => row.amountEur);
-        const totalDebt = sum(receivables, (row) => row.totalDebt);
-        const share31Plus = totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0;
-        const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
         const tempoRows = groupTempoRows(tableRows);
         const profitClients = profitClientPenetration(tableRows, 12);
         const profitGroups = profitGroupPenetration(tableRows, 10);
@@ -2809,20 +2806,12 @@
             description: `Пройдено ${pct(monthPace.elapsedShare * 100)} місяця. Порівняння з очікуваним оборотом на сьогодні.`
           },
           {
-            title: 'Знижка тисне на маржу',
-            value: money(discountPressureTurnover),
-            tone: riskyRows.length ? 'danger' : 'success',
+            title: 'Середня знижка',
+            value: pct(avgDiscountValue),
+            tone: avgDiscountValue >= 8 ? 'warning' : 'success',
             description: riskyRows.length
-              ? `${riskyRows.length} продажів потребують рев'ю. База маржі: ${pct(marginThreshold)}.`
-              : 'Критичних рядків по маржі та знижці не видно.'
-          },
-          {
-            title: 'Дебіторка в продажах',
-            value: money(sum(receivables, (row) => row.overdueDebt)),
-            tone: sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success',
-            description: sum(receivables, (row) => row.overdueDebt) > 0
-              ? `${topOverdueClients[0]?.name || 'Клієнт'} має найбільшу прострочку у зрізі.`
-              : 'У зрізі немає прострочки, що блокує продажну активність.'
+              ? `${riskyRows.length} продажів потребують рев'ю. Під тиском ${money(discountPressureTurnover)} обороту.`
+              : 'Середня знижка тримається без явного тиску на маржу.'
           }
         ];
         const topClientsChart = byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8);
@@ -2838,10 +2827,9 @@
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
               ${kpi('Валовий план', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у фільтрах', grossPlanReady ? (completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger') : 'secondary')}
               ${kpi('Темп місяця', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (monthPace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
+              ${kpi('Темп %', grossPlanReady ? pct(monthPace.projectedCompletionPercent) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Після задання плану з’явиться прогноз ритму', grossPlanReady ? (monthPace.projectedCompletionPercent >= 100 ? 'success' : monthPace.projectedCompletionPercent >= 85 ? 'warning' : 'danger') : 'secondary')}
               ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
-              ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'secondary')}
-              ${kpi('Потрібно в день', money(monthPace.requiredPerDay), `Прогноз виконання: ${pct(monthPace.projectedCompletionPercent)}`, monthPace.projectedCompletionPercent >= 100 ? 'success' : 'warning')}
-              ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від дебіторки`, sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success')}
+              ${kpi('Середня знижка', pct(avgDiscountValue), 'Робоча база по видимих продажах', avgDiscountValue >= 8 ? 'warning' : 'secondary')}
             </div>
 
             <div class="three-up">
@@ -2965,8 +2953,18 @@
                 ], { rowKey: (row) => row.productGroup })}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">Найбільша прострочка</div>
-                ${bars(topOverdueClients, money, '#d86f61')}
+                <div class="chart-title">Продажі з тиском на маржу</div>
+                ${table('salesRisks', riskyRows, [
+                  { title: 'Дата', key: 'date' },
+                  { title: 'Клієнт', key: 'clientName' },
+                  { title: 'Бренд', key: 'brand' },
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'Оборот', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
+                  { title: 'Маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
+                  { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
+                ], {
+                  rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
+                })}
               </div>
             </div>
 
@@ -3004,18 +3002,19 @@
               </div>
 
               <div class="chart-shell">
-                <div class="chart-title">Продажі з тиском на маржу</div>
-                ${table('salesRisks', riskyRows, [
-                  { title: 'Дата', key: 'date' },
-                  { title: 'Клієнт', key: 'clientName' },
-                  { title: 'Бренд', key: 'brand' },
-                  { title: 'Група', key: 'productGroup' },
-                  { title: 'Оборот', key: 'amountEur', sortValue: (row) => row.amountEur, render: (row) => money(row.amountEur) },
-                  { title: 'Маржа', key: 'netMargin', sortValue: (row) => row.netMargin, render: (row) => pct(row.netMargin) },
-                  { title: 'Знижка', key: 'discountPercent', sortValue: (row) => row.discountPercent, render: (row) => pct(row.discountPercent) }
-                ], {
-                  rowKey: (row, index) => `${row.clientCode || row.unifiedClientCode || index}-${row.date}-${row.productCode}`
-                })}
+                <div class="chart-title">Середня маржа і run-rate</div>
+                <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">Середня маржа</div>
+                    <div class="metric-value">${escapeHtml(pct(avgMarginValue))}</div>
+                    <div class="metric-copy">База прибутковості для поточного зрізу продажів.</div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-label">Потрібно в день</div>
+                    <div class="metric-value">${escapeHtml(grossPlanReady ? money(monthPace.requiredPerDay) : '—')}</div>
+                    <div class="metric-copy">${grossPlanReady ? `Щоб вийти на ${money(grossPlan)}` : 'Показник з’явиться після задання валового плану.'}</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -3059,32 +3058,26 @@
                 <div class="metric-strip-copy">Сумарний денний темп для закриття плану</div>
               </div>
             </section>
-            <div class="two-up">
-              <div class="chart-shell">
-                <div class="chart-title">Планові групи: частка vs ціль</div>
-                ${table('groupsShare', shareRows, [
-                  { title: 'Група', key: 'productGroup' },
-                  { title: 'Факт', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
-                  { title: 'Факт %', key: 'actualShare', sortValue: (row) => row.actualShare, render: (row) => pct(row.actualShare) },
-                  { title: 'Ціль %', key: 'targetShare', sortValue: (row) => row.targetShare, render: (row) => pct(row.targetShare) },
-                  {
-                    title: 'Відхилення',
-                    key: 'shareDelta',
-                    sortValue: (row) => row.shareDelta,
-                    render: (row) => `<span class="${row.tone === 'success' ? 'ok' : row.tone === 'warning' ? 'tone-warning' : 'danger'}">${escapeHtml(row.shareDelta >= 0 ? `+${pct(row.shareDelta)}` : pct(row.shareDelta))}</span>`
-                  },
-                  {
-                    title: 'Статус',
-                    key: 'tone',
-                    sortValue: (row) => ({ danger: 0, warning: 1, success: 2 }[row.tone] || 0),
-                    render: (row) => `<span class="group-status ${escapeHtml(row.tone)}">${escapeHtml(statusLabel(row.tone))}</span>`
-                  }
-                ], { rowKey: (row) => row.productGroup })}
-              </div>
-              <div class="chart-shell">
-                <div class="chart-title">Планова структура за фактом</div>
-                ${pie(planGroupBars(shareRows).slice(0, 8), 'Планові групи')}
-              </div>
+            <div class="chart-shell">
+              <div class="chart-title">Планові групи: частка vs ціль</div>
+              ${table('groupsShare', shareRows, [
+                { title: 'Група', key: 'productGroup' },
+                { title: 'Факт', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+                { title: 'Факт %', key: 'actualShare', sortValue: (row) => row.actualShare, render: (row) => pct(row.actualShare) },
+                { title: 'Ціль %', key: 'targetShare', sortValue: (row) => row.targetShare, render: (row) => pct(row.targetShare) },
+                {
+                  title: 'Відхилення',
+                  key: 'shareDelta',
+                  sortValue: (row) => row.shareDelta,
+                  render: (row) => `<span class="${row.tone === 'success' ? 'ok' : row.tone === 'warning' ? 'tone-warning' : 'danger'}">${escapeHtml(row.shareDelta >= 0 ? `+${pct(row.shareDelta)}` : pct(row.shareDelta))}</span>`
+                },
+                {
+                  title: 'Статус',
+                  key: 'tone',
+                  sortValue: (row) => ({ danger: 0, warning: 1, success: 2 }[row.tone] || 0),
+                  render: (row) => `<span class="group-status ${escapeHtml(row.tone)}">${escapeHtml(statusLabel(row.tone))}</span>`
+                }
+              ], { rowKey: (row) => row.productGroup })}
             </div>
             <div class="two-up">
               <div class="chart-shell">
@@ -3598,6 +3591,31 @@
         if (!groupGapModeButton) return;
         state.groupGapMode = groupGapModeButton.dataset.groupGapMode;
         renderOverview();
+      });
+
+      let activeTableDrag = null;
+
+      document.addEventListener('mousedown', (event) => {
+        const wrap = event.target.closest('.table-wrap');
+        if (!wrap || event.target.closest('button, input, a, label')) return;
+        if (wrap.scrollWidth <= wrap.clientWidth) return;
+        activeTableDrag = {
+          wrap,
+          startX: event.clientX,
+          startScrollLeft: wrap.scrollLeft
+        };
+        wrap.classList.add('dragging');
+      });
+
+      document.addEventListener('mousemove', (event) => {
+        if (!activeTableDrag) return;
+        activeTableDrag.wrap.scrollLeft = activeTableDrag.startScrollLeft - (event.clientX - activeTableDrag.startX);
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!activeTableDrag) return;
+        activeTableDrag.wrap.classList.remove('dragging');
+        activeTableDrag = null;
       });
 
       document.addEventListener('mousemove', (event) => {

@@ -144,7 +144,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
       completionPercent: row.completionPercent
     }))
     .sort((a, b) => b.targetShare - a.targetShare || b.turnover - a.turnover)
-    .slice(0, 10);
+    .slice(0, 12);
   const activeClients = new Set(monthSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
   const avgDailyTurnover = daily.length ? avg(daily.map((row) => row.turnover)) : 0;
   const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
@@ -177,36 +177,21 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
         title="Огляд дашборду"
       />
 
-      <section className="page-hero motion-fade-up">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <div className="signal-chip">
-              <strong>Where behind</strong>
-              <span>Темп, план, penetration, дебіторка</span>
-            </div>
-            <h2 className="hero-title">Один екран для трьох питань: де відстаємо, чому це стається і яка дія потрібна наступною.</h2>
-            <p className="hero-note">
-              Огляд тепер зібраний як щоденний control room: верхній шар тримає ритм місяця, середній показує групи та клієнтів,
-              а нижній дає короткий перелік точок, де потрібно переходити в продажі або в задачі.
-            </p>
-            <div className="hero-chip-row">
-              <span className="signal-chip"><strong>{percent(kpis.grossPlanCompletion)}</strong><span>виконання валового плану</span></span>
-              <span className="signal-chip"><strong>{money(kpis.overdueDebt)}</strong><span>прострочка у фокусі</span></span>
-              <span className="signal-chip"><strong>{String(activeClients)}</strong><span>активних клієнтів</span></span>
-            </div>
-          </div>
-          <div className="hero-side">
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Темп місяця</div>
-              <div className="metric-card-value">{percent(kpis.grossPlanCompletion)}</div>
-              <div className="metric-card-copy">Перший рівень контролю для валового плану на активний місяць {month}.</div>
-            </div>
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Cross-sell резерв</div>
-              <div className="metric-card-value">{visibleGroupGaps.filter((row) => row.missingGroups > 0).length}</div>
-              <div className="metric-card-copy">Клієнтів мають незакриті планові групи у поточному видимому зрізі.</div>
-            </div>
-          </div>
+      <section className="metric-strip motion-fade-up">
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Валовий план</div>
+          <div className="metric-strip-value">{percent(kpis.grossPlanCompletion)}</div>
+          <div className="metric-strip-copy">Активний місяць: {month}</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Прострочка</div>
+          <div className="metric-strip-value">{money(kpis.overdueDebt)}</div>
+          <div className="metric-strip-copy">Поточний ризик оплат</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Cross-sell резерв</div>
+          <div className="metric-strip-value">{visibleGroupGaps.filter((row) => row.missingGroups > 0).length}</div>
+          <div className="metric-strip-copy">Клієнтів з незакритими плановими групами</div>
         </div>
       </section>
 
@@ -283,7 +268,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
         <KpiCard hint={`Валовий оборот за ${month}`} title="Загальний оборот" tone="info" value={money(kpis.totalTurnover)} />
         <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Виконання валового плану" tone={completionTone} value={percent(kpis.grossPlanCompletion)} />
         <KpiCard hint={`31+ днів: ${percent(share31Plus)} від усієї дебіторки`} title="Прострочена дебіторка" tone={debtTone} value={money(kpis.overdueDebt)} />
-        <KpiCard hint={`Середній день: ${money(avgDailyTurnover)}`} title="Активні клієнти" tone="teal" value={String(activeClients)} />
+        <KpiCard hint={`Середній день: ${money(avgDailyTurnover)}`} title="Активні клієнти" tone="secondary" value={String(activeClients)} />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
@@ -302,14 +287,14 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <div className="mt-1 text-[11px] leading-4 text-muted">
                   {money(row.turnover)} · {percent(row.turnoverShare)} · {percent(row.targetShare)}
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(141,162,199,0.16)]">
-                  <div className="h-full rounded-full bg-[var(--accent)] transition-all duration-300 ease-out" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
+                <div className="mt-3 h-2 overflow-hidden bg-[rgba(224,216,198,0.12)]">
+                  <div className="h-full bg-[var(--accent)] transition-all duration-300 ease-out" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <SimpleBarChart barColor="#fb7185" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
+        <SimpleBarChart barColor="#c96b5d" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
       </section>
 
       <section className="space-y-3">
@@ -347,7 +332,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <div className="text-sm text-muted">Групи, які клієнт вже робить:</div>
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {[...row.coveredGroupStats, ...row.coveredBrandStats.map((brand) => ({ ...brand, planShare: null }))].map((item) => (
-                    <div className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] px-3 py-2" key={item.name}>
+                    <div className="border border-line bg-[var(--panel)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
                       <div className="mt-1 text-[10px] leading-4 text-muted">
                         {money(item.amount)} · {percent(item.turnoverShare)}
@@ -361,12 +346,12 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <div className="text-sm text-muted">Групи, яких не вистачає:</div>
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {row.missingGroupStats.length ? row.missingGroupStats.map((item) => (
-                    <div className="rounded-[12px] border border-line bg-[rgba(78,161,255,0.08)] px-3 py-2" key={item.name}>
+                    <div className="border border-line bg-[rgba(199,181,138,0.08)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
                       <div className="mt-1 text-[10px] leading-4 text-muted">{percent(item.planShare)}</div>
                     </div>
                   )) : (
-                    <div className="rounded-[12px] border border-line bg-[rgba(52,211,153,0.08)] px-3 py-2 text-sm text-white">Усі планові групи вже закриті</div>
+                    <div className="border border-line bg-[rgba(120,166,106,0.1)] px-3 py-2 text-sm text-white">Усі планові групи вже закриті</div>
                   )}
                 </div>
               </div>

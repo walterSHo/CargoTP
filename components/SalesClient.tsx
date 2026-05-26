@@ -27,14 +27,14 @@ import {
 } from '@/lib/analytics';
 import { money, percent } from '@/lib/format';
 import { normalizeProductGroup } from '@/lib/product-groups';
-import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
+import type { ProcessedData, SalesRecord } from '@/lib/types';
 
 type SearchMode = 'code' | 'client' | 'brand' | 'group';
 
 type ActionSignal = {
   title: string;
   value: string;
-  tone: 'success' | 'warning' | 'danger' | 'teal';
+  tone: 'success' | 'warning' | 'danger' | 'secondary';
   description: string;
 };
 
@@ -128,23 +128,15 @@ function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
   return row.productGroup.toLowerCase().includes(value);
 }
 
-function matchesReceivables(row: ReceivableRecord, mode: SearchMode, query: string) {
-  if (!query) return true;
-  const value = query.toLowerCase();
-  if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
-  if (mode === 'client') return row.clientName.toLowerCase().includes(value);
-  return false;
-}
-
 function suggestionValues(data: ProcessedData, mode: SearchMode) {
   const values = new Set<string>();
   if (mode === 'code') {
-    [...data.sales, ...data.receivables].forEach((row) => {
+    data.sales.forEach((row) => {
       if (row.clientCode) values.add(row.clientCode);
       if (row.unifiedClientCode) values.add(row.unifiedClientCode);
     });
   }
-  if (mode === 'client') [...data.sales, ...data.receivables].forEach((row) => row.clientName && values.add(row.clientName));
+  if (mode === 'client') data.sales.forEach((row) => row.clientName && values.add(row.clientName));
   if (mode === 'brand') data.sales.forEach((row) => row.brand && values.add(row.brand));
   if (mode === 'group') {
     data.sales.forEach((row) => {
@@ -196,23 +188,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     [data.sales, month, query, searchMode]
   );
   const visibleSales = useMemo(() => applyColumnFilters(baseSales, filters), [baseSales, filters]);
-  const visibleClientKeys = useMemo(
-    () => new Set(visibleSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)),
-    [visibleSales]
-  );
-  const receivables = useMemo(() => data.receivables.filter((row) => {
-    if (searchMode === 'brand' || searchMode === 'group') {
-      return !query || visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName);
-    }
-
-    if (visibleClientKeys.size > 0 && (Object.keys(filters).length > 0 || query || month)) {
-      return visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName) && matchesReceivables(row, searchMode, query);
-    }
-
-    return matchesReceivables(row, searchMode, query);
-  }), [data.receivables, filters, month, query, searchMode, visibleClientKeys]);
-
-  const kpis = useMemo(() => dashboardKpis(visibleSales, receivables, data.monthlyPlans, month), [data.monthlyPlans, month, receivables, visibleSales]);
+  const kpis = useMemo(() => dashboardKpis(visibleSales, [], data.monthlyPlans, month), [data.monthlyPlans, month, visibleSales]);
   const monthPace = useMemo(() => monthPaceSnapshot(visibleSales, data.monthlyPlans, month), [data.monthlyPlans, month, visibleSales]);
   const topClients = useMemo(() => topClientsByTurnover(visibleSales, 10), [visibleSales]);
   const topClientsChart = useMemo(() => topClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.turnover })), [topClients]);
@@ -231,15 +207,10 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     .sort((a, b) => b.turnover - a.turnover || b.targetShare - a.targetShare)
     .slice(0, 6), [data.groupPlans, visibleSales]);
   const topGroupsPie = useMemo(() => groupShareTargets.map((row) => ({ name: row.name, value: row.turnover })).filter((row) => row.value > 0), [groupShareTargets]);
-  const topOverdueClients = useMemo(() => byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), [receivables]);
   const tempoRows = useMemo(() => groupTempoRows(data.groupPlans, visibleSales, month), [data.groupPlans, month, visibleSales]);
   const profitClients = useMemo(() => profitClientPenetration(visibleSales, 12), [visibleSales]);
   const profitGroups = useMemo(() => profitGroupPenetration(visibleSales, 10), [visibleSales]);
 
-  const totalDebt = receivables.reduce((sum, row) => sum + row.totalDebt, 0);
-  const share31Plus = receivables.length
-    ? (receivables.reduce((sum, row) => sum + row.bucket31Plus, 0) / Math.max(totalDebt, 1)) * 100
-    : 0;
   const profitTurnover = useMemo(
     () => visibleSales.filter((row) => normalizeProductGroup(row.brand) === normalizeProductGroup(PROFIT_GROUP_NAME)).reduce((sum, row) => sum + row.amountEur, 0),
     [visibleSales]
@@ -271,7 +242,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     {
       title: 'Cross-sell резерв',
       value: `${deficitClients.length} клієнтів`,
-      tone: deficitClients.length ? 'teal' : 'success',
+      tone: deficitClients.length ? 'secondary' : 'success',
       description: deficitClients.length
         ? `${deficitClients[0]?.clientName || 'Клієнт'} має найбільший дефіцит по планових групах. Це швидкий резерв росту.`
         : 'У видимому зрізі активні клієнти вже добре закривають планові групи.'
@@ -283,12 +254,12 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       description: `На зараз пройдено ${percent(monthPace.elapsedShare * 100)} місяця. Порівняння йде з очікуваним оборотом до сьогодні.`
     },
     {
-      title: 'Знижка тисне на маржу',
-      value: money(discountPressureTurnover),
-      tone: riskyRows.length ? 'danger' : 'success',
+      title: 'Середня знижка',
+      value: percent(avgDiscount),
+      tone: avgDiscount >= 8 ? 'warning' : 'success',
       description: riskyRows.length
         ? `${riskyRows.length} продажів потребують уваги: висока знижка або маржа нижче робочої бази ${percent(marginThreshold)}.`
-        : 'Немає рядків, де знижка або маржа зараз виглядають ризиково для цього зрізу.'
+        : 'Середня знижка тримається без явного тиску на маржу в поточному зрізі.'
     }
   ];
 
@@ -298,7 +269,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
   if (!month) {
     return (
-      <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-6 text-sm text-muted">
+      <div className="border border-line bg-[var(--panel)] p-6 text-sm text-muted">
         Немає оброблених Excel-даних для побудови продажного dashboard.
       </div>
     );
@@ -375,36 +346,21 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
-      <section className="page-hero motion-fade-up">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <div className="signal-chip">
-              <strong>Filtered dataset</strong>
-              <span>KPI, charts, tables, risks</span>
-            </div>
-            <h2 className="hero-title">Продажі зібрані в один робочий контур: пошук і фільтри змінюють однаково і графіки, і ризики, і таблицю.</h2>
-            <p className="hero-note">
-              Екран фокусується на темпі місяця, group pace, PROFIT penetration, cross-sell і маржинальних ризиках.
-              Це дозволяє швидко перейти від сигналу до конкретного клієнта або рядка продажу.
-            </p>
-            <div className="hero-chip-row">
-              <span className="signal-chip"><strong>{money(monthPace.varianceToTempo)}</strong><span>факт проти темпу</span></span>
-              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>частка PROFIT</span></span>
-              <span className="signal-chip"><strong>{riskyRows.length}</strong><span>ризикових продажів</span></span>
-            </div>
-          </div>
-          <div className="hero-side">
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Потрібно / день</div>
-              <div className="metric-card-value">{money(monthPace.requiredPerDay)}</div>
-              <div className="metric-card-copy">Поточний run-rate, який потрібен, щоб закрити валовий план у {month}.</div>
-            </div>
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Тиск концентрації</div>
-              <div className="metric-card-value">{percent(concentrationShare)}</div>
-              <div className="metric-card-copy">Частка обороту, яка припадає на трьох найбільших клієнтів цього зрізу.</div>
-            </div>
-          </div>
+      <section className="metric-strip motion-fade-up">
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Факт проти темпу</div>
+          <div className="metric-strip-value">{money(monthPace.varianceToTempo)}</div>
+          <div className="metric-strip-copy">Очікування на поточну дату</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Частка PROFIT</div>
+          <div className="metric-strip-value">{percent(profitShare)}</div>
+          <div className="metric-strip-copy">Ціль: {percent(PROFIT_PLAN_PERCENT)}</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Ризикові продажі</div>
+          <div className="metric-strip-value">{riskyRows.length}</div>
+          <div className="metric-strip-copy">Рядки, де знижка або маржа вже потребують рев'ю</div>
         </div>
       </section>
 
@@ -412,9 +368,9 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         <KpiCard hint={`Видимий оборот за ${month}`} title="Оборот зрізу" tone="info" value={money(kpis.totalTurnover)} />
         <KpiCard hint={`Планова база: ${money(kpis.planTurnover)} з планом ${money(kpis.grossPlan)}`} title="Валовий план" tone={kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger'} value={percent(kpis.grossPlanCompletion)} />
         <KpiCard hint={`На поточну дату очікувалось ${money(monthPace.expectedTurnoverToDate)}`} title="Темп місяця" tone={monthPace.varianceToTempo >= 0 ? 'success' : 'warning'} value={money(monthPace.varianceToTempo)} />
+        <KpiCard hint={`Якщо зберегти поточний ритм, місяць закриється на ${percent(monthPace.projectedCompletionPercent)}`} title="Темп %" tone={monthPace.projectedCompletionPercent >= 100 ? 'success' : monthPace.projectedCompletionPercent >= 85 ? 'warning' : 'danger'} value={percent(monthPace.projectedCompletionPercent)} />
         <KpiCard hint={`Ціль PROFIT: ${percent(PROFIT_PLAN_PERCENT)}`} title="Частка PROFIT" tone={profitGap > 0 ? 'warning' : 'success'} value={percent(profitShare)} />
-        <KpiCard hint={`Робоча база маржі в цьому зрізі`} title="Середня маржа" tone="teal" value={percent(avgMargin)} />
-        <KpiCard hint={`31+ днів: ${percent(share31Plus)} від дебіторки видимих клієнтів`} title="Прострочена дебіторка" tone={kpis.overdueDebt > 0 ? 'danger' : 'success'} value={money(kpis.overdueDebt)} />
+        <KpiCard hint={`Робоча база знижки в цьому зрізі`} title="Середня знижка" tone={avgDiscount >= 8 ? 'warning' : 'secondary'} value={percent(avgDiscount)} />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
@@ -474,9 +430,9 @@ export function SalesClient({ data }: { data: ProcessedData }) {
               <div className="mt-2 text-sm text-muted">Частка обороту трьох найбільших клієнтів.</div>
             </div>
             <div className="soft-panel interactive-lift p-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Видима дебіторка</div>
-              <div className="mt-2 text-2xl font-black text-white">{money(totalDebt)}</div>
-              <div className="mt-2 text-sm text-muted">Щоб продажі не відривались від оплат.</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Середня маржа</div>
+              <div className="mt-2 text-2xl font-black text-white">{percent(avgMargin)}</div>
+              <div className="mt-2 text-sm text-muted">Робоча база прибутковості для цього продажного зрізу.</div>
             </div>
           </div>
         </div>
@@ -493,7 +449,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
               initialSorting={[{ id: 'missingPlanShare', desc: true }]}
               maxHeightClassName="max-h-[30rem]"
               renderExpandedRow={(row) => (
-                <div className="grid gap-4 rounded-[14px] border border-line bg-[rgba(15,25,45,0.92)] p-4">
+                <div className="grid gap-4 border border-line bg-[var(--panel)] p-4">
                   <div className="text-sm text-white">
                     <strong>{row.clientName}</strong> ({row.clientCode || row.unifiedClientCode || 'без коду'})
                   </div>
@@ -507,7 +463,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
                       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Вже купує</div>
                       <div className="flex flex-wrap gap-2">
                         {row.coveredGroupStats.map((item) => (
-                          <span className="rounded-[10px] border border-line bg-[rgba(78,161,255,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
+                          <span className="border border-line bg-[rgba(199,181,138,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
                             {item.name}: {money(item.amount)}
                           </span>
                         ))}
@@ -517,7 +473,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
                       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Що відкрити</div>
                       <div className="flex flex-wrap gap-2">
                         {row.missingGroupStats.map((item) => (
-                          <span className="rounded-[10px] border border-line bg-[rgba(251,113,133,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
+                          <span className="border border-line bg-[rgba(201,107,93,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
                             {item.name}: {percent(item.planShare)}
                           </span>
                         ))}
@@ -587,17 +543,17 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
 
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">Todo-дошка винесена окремо</div>
+          <div className="mb-1 text-sm font-semibold text-white">Todo-список винесено окремо</div>
           <div className="text-sm leading-6 text-muted">
-            Для зручності todo тепер живе в окремій вкладці з дошкою, тегами, пріоритетами і швидкими задачами з аналітики.
+            Для зручності todo тепер живе в окремій вкладці зі списком, тегами, пріоритетами і швидкими задачами з аналітики.
           </div>
           <div className="mt-4 space-y-3">
             <div className="soft-panel interactive-lift p-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Що всередині</div>
-              <div className="mt-2 text-sm text-muted">Окрема дошка `todo / doing / done`, локальне зберігання, фільтри по тегах і пріоритетах, автопідказки по cross-sell, PROFIT і дебіторці.</div>
+              <div className="mt-2 text-sm text-muted">Окремий список `todo / doing / done`, локальне зберігання, фільтри по тегах і пріоритетах, автопідказки по cross-sell, PROFIT і дебіторці.</div>
             </div>
-            <Link className="inline-flex items-center justify-center rounded-[12px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-[1px] hover:border-[rgba(78,161,255,0.6)] hover:bg-[rgba(78,161,255,0.22)]" href="/todo">
-              Відкрити todo-дошку
+            <Link className="inline-flex items-center justify-center border border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:border-[rgba(199,181,138,0.6)] hover:bg-[rgba(199,181,138,0.2)]" href="/todo">
+              Відкрити todo-список
             </Link>
           </div>
         </div>
