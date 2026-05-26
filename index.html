@@ -30,7 +30,7 @@
         --radius-panel: 4px;
         --radius-control: 4px;
         --radius-pill: 999px;
-        --content-max: 1520px;
+        --content-max: 1760px;
       }
       * { box-sizing: border-box; }
       html { background: var(--bg-top); }
@@ -139,7 +139,7 @@
         margin-bottom: 12px;
       }
       .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-      button, select, input { font: inherit; }
+      button, select, input, textarea { font: inherit; }
       .sr-only {
         position: absolute;
         width: 1px;
@@ -237,9 +237,9 @@
         flex-wrap: wrap;
         align-items: end;
         justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 12px;
-        padding: 4px 0 10px;
+        gap: 12px;
+        margin-bottom: 8px;
+        padding: 2px 0 10px;
         border-bottom: 1px solid var(--line);
         background: transparent;
         box-shadow: none;
@@ -265,18 +265,18 @@
         letter-spacing: .14em;
       }
       .page-header-stats {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
         gap: 8px;
-        min-width: 0;
+        min-width: min(100%, 520px);
         justify-content: flex-end;
       }
       .page-header-stat {
-        min-width: 156px;
-        padding: 10px 12px;
+        min-width: 0;
+        padding: 10px 11px;
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
-        background: transparent;
+        background: #191919;
       }
       .page-header-stat-label {
         color: var(--muted);
@@ -303,11 +303,11 @@
         z-index: 40;
         isolation: isolate;
         overflow: visible;
-        gap: 12px;
-        margin: 16px 0 18px;
+        gap: 10px;
+        margin: 12px 0 12px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 14px;
+        padding: 12px 14px;
         background: transparent;
         box-shadow: none;
         transition: border-color 180ms ease, background-color 180ms ease;
@@ -315,8 +315,8 @@
       }
       .toolbar-grid {
         display: grid;
-        gap: 14px;
-        grid-template-columns: 220px minmax(0, 1fr) 220px;
+        gap: 12px;
+        grid-template-columns: 210px minmax(0, 1fr) 210px;
       }
       .toolbar-head {
         display: flex;
@@ -343,19 +343,23 @@
       }
       .toolbar label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; flex: 1 1 220px; min-width: 0; text-transform: uppercase; letter-spacing: 0.08em; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
-      input, select {
+      input, select, textarea {
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
         background: #181818;
         color: var(--ink);
-        padding: 12px 14px;
+        padding: 11px 13px;
         min-width: 0;
         width: 100%;
         box-shadow: none;
         transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
       }
-      input:hover, select:hover { border-color: var(--line-strong); }
-      input:focus-visible, select:focus-visible, button:focus-visible {
+      textarea {
+        resize: vertical;
+        min-height: 112px;
+      }
+      input:hover, select:hover, textarea:hover { border-color: var(--line-strong); }
+      input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
         outline: none;
         border-color: rgba(255, 255, 255, 0.34);
         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
@@ -381,6 +385,36 @@
       }
       .mode-pill.active {
         border-color: white;
+        background: white;
+        color: #111111;
+      }
+      .segment-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-control);
+        background: #181818;
+      }
+      .segment-btn {
+        border: 0;
+        border-radius: calc(var(--radius-control) - 2px);
+        background: transparent;
+        color: var(--muted);
+        padding: 8px 10px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 140ms ease, color 140ms ease;
+      }
+      .segment-btn:hover {
+        color: white;
+        background: #202020;
+      }
+      .segment-btn.is-active {
         background: white;
         color: #111111;
       }
@@ -425,16 +459,16 @@
       .muted { color: var(--muted); }
       .section { display: none; }
       .section.active { display: block; }
-      .section-stack { display: grid; gap: 18px; }
+      .section-stack { display: grid; gap: 12px; }
       .section-head { display: grid; gap: 6px; }
-      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-      .two-up { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr); }
-      .three-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      .two-up { display: grid; gap: 12px; grid-template-columns: minmax(0, 1.58fr) minmax(360px, 1fr); }
+      .three-up { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
       .overview-kpis .kpi:first-child { grid-column: span 2; }
       .overview-hero {
         display: grid;
-        gap: 16px;
-        grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+        gap: 12px;
+        grid-template-columns: minmax(0, 1.4fr) minmax(360px, 0.92fr);
       }
       .hero-panel,
       .action-panel {
@@ -444,7 +478,7 @@
         box-shadow: none;
       }
       .hero-panel {
-        padding: 18px;
+        padding: 14px;
       }
       .hero-head,
       .action-head {
@@ -463,9 +497,9 @@
       }
       .hero-title,
       .action-title {
-        margin-top: 8px;
+        margin-top: 6px;
         color: white;
-        font-size: 22px;
+        font-size: 21px;
         font-weight: 700;
         letter-spacing: -0.02em;
       }
@@ -493,13 +527,13 @@
         white-space: nowrap;
       }
       .hero-grid {
-        margin-top: 18px;
+        margin-top: 12px;
         display: grid;
-        gap: 12px;
+        gap: 8px;
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
       .hero-stat {
-        padding: 14px 14px 12px;
+        padding: 13px 13px 11px;
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
         background: #1c1c1c;
@@ -512,28 +546,28 @@
         text-transform: uppercase;
       }
       .hero-stat-value {
-        margin-top: 8px;
+        margin-top: 7px;
         color: white;
-        font-size: 21px;
+        font-size: 20px;
         font-weight: 720;
         letter-spacing: -0.03em;
       }
       .hero-stat-copy {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
         line-height: 1.45;
       }
       .hero-stat-value.tone-success { color: var(--green); }
       .hero-stat-value.tone-warning { color: var(--amber); }
       .hero-stat-value.tone-danger { color: var(--red); }
       .action-panel {
-        padding: 18px;
+        padding: 14px;
       }
       .action-stack {
-        margin-top: 16px;
+        margin-top: 12px;
         display: grid;
-        gap: 10px;
+        gap: 8px;
       }
       .action-item {
         display: grid;
@@ -573,7 +607,7 @@
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 16px;
+        padding: 13px;
         box-shadow: none;
         transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
         animation: fadeUp 420ms ease-out both;
@@ -586,8 +620,8 @@
       .kpi {
         position: relative;
         overflow: hidden;
-        min-height: 138px;
-        padding: 18px 18px 16px 20px;
+        min-height: 112px;
+        padding: 14px 14px 12px 16px;
       }
       .kpi::before {
         content: '';
@@ -610,8 +644,8 @@
       }
       .kpi:hover::after { opacity: 1; }
       .kpi .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; max-width: 22ch; line-height: 1.35; }
-      .kpi .value { margin-top: 16px; font-size: clamp(23px, 2.2vw, 30px); line-height: 1; font-weight: 700; color: white; letter-spacing: -0.03em; }
-      .kpi .muted { margin-top: 14px; font-size: 12px; line-height: 1.55; max-width: 34ch; }
+      .kpi .value { margin-top: 12px; font-size: clamp(22px, 1.8vw, 28px); line-height: 1; font-weight: 700; color: white; letter-spacing: -0.03em; }
+      .kpi .muted { margin-top: 8px; font-size: 11px; line-height: 1.45; max-width: 34ch; }
       .kpi.info { --kpi-accent: #ffffff; }
       .kpi.success { --kpi-accent: var(--green); }
       .kpi.warning { --kpi-accent: var(--amber); }
@@ -629,7 +663,7 @@
       }
       .metric-strip-item {
         min-width: 0;
-        padding: 14px 16px;
+        padding: 13px 14px;
         border-right: 1px solid var(--line);
       }
       .metric-strip-item:last-child { border-right: 0; }
@@ -656,7 +690,7 @@
       .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: transparent; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: none; }
       .table-wrap.tall { max-height: 30rem; overflow-y: auto; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
-      th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      th, td { padding: 12px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { position: relative; }
       th { background: #1d1d1d; font-weight: 750; color: var(--ink); }
       td { color: var(--ink); }
@@ -782,15 +816,15 @@
         color: white;
         background: #202020;
       }
-      .bar-list { display: grid; gap: 10px; }
-      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; transition: background-color 140ms ease; }
+      .bar-list { display: grid; gap: 8px; }
+      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-radius: 0; transition: background-color 140ms ease; }
       .bar-row:hover { background: rgba(255,255,255,0.03); }
       .bar-bg { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
       .bar { height: 100%; border-radius: inherit; background: #efefef; transition: width 260ms ease, filter 140ms ease; }
       .bar-row:hover .bar { filter: saturate(1.12) brightness(1.08); }
       .status-red { color: var(--red); font-weight: 800; }
       .status-green { color: var(--green); font-weight: 800; }
-      .status-lime { color: var(--lime); font-weight: 900; }
+      .status-lime { color: var(--green); font-weight: 900; }
       .danger { color: var(--red); }
       .ok { color: var(--green); }
       .empty { padding: 20px; border: 1px dashed var(--line); border-radius: var(--radius-panel); background: transparent; color: var(--muted); }
@@ -817,7 +851,7 @@
         font-size: 12px;
         font-weight: 700;
       }
-      .pie-wrap { display: grid; gap: 18px; align-items: start; grid-template-columns: minmax(220px, 280px) 1fr; }
+      .pie-wrap { display: grid; gap: 16px; align-items: start; grid-template-columns: minmax(220px, 280px) 1fr; }
       .pie-chart {
         display: grid;
         gap: 14px;
@@ -855,14 +889,32 @@
       .legend-dot { width: 12px; height: 12px; border-radius: var(--radius-control); }
       .chart-shell {
         display: grid;
-        gap: 14px;
-        padding: 16px;
+        gap: 10px;
+        padding: 13px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         background: transparent;
         box-shadow: none;
       }
+      .chart-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .chart-head-copy {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+        max-width: 46ch;
+      }
       .chart-title { font-size: 15px; font-weight: 750; letter-spacing: -0.01em; }
+      .chart-subtle {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.45;
+      }
       .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
       .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
       .legend-swatch { width: 10px; height: 10px; border-radius: var(--radius-control); display: inline-block; }
@@ -888,18 +940,91 @@
       .chart-tooltip-title { color: var(--ink); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
       .chart-tooltip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
       .chart-tooltip-row strong { color: white; }
-      .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 18px; background: transparent; box-shadow: none; }
+      .insight-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 16px; background: transparent; box-shadow: none; }
       .insight .meta { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
       .insight .big { margin-top: 10px; color: white; font-size: 28px; font-weight: 900; letter-spacing: -0.03em; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
       .metric-stack { display: grid; gap: 10px; }
       .metric-card {
-        padding: 14px;
+        padding: 12px 13px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         background: transparent;
         box-shadow: none;
+      }
+      .plan-tile-grid {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .plan-tile {
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-control);
+        background: #1b1b1b;
+      }
+      .plan-tile-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .plan-tile-title {
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+      .plan-tile-metrics {
+        display: grid;
+        gap: 3px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .plan-tile-delta {
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .plan-tile-progress {
+        height: 7px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.08);
+      }
+      .plan-tile-progress > span {
+        display: block;
+        height: 100%;
+        background: #f0f0f0;
+      }
+      .plan-tile-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-control);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .plan-tile.success .plan-tile-status {
+        border-color: rgba(104, 176, 127, 0.42);
+        background: rgba(104, 176, 127, 0.1);
+        color: var(--green);
+      }
+      .plan-tile.warning .plan-tile-status {
+        border-color: rgba(216, 163, 61, 0.42);
+        background: rgba(216, 163, 61, 0.1);
+        color: var(--amber);
+      }
+      .plan-tile.danger .plan-tile-status {
+        border-color: rgba(216, 111, 97, 0.42);
+        background: rgba(216, 111, 97, 0.1);
+        color: var(--red);
       }
       .metric-label {
         color: var(--muted);
@@ -920,6 +1045,32 @@
         color: var(--muted);
         font-size: 12px;
         line-height: 1.6;
+      }
+      .group-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: var(--radius-control);
+        border: 1px solid var(--line);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .group-status.success {
+        border-color: rgba(104, 176, 127, 0.42);
+        background: rgba(104, 176, 127, 0.12);
+        color: var(--green);
+      }
+      .group-status.warning {
+        border-color: rgba(216, 163, 61, 0.42);
+        background: rgba(216, 163, 61, 0.12);
+        color: var(--amber);
+      }
+      .group-status.danger {
+        border-color: rgba(216, 111, 97, 0.42);
+        background: rgba(216, 111, 97, 0.12);
+        color: var(--red);
       }
       .button-primary,
       .button-danger {
@@ -942,18 +1093,34 @@
       }
       .button-primary:hover,
       .button-danger:hover { transform: translateY(-1px); }
-      .control-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      .todo-shell { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.45fr) 300px; align-items: start; }
-      .todo-main { display: grid; gap: 14px; }
+      .control-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+      .todo-shell { display: grid; gap: 12px; }
+      .todo-main { display: grid; gap: 12px; }
       .todo-list-shell {
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         background: transparent;
         box-shadow: none;
-        padding: 16px;
+        padding: 13px;
       }
-      .todo-quick-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      .todo-section-list { display: grid; gap: 14px; margin-top: 14px; }
+      .todo-summary-grid { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .todo-composer-grid { display: grid; gap: 10px; grid-template-columns: 1.3fr minmax(170px, 0.85fr) 150px 150px; }
+      .todo-composer-meta { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) 220px; margin-top: 10px; }
+      .todo-filter-grid { display: grid; gap: 10px; grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(140px, 0.6fr)); }
+      .todo-board { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+      .todo-lane {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        min-height: 100%;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(255, 255, 255, 0.01);
+      }
+      .todo-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .todo-lane-copy { margin-top: 3px; font-size: 11px; color: var(--muted); }
+      .todo-section-list { display: grid; gap: 10px; }
       .todo-section { display: grid; gap: 10px; }
       .todo-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
       .todo-section-title { font-size: 14px; font-weight: 700; color: white; }
@@ -964,7 +1131,7 @@
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: #1d1d1d;
+        background: #1b1b1b;
         box-shadow: none;
         transition: border-color 160ms ease, background-color 160ms ease;
       }
@@ -973,30 +1140,37 @@
         border-color: var(--line-strong);
         background: #222222;
       }
-      .todo-row-main { display: flex; align-items: flex-start; gap: 10px; }
-      .todo-row-check {
+      .todo-row-main { display: grid; gap: 8px; }
+      .todo-row-copy { min-width: 0; }
+      .todo-row-title { font-size: 14px; font-weight: 700; color: white; line-height: 1.45; }
+      .todo-row-note { margin-top: 2px; font-size: 12px; line-height: 1.55; color: var(--muted); }
+      .todo-row-meta { display: flex; flex-wrap: wrap; gap: 7px; }
+      .todo-client-link {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        margin-top: 2px;
-        border-radius: 8px;
-        border: 1px solid var(--line-strong);
-        background: #232323;
+        gap: 6px;
+        padding: 5px 9px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-control);
         color: white;
-        font-size: 10px;
-        font-weight: 800;
-        cursor: pointer;
+        background: #202020;
+        font-size: 11px;
+        font-weight: 700;
       }
-      .todo-row-check.done {
-        border-color: rgba(120, 166, 106, 0.42);
-        background: rgba(120, 166, 106, 0.12);
-        color: var(--green);
+      .todo-due {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: var(--radius-control);
+        border: 1px solid var(--line);
+        font-size: 11px;
+        font-weight: 700;
       }
-      .todo-row-copy { min-width: 0; flex: 1; }
-      .todo-row-title { font-size: 14px; font-weight: 700; color: white; line-height: 1.45; }
-      .todo-row-note { margin-top: 4px; font-size: 11px; line-height: 1.5; color: var(--muted); }
+      .todo-due.overdue { border-color: rgba(216, 111, 97, 0.44); background: rgba(216, 111, 97, 0.1); color: var(--red); }
+      .todo-due.today { border-color: rgba(216, 163, 61, 0.44); background: rgba(216, 163, 61, 0.12); color: var(--amber); }
+      .todo-due.upcoming { border-color: rgba(104, 176, 127, 0.42); background: rgba(104, 176, 127, 0.1); color: var(--green); }
+      .todo-due.none { background: #202020; color: var(--muted-strong); }
       .todo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
       .todo-badges { display: flex; flex-wrap: wrap; gap: 8px; }
       .todo-badge {
@@ -1014,13 +1188,40 @@
       .todo-badge.priority-high { border-color: rgba(201, 107, 93, 0.38); background: rgba(201, 107, 93, 0.14); color: var(--red); }
       .todo-badge.priority-medium { border-color: rgba(192, 139, 62, 0.42); background: rgba(192, 139, 62, 0.12); color: var(--amber); }
       .todo-badge.priority-low { background: var(--card); color: var(--muted); }
-      .todo-sidebar { display: grid; gap: 14px; }
-      .todo-summary-list { display: grid; gap: 10px; margin-top: 12px; }
+      .todo-status-switch { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+      .todo-status-btn {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-control);
+        background: #202020;
+        color: var(--muted-strong);
+        padding: 7px 9px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+      }
+      .todo-status-btn:hover { border-color: var(--line-strong); color: white; }
+      .todo-status-btn.is-active {
+        border-color: white;
+        background: white;
+        color: #111111;
+      }
+      .todo-lane.empty-lane { min-height: 240px; }
+      .todo-empty-card {
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+        border: 1px dashed var(--line);
+        border-radius: var(--radius-control);
+        color: var(--muted);
+        min-height: 116px;
+        align-content: center;
+      }
       @media (min-width: 980px) {
         .app-shell { display: grid; grid-template-columns: 72px minmax(0, 1fr); }
         .sidebar { display: block; }
         .mobile-nav { display: none; }
-        main { padding: 22px 22px 28px; }
+        main { padding: 20px 22px 26px; }
       }
       @media (max-width: 979px) {
         .page-header {
@@ -1037,7 +1238,11 @@
           grid-template-columns: 1fr;
         }
         .two-up { grid-template-columns: 1fr; }
-        .todo-shell { grid-template-columns: 1fr; }
+        .todo-composer-grid,
+        .todo-composer-meta,
+        .todo-filter-grid,
+        .todo-summary-grid,
+        .todo-board { grid-template-columns: 1fr; }
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
         main { padding: 12px 12px 18px; }
@@ -1052,10 +1257,70 @@
         .tab { min-width: 104px; }
       }
       @media (max-width: 640px) {
+        body { overflow-x: hidden; }
         h1 { font-size: 25px; }
+        main {
+          width: 100%;
+          max-width: 100%;
+        }
         .grid { grid-template-columns: 1fr; }
         .overview-kpis .kpi:first-child {
           grid-column: span 1;
+        }
+        .hero-panel,
+        .action-panel,
+        .chart-shell,
+        .card,
+        .todo-list-shell,
+        .table-wrap {
+          min-width: 0;
+          max-width: 100%;
+        }
+        .hero-head,
+        .action-item-meta,
+        .chart-head {
+          display: grid;
+          grid-template-columns: 1fr;
+          justify-content: start;
+          flex-wrap: wrap;
+        }
+        .hero-chip,
+        .action-item-value {
+          justify-self: start;
+        }
+        .action-item-value {
+          max-width: 100%;
+          text-align: left;
+          overflow-wrap: anywhere;
+        }
+        .plan-tile-grid {
+          grid-template-columns: 1fr;
+        }
+        .plan-tile-head {
+          display: grid;
+          grid-template-columns: 1fr;
+          align-items: flex-start;
+          justify-content: start;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .plan-tile-status,
+        .bar-status {
+          max-width: 100%;
+          justify-self: start;
+          white-space: normal;
+        }
+        .bar-row {
+          grid-template-columns: 1fr;
+          gap: 7px;
+        }
+        .bar-bg {
+          grid-column: 1;
+          grid-row: auto;
+        }
+        .bar-row strong {
+          justify-self: start;
+          white-space: normal;
         }
         .metric-strip {
           grid-template-columns: 1fr;
@@ -1067,9 +1332,8 @@
         .metric-strip-item:last-child {
           border-bottom: 0;
         }
-        .kpi {
-          min-height: 0;
-        }
+        .kpi { min-height: 0; }
+        .line-chart { height: 216px; }
       }
     </style>
   </head>
@@ -1087,9 +1351,9 @@
               <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 20V10"></path><path d="M12 20V4"></path><path d="M20 20v-7"></path></svg></span>
               <span class="tab-label">Продажі</span>
             </button>
-            <button class="tab rail-tab" data-tab="todo" data-label="Todo" aria-label="Todo" type="button">
+            <button class="tab rail-tab" data-tab="todo" data-label="Задачі" aria-label="Задачі" type="button">
               <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M9 11l2 2 4-4"></path><rect x="4" y="4" width="16" height="16"></rect></svg></span>
-              <span class="tab-label">Todo</span>
+              <span class="tab-label">Задачі</span>
             </button>
             <button class="tab rail-tab" data-tab="groups" data-label="План груп" aria-label="План груп" type="button">
               <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16"></path><path d="M4 16h16"></path><path d="M8 4v16"></path></svg></span>
@@ -1123,7 +1387,7 @@
           <div class="mobile-tabs">
             <button class="tab active" data-tab="overview" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg></span><span class="tab-label">Огляд</span></button>
             <button class="tab" data-tab="sales" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 20V10"></path><path d="M12 20V4"></path><path d="M20 20v-7"></path></svg></span><span class="tab-label">Продажі</span></button>
-            <button class="tab" data-tab="todo" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M9 11l2 2 4-4"></path><rect x="4" y="4" width="16" height="16"></rect></svg></span><span class="tab-label">Todo</span></button>
+            <button class="tab" data-tab="todo" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M9 11l2 2 4-4"></path><rect x="4" y="4" width="16" height="16"></rect></svg></span><span class="tab-label">Задачі</span></button>
             <button class="tab" data-tab="groups" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16"></path><path d="M4 16h16"></path><path d="M8 4v16"></path></svg></span><span class="tab-label">Групи</span></button>
             <button class="tab" data-tab="receivables" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16v8H4z"></path><path d="M8 12h4"></path></svg></span><span class="tab-label">Борг</span></button>
             <button class="tab" data-tab="tires" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></span><span class="tab-label">Шини</span></button>
@@ -1204,15 +1468,19 @@
         month: '',
         search: '',
         searchMode: 'code',
+        salesGroupView: 'all',
         grossPlan: 0,
         clientSuggestions: [],
         tableSorts: {
           topClients: { key: 'turnover', dir: 'desc' },
           groupGaps: { key: 'missingPlanShare', dir: 'desc' },
           sales: { key: 'clientCode', dir: 'asc' },
+          salesPlanGroups: { key: 'shareDelta', dir: 'asc' },
           salesOpportunities: { key: 'missingPlanShare', dir: 'desc' },
           salesRisks: { key: 'discountPercent', dir: 'desc' },
           salesTempo: { key: 'tempoDelta', dir: 'asc' },
+          groupsShare: { key: 'shareDelta', dir: 'asc' },
+          groupsTempo: { key: 'tempoDelta', dir: 'asc' },
           profitClients: { key: 'hasProfit', dir: 'asc' },
           profitGroups: { key: 'penetrationPercent', dir: 'asc' },
           groups: { key: 'planAmount', dir: 'desc' },
@@ -1228,7 +1496,9 @@
         salesTodos: [],
         salesTodoDraft: {
           title: '',
+          description: '',
           clientName: '',
+          dueDate: '',
           tags: '',
           priority: 'medium'
         },
@@ -1242,7 +1512,7 @@
       const pageTitles = {
         overview: 'Огляд',
         sales: 'Продажі',
-        todo: 'Todo',
+        todo: 'Задачі',
         groups: 'План груп',
         receivables: 'Дебіторка',
         tires: 'Шини'
@@ -1434,6 +1704,44 @@
         return [...new Set(String(value || '').split(',').map((tag) => tag.trim()).filter(Boolean))];
       }
 
+      function normalizeTodoDate(value) {
+        if (!value) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) return String(value);
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toISOString().slice(0, 10);
+      }
+
+      function todoDueState(value) {
+        const normalized = normalizeTodoDate(value);
+        if (!normalized) return 'none';
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const due = new Date(`${normalized}T00:00:00`);
+        const deltaDays = Math.round((due - today) / 86400000);
+        if (deltaDays < 0) return 'overdue';
+        if (deltaDays === 0) return 'today';
+        return 'upcoming';
+      }
+
+      function todoDueLabel(value) {
+        const normalized = normalizeTodoDate(value);
+        if (!normalized) return 'Без дедлайну';
+        const dueState = todoDueState(normalized);
+        const formatted = new Date(`${normalized}T00:00:00`).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+        if (dueState === 'overdue') return `Прострочено · ${formatted}`;
+        if (dueState === 'today') return `Сьогодні · ${formatted}`;
+        return `До ${formatted}`;
+      }
+
+      function todoDueRank(value) {
+        const dueState = todoDueState(value);
+        if (dueState === 'overdue') return 0;
+        if (dueState === 'today') return 1;
+        if (dueState === 'upcoming') return 2;
+        return 3;
+      }
+
       function loadSalesTodos() {
         try {
           const raw = window.localStorage.getItem(TODO_STORAGE_KEY);
@@ -1442,7 +1750,9 @@
           return parsed.map((todo) => ({
             id: todo.id || createTodoId(),
             title: String(todo.title || ''),
+            description: String(todo.description || ''),
             clientName: String(todo.clientName || ''),
+            dueDate: normalizeTodoDate(todo.dueDate),
             tags: Array.isArray(todo.tags) ? todo.tags.filter((tag) => typeof tag === 'string') : [],
             priority: ['high', 'low'].includes(todo.priority) ? todo.priority : 'medium',
             status: ['doing', 'done'].includes(todo.status) ? todo.status : 'todo',
@@ -1455,10 +1765,6 @@
 
       function saveSalesTodos() {
         window.localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(state.salesTodos));
-      }
-
-      function toggleTodoDone(status) {
-        return status === 'done' ? 'todo' : 'done';
       }
 
       function todoStatusLabel(status) {
@@ -1484,7 +1790,9 @@
           {
             id: createTodoId(),
             title: String(todo.title || '').trim(),
+            description: String(todo.description || '').trim(),
             clientName: String(todo.clientName || '').trim(),
+            dueDate: normalizeTodoDate(todo.dueDate),
             tags: Array.isArray(todo.tags) ? todo.tags.filter(Boolean) : [],
             priority: ['high', 'low'].includes(todo.priority) ? todo.priority : 'medium',
             status: 'todo',
@@ -1501,10 +1809,16 @@
           .filter((todo) => state.salesTodoFilters.status === 'all' || todo.status === state.salesTodoFilters.status)
           .filter((todo) => state.salesTodoFilters.priority === 'all' || todo.priority === state.salesTodoFilters.priority)
           .filter((todo) => state.salesTodoFilters.tag === 'all' || todo.tags.includes(state.salesTodoFilters.tag))
-          .filter((todo) => !search || [todo.title, todo.clientName, todo.tags.join(' ')].join(' ').toLowerCase().includes(search))
+          .filter((todo) => !search || [todo.title, todo.description, todo.clientName, todo.tags.join(' ')].join(' ').toLowerCase().includes(search))
           .sort((left, right) => {
             const statusRank = { todo: 0, doing: 1, done: 2 };
             if (statusRank[left.status] !== statusRank[right.status]) return statusRank[left.status] - statusRank[right.status];
+            const dueRankDelta = todoDueRank(left.dueDate) - todoDueRank(right.dueDate);
+            if (dueRankDelta !== 0) return dueRankDelta;
+            if (todoDueRank(left.dueDate) < 3 && todoDueRank(right.dueDate) < 3) {
+              const dueDateDelta = String(left.dueDate || '').localeCompare(String(right.dueDate || ''));
+              if (dueDateDelta !== 0) return dueDateDelta;
+            }
             const priorityDelta = todoPriorityWeight(right.priority) - todoPriorityWeight(left.priority);
             if (priorityDelta !== 0) return priorityDelta;
             return right.createdAt.localeCompare(left.createdAt);
@@ -1688,6 +2002,49 @@
         });
       }
 
+      function performanceTone(value, warningFloor = -2) {
+        if (value >= 0) return 'success';
+        if (value >= warningFloor) return 'warning';
+        return 'danger';
+      }
+
+      function planGroupShareRows(rows) {
+        const totalTurnover = sum(rows, (row) => row.amountEur);
+        const grossPlanTurnover = sum(rows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
+        return groupPlanRows(rows)
+          .filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP))
+          .map((row) => {
+            const isProfitGroup = normalizeProductGroup(row.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME);
+            const targetShare = isProfitGroup ? PROFIT_PLAN_PERCENT : row.share;
+            const actualShare = isProfitGroup
+              ? (totalTurnover ? row.factFromSales / totalTurnover * 100 : 0)
+              : (grossPlanTurnover ? row.factFromSales / grossPlanTurnover * 100 : 0);
+            const shareDelta = actualShare - targetShare;
+            const tone = performanceTone(shareDelta);
+            return {
+              ...row,
+              targetShare,
+              actualShare,
+              shareDelta,
+              tone
+            };
+          })
+          .sort((a, b) => a.shareDelta - b.shareDelta || b.planAmount - a.planAmount || a.productGroup.localeCompare(b.productGroup, 'uk', { sensitivity: 'base' }));
+      }
+
+      function planGroupBars(rows) {
+        return rows
+          .filter((row) => row.factFromSales > 0 || row.targetShare > 0)
+          .map((row) => ({ name: row.productGroup, value: row.factFromSales }))
+          .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name, 'uk', { sensitivity: 'base' }));
+      }
+
+      function statusLabel(tone) {
+        if (tone === 'success') return 'Ок';
+        if (tone === 'warning') return 'Увага';
+        return 'Ризик';
+      }
+
       function monthProgress(referenceDate = new Date().toISOString().slice(0, 10)) {
         const [year, monthNumber] = String(state.month || '').split('-').map(Number);
         if (!year || !monthNumber) return { totalDays: 0, elapsedDays: 0, remainingDays: 0, elapsedShare: 0 };
@@ -1756,14 +2113,14 @@
 
         if (tabId === 'sales') {
           setHeaderStat(1, 'Оборот зрізу', money(salesTotal), `Фільтри застосовані до всіх блоків за ${state.month}`);
-          setHeaderStat(2, 'Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · cross-sell клієнтів: ${deficitClients.length}`);
+          setHeaderStat(2, 'Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · клієнтів на cross-sell: ${deficitClients.length}`);
           setHeaderStat(3, 'Темп', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у фільтрах');
           return;
         }
         if (tabId === 'todo') {
           setHeaderStat(1, 'Активні задачі', String(openTodoCount), `Завершено: ${doneTodoCount}`);
           setHeaderStat(2, 'Черга cross-sell', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
-          setHeaderStat(3, 'Тиск дебіторки', money(overdue), 'Підказки для задач формуються з аналітики');
+          setHeaderStat(3, 'Тиск дебіторки', money(overdue), 'Ризики підтягуються до задач по клієнтах');
           return;
         }
         if (tabId === 'groups') {
@@ -2038,7 +2395,7 @@
         const max = Math.max(...rows.map((row) => row.value), 1);
         const total = sum(rows, (row) => row.value);
         return `
-          <div class="card bar-list">
+          <div class="bar-list">
             ${rows.map((row) => `
               <div class="bar-row chart-point" ${tooltipAttrs(row.name, ['Значення::' + valueFormatter(row.value), 'Частка::' + pct(total ? row.value / total * 100 : 0)])}>
                 <div title="${escapeHtml(row.name)}">${escapeHtml(shortLabel(row.name, 28))}</div>
@@ -2056,7 +2413,7 @@
         if (!total) return empty();
 
         return `
-          <div class="card pie-wrap">
+          <div class="pie-wrap">
             <div class="pie-chart">
               <div class="pie-stacked-bar">
                 ${rows.map((row, index) => `<span class="pie-stacked-segment" style="width:${Math.max(row.value / total * 100, 2)}%;background:${COLORS[index % COLORS.length]};"></span>`).join('')}
@@ -2150,6 +2507,28 @@
         return value < 95 ? 'status-red' : value <= 100 ? 'status-green' : 'status-lime';
       }
 
+      function planTiles(rows) {
+        if (!rows.length) return empty('Немає планових груп');
+        return `
+          <div class="plan-tile-grid">
+            ${rows.map((row) => `
+              <article class="plan-tile ${escapeHtml(row.tone)}">
+                <div class="plan-tile-head">
+                  <div class="plan-tile-title" title="${escapeHtml(row.productGroup)}">${escapeHtml(shortLabel(row.productGroup, 26))}</div>
+                  <span class="plan-tile-status">${escapeHtml(statusLabel(row.tone))}</span>
+                </div>
+                <div class="plan-tile-metrics">
+                  <div>Факт: ${escapeHtml(money(row.factFromSales))}</div>
+                  <div>Частка: ${escapeHtml(pct(row.actualShare))} / ціль ${escapeHtml(pct(row.targetShare))}</div>
+                </div>
+                <div class="plan-tile-delta ${row.tone === 'success' ? 'ok' : row.tone === 'warning' ? 'tone-warning' : 'danger'}">${escapeHtml(row.shareDelta >= 0 ? `+${pct(row.shareDelta)}` : pct(row.shareDelta))}</div>
+                <div class="plan-tile-progress"><span style="width:${Math.min(Math.max(row.actualShare / Math.max(row.targetShare, 0.001) * 100, 4), 100)}%"></span></div>
+              </article>
+            `).join('')}
+          </div>
+        `;
+      }
+
       function renderOverview() {
         const sales = filteredSales();
         const visibleClientKeys = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
@@ -2167,21 +2546,13 @@
         const groupGaps = clientGroupShareGaps(sales);
         const visibleGroupGaps = state.groupGapMode === 'deficit' ? groupGaps.filter((row) => row.missingGroups > 0) : groupGaps;
         const daily = dailySalesSeries(sales);
-        const groupShareTargets = groupPlanRows(sales)
-          .filter((row) => normalizeProductGroup(row.productGroup) !== normalizeProductGroup(AGGREGATE_PLAN_GROUP))
+        const planShareRows = planGroupShareRows(sales);
+        const planShareHighlights = [...planShareRows]
           .sort((a, b) => {
-            const leftTarget = normalizeProductGroup(a.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : a.share;
-            const rightTarget = normalizeProductGroup(b.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : b.share;
-            return rightTarget - leftTarget || b.factFromSales - a.factFromSales;
+            const severityDelta = Math.abs(b.shareDelta) - Math.abs(a.shareDelta);
+            return severityDelta || b.planAmount - a.planAmount || a.productGroup.localeCompare(b.productGroup, 'uk', { sensitivity: 'base' });
           })
-          .map((row) => ({
-            name: row.productGroup,
-            turnover: row.factFromSales,
-            turnoverShare: total ? row.factFromSales / total * 100 : 0,
-            targetShare: normalizeProductGroup(row.productGroup) === normalizeProductGroup(PROFIT_GROUP_NAME) ? PROFIT_PLAN_PERCENT : row.share,
-            completionPercent: row.completionPercent
-          }))
-          .slice(0, 10);
+          .slice(0, 8);
         const activeClients = new Set(sales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName)).size;
         const avgDailyTurnover = daily.length ? avg(daily, (row) => row.turnover) : 0;
         const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
@@ -2227,7 +2598,7 @@
                   <div>
                     <div class="hero-kicker">Стан місяця</div>
                     <div class="hero-title">Темп, план і перша точка тиску</div>
-                    <div class="hero-copy">Три сигнали для швидкого рішення.</div>
+                    <div class="hero-copy">Швидкий зріз без декоративного шуму.</div>
                   </div>
                   <div class="hero-chip">${escapeHtml(state.month)}</div>
                 </div>
@@ -2254,7 +2625,7 @@
                   <div>
                     <div class="action-kicker">Пріоритет</div>
                     <div class="action-title">Що варто робити далі</div>
-                    <div class="action-copy">Три найближчі точки дії.</div>
+                    <div class="action-copy">Три дії, які зараз реально рухають місяць.</div>
                   </div>
                 </div>
                 <div class="action-stack">
@@ -2289,18 +2660,9 @@
 
             <div class="two-up">
               <div class="chart-shell">
-                <div class="chart-title">Планові долі груп</div>
-                <div class="search-suggestions-grid">
-                  ${groupShareTargets.map((row) => `
-                    <div class="filter-option" style="cursor:default;">
-                      <div style="font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
-                      <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(row.turnover))} · ${escapeHtml(pct(row.turnoverShare))} · ${escapeHtml(pct(row.targetShare))}</div>
-                      <div style="margin-top:10px;height:8px;overflow:hidden;background:rgba(255,255,255,0.08);">
-                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;background:#f0f0f0;"></div>
-                      </div>
-                    </div>
-                  `).join('') || empty('Немає планових груп')}
-                </div>
+                <div class="chart-title">Планові групи: частка і статус</div>
+                <div class="chart-subtle">Тільки групи з плану. Видно факт, ціль і відхилення в єдиній шкалі.</div>
+                ${planTiles(planShareHighlights)}
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Топ клієнтів за прострочкою</div>
@@ -2466,6 +2828,9 @@
         const topClientsChart = byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8);
         const topBrandsChart = byTop(tableRows, (row) => row.brand || 'Без бренду', (row) => row.amountEur, 8);
         const topGroupsChart = byTop(tableRows, (row) => row.productGroup || 'Без групи', (row) => row.amountEur, 8);
+        const planGroups = planGroupShareRows(tableRows);
+        const visibleGroupBars = state.salesGroupView === 'planned' ? planGroupBars(planGroups).slice(0, 8) : topGroupsChart;
+        const laggingPlanGroups = planGroups.filter((row) => row.tone !== 'success');
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
@@ -2482,7 +2847,19 @@
             <div class="three-up">
               <div class="chart-shell"><div class="chart-title">Топ клієнтів за оборотом</div>${bars(topClientsChart)}</div>
               <div class="chart-shell"><div class="chart-title">Топ брендів</div>${bars(topBrandsChart)}</div>
-              <div class="chart-shell"><div class="chart-title">Топ товарних груп</div>${bars(topGroupsChart)}</div>
+              <div class="chart-shell">
+                <div class="chart-head">
+                  <div>
+                    <div class="chart-title">${state.salesGroupView === 'planned' ? 'Планові групи за фактом' : 'Топ груп за оборотом'}</div>
+                    <div class="chart-head-copy">Перемикач дозволяє порівняти весь зріз продажів із фокусом тільки на планових групах.</div>
+                  </div>
+                  <div class="segment-control">
+                    <button class="segment-btn ${state.salesGroupView === 'all' ? 'is-active' : ''}" data-sales-group-view="all" type="button">Всі групи</button>
+                    <button class="segment-btn ${state.salesGroupView === 'planned' ? 'is-active' : ''}" data-sales-group-view="planned" type="button">Лише планові</button>
+                  </div>
+                </div>
+                ${bars(visibleGroupBars)}
+              </div>
             </div>
 
             <div class="insight-grid">
@@ -2511,12 +2888,38 @@
                 ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#8b8170')}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">Структура груп у зрізі</div>
-                ${pie(topGroupsChart, 'Зріз продажів')}
+                <div class="chart-title">Структура планових груп</div>
+                ${pie(planGroupBars(planGroups).slice(0, 8), 'Планова база')}
               </div>
             </div>
 
             <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-head">
+                  <div>
+                    <div class="chart-title">Планові групи: виконання</div>
+                    <div class="chart-head-copy">Тут видно факт, цільову долю й відхилення. Це управлінський блок, а не просто рейтинг обороту.</div>
+                  </div>
+                </div>
+                ${table('salesPlanGroups', planGroups, [
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'Факт', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+                  { title: 'Факт %', key: 'actualShare', sortValue: (row) => row.actualShare, render: (row) => pct(row.actualShare) },
+                  { title: 'Ціль %', key: 'targetShare', sortValue: (row) => row.targetShare, render: (row) => pct(row.targetShare) },
+                  {
+                    title: 'Відхилення',
+                    key: 'shareDelta',
+                    sortValue: (row) => row.shareDelta,
+                    render: (row) => `<span class="${row.tone === 'success' ? 'ok' : row.tone === 'warning' ? 'tone-warning' : 'danger'}">${escapeHtml(row.shareDelta >= 0 ? `+${pct(row.shareDelta)}` : pct(row.shareDelta))}</span>`
+                  },
+                  {
+                    title: 'Статус',
+                    key: 'tone',
+                    sortValue: (row) => ({ danger: 0, warning: 1, success: 2 }[row.tone] || 0),
+                    render: (row) => `<span class="group-status ${escapeHtml(row.tone)}">${escapeHtml(statusLabel(row.tone))}</span>`
+                  }
+                ], { rowKey: (row) => row.productGroup })}
+              </div>
               <div class="chart-shell">
                 <div class="chart-title">Темп по групах</div>
                 ${table('salesTempo', tempoRows, [
@@ -2529,6 +2932,9 @@
                   { title: 'Треба / день', key: 'requiredPerDay', sortValue: (row) => row.requiredPerDay, render: (row) => money(row.requiredPerDay) }
                 ], { rowKey: (row) => row.productGroup })}
               </div>
+            </div>
+
+            <div class="two-up">
               <div class="chart-shell">
                 <div class="chart-title">Покриття PROFIT по клієнтах</div>
                 ${table('profitClients', profitClients, [
@@ -2539,6 +2945,10 @@
                   { title: 'PROFIT %', key: 'profitShare', sortValue: (row) => row.profitShare, render: (row) => pct(row.profitShare) },
                   { title: 'Статус', key: 'hasProfit', sortValue: (row) => Number(row.hasProfit), render: (row) => row.hasProfit ? 'Є PROFIT' : 'Немає PROFIT' }
                 ], { rowKey: (row) => row.clientCode || row.unifiedClientCode || row.clientName })}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Де планові групи просідають</div>
+                ${bars(laggingPlanGroups.slice(0, 8).map((row) => ({ name: row.productGroup, value: Math.abs(row.shareDelta) })), pct, '#d86f61')}
               </div>
             </div>
 
@@ -2619,13 +3029,74 @@
 
       function renderGroups() {
         const rows = groupTempoRows(filteredSales());
+        const shareRows = planGroupShareRows(filteredSales());
+        const laggingRows = rows.filter((row) => row.tempoDelta < 0).slice(0, 8);
+        const leadingRows = [...rows].sort((a, b) => b.completionPercent - a.completionPercent || b.factFromSales - a.factFromSales).slice(0, 8);
+        const successCount = shareRows.filter((row) => row.tone === 'success').length;
+        const warningCount = shareRows.filter((row) => row.tone === 'warning').length;
+        const dangerCount = shareRows.filter((row) => row.tone === 'danger').length;
         document.getElementById('groups').innerHTML = `
           <div class="section-stack">
-            <div class="chart-shell">
-              <div class="chart-title">Групи з найбільшим фактом із продажів</div>
-              ${bars(rows.map((row) => ({ name: row.productGroup, value: row.factFromSales })).sort((a, b) => b.value - a.value).slice(0, 8))}
+            <section class="metric-strip">
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Ок по структурі</div>
+                <div class="metric-strip-value tone-success">${escapeHtml(String(successCount))}</div>
+                <div class="metric-strip-copy">Групи вже на цільовій частці або вище</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">На межі</div>
+                <div class="metric-strip-value tone-warning">${escapeHtml(String(warningCount))}</div>
+                <div class="metric-strip-copy">Потрібне точкове втручання без паніки</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Поза ціллю</div>
+                <div class="metric-strip-value tone-danger">${escapeHtml(String(dangerCount))}</div>
+                <div class="metric-strip-copy">Групи з помітним розривом до планової долі</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Треба в день</div>
+                <div class="metric-strip-value">${escapeHtml(money(sum(rows, (row) => row.requiredPerDay)))}</div>
+                <div class="metric-strip-copy">Сумарний денний темп для закриття плану</div>
+              </div>
+            </section>
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">Планові групи: частка vs ціль</div>
+                ${table('groupsShare', shareRows, [
+                  { title: 'Група', key: 'productGroup' },
+                  { title: 'Факт', key: 'factFromSales', sortValue: (row) => row.factFromSales, render: (row) => money(row.factFromSales) },
+                  { title: 'Факт %', key: 'actualShare', sortValue: (row) => row.actualShare, render: (row) => pct(row.actualShare) },
+                  { title: 'Ціль %', key: 'targetShare', sortValue: (row) => row.targetShare, render: (row) => pct(row.targetShare) },
+                  {
+                    title: 'Відхилення',
+                    key: 'shareDelta',
+                    sortValue: (row) => row.shareDelta,
+                    render: (row) => `<span class="${row.tone === 'success' ? 'ok' : row.tone === 'warning' ? 'tone-warning' : 'danger'}">${escapeHtml(row.shareDelta >= 0 ? `+${pct(row.shareDelta)}` : pct(row.shareDelta))}</span>`
+                  },
+                  {
+                    title: 'Статус',
+                    key: 'tone',
+                    sortValue: (row) => ({ danger: 0, warning: 1, success: 2 }[row.tone] || 0),
+                    render: (row) => `<span class="group-status ${escapeHtml(row.tone)}">${escapeHtml(statusLabel(row.tone))}</span>`
+                  }
+                ], { rowKey: (row) => row.productGroup })}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Планова структура за фактом</div>
+                ${pie(planGroupBars(shareRows).slice(0, 8), 'Планові групи')}
+              </div>
             </div>
-            ${table('groups', rows, [
+            <div class="two-up">
+              <div class="chart-shell">
+                <div class="chart-title">Найбільше відставання по темпу</div>
+                ${bars(laggingRows.map((row) => ({ name: row.productGroup, value: Math.abs(row.tempoDelta) })), money, '#d86f61')}
+              </div>
+              <div class="chart-shell">
+                <div class="chart-title">Лідери виконання</div>
+                ${bars(leadingRows.map((row) => ({ name: row.productGroup, value: row.completionPercent })), pct, '#68b07f')}
+              </div>
+            </div>
+            ${table('groupsTempo', rows, [
               { title: 'Група', key: 'productGroup' },
               { title: 'План %', key: 'planPercent', sortValue: (row) => row.planPercent, render: (row) => pct(row.planPercent) },
               { title: 'Частка від плану', titleHtml: infoLabel('Частка від плану', 'Цільовий відсоток валового плану, який має дати ця товарна група.'), key: 'share', sortValue: (row) => row.share, render: (row) => pct(row.share) },
@@ -2659,24 +3130,13 @@
         const visibleClientKeys = new Set(visibleSales.map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
         const receivables = state.data.receivables.filter((row) => visibleClientKeys.has(row.clientCode || row.unifiedClientCode || row.clientName));
         const deficitClients = clientGroupShareGaps(visibleSales).filter((row) => row.missingGroups > 0);
-        const topOverdueClients = byTop(receivables.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8);
-        const profitClients = profitClientPenetration(visibleSales, 12);
-        const noProfitClient = profitClients.find((row) => !row.hasProfit);
-        const total = sum(visibleSales, (row) => row.amountEur);
-        const profitTurnover = sum(visibleSales.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
-        const profitShare = total ? profitTurnover / total * 100 : 0;
-        const profitGap = Math.max(PROFIT_PLAN_PERCENT - profitShare, 0);
         const todoRows = filteredSalesTodos();
         const todoTags = salesTodoTags();
         const openTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done').length;
+        const doingTodoCount = state.salesTodos.filter((todo) => todo.status === 'doing').length;
         const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
+        const overdueTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done' && todoDueState(todo.dueDate) === 'overdue').length;
         const lanes = ['todo', 'doing', 'done'];
-        const todoSuggestions = [
-          ...(profitGap > 0 ? [{ title: `Дотягнути PROFIT до ${pct(PROFIT_PLAN_PERCENT)}`, clientName: '', tags: ['profit', 'план'], priority: 'high' }] : []),
-          ...(deficitClients[0] ? [{ title: `Розширити матрицю для ${deficitClients[0].clientName}`, clientName: deficitClients[0].clientName, tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)], priority: 'high' }] : []),
-          ...(noProfitClient ? [{ title: `Запустити PROFIT у ${noProfitClient.clientName}`, clientName: noProfitClient.clientName, tags: ['profit', 'penetration'], priority: 'high' }] : []),
-          ...(topOverdueClients[0] ? [{ title: `Закрити прострочку по ${topOverdueClients[0].name}`, clientName: topOverdueClients[0].name, tags: ['дебіторка', 'контроль оплат'], priority: 'medium' }] : [])
-        ];
 
         document.getElementById('todo').innerHTML = `
           <div class="section-stack">
@@ -2684,46 +3144,60 @@
               <div class="metric-strip-item">
                 <div class="metric-strip-label">Активні задачі</div>
                 <div class="metric-strip-value">${escapeHtml(String(openTodoCount))}</div>
-                <div class="metric-strip-copy">У роботі або в черзі</div>
+                <div class="metric-strip-copy">Черга, яку треба розібрати зараз</div>
               </div>
               <div class="metric-strip-item">
-                <div class="metric-strip-label">Підказки</div>
-                <div class="metric-strip-value">${escapeHtml(String(todoSuggestions.length))}</div>
-                <div class="metric-strip-copy">Автоматичні задачі з аналітики</div>
+                <div class="metric-strip-label">В процесі</div>
+                <div class="metric-strip-value">${escapeHtml(String(doingTodoCount))}</div>
+                <div class="metric-strip-copy">Задачі, які вже взяті в роботу</div>
               </div>
               <div class="metric-strip-item">
-                <div class="metric-strip-label">PROFIT gap</div>
-                <div class="metric-strip-value">${escapeHtml(pct(profitGap))}</div>
-                <div class="metric-strip-copy">До цільових ${escapeHtml(pct(PROFIT_PLAN_PERCENT))}</div>
+                <div class="metric-strip-label">Прострочені</div>
+                <div class="metric-strip-value ${overdueTodoCount ? 'tone-danger' : ''}">${escapeHtml(String(overdueTodoCount))}</div>
+                <div class="metric-strip-copy">Потребують уваги сьогодні</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Закрито</div>
+                <div class="metric-strip-value">${escapeHtml(String(doneTodoCount))}</div>
+                <div class="metric-strip-copy">Завершені задачі за цей цикл</div>
               </div>
             </section>
 
             <div class="todo-shell">
               <div class="todo-main">
                 <div class="todo-list-shell">
-                  <div class="section-head" style="margin-bottom:12px;">
-                    <h2>Швидке додавання</h2>
-                    <p class="muted">Короткий класичний ввід: задача, клієнт, теги і пріоритет.</p>
+                  <div class="section-head" style="margin-bottom:10px;">
+                    <h2>Нова задача</h2>
+                    <p class="muted">Один компактний блок для постановки задачі з дедлайном, клієнтом і контекстом.</p>
                   </div>
-                  <div class="todo-quick-grid">
+                  <div class="todo-composer-grid">
                     <input data-sales-todo-draft="title" placeholder="Назва задачі" value="${escapeHtml(state.salesTodoDraft.title)}" />
-                    <input data-sales-todo-draft="clientName" placeholder="Клієнт або сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
-                    <input data-sales-todo-draft="tags" placeholder="Теги через кому: profit, дебіторка, cross-sell" value="${escapeHtml(state.salesTodoDraft.tags)}" />
+                    <input data-sales-todo-draft="clientName" placeholder="Клієнт / сегмент" value="${escapeHtml(state.salesTodoDraft.clientName)}" />
+                    <input data-sales-todo-draft="dueDate" type="date" value="${escapeHtml(state.salesTodoDraft.dueDate)}" />
                     <select data-sales-todo-draft="priority">
                       <option value="high" ${state.salesTodoDraft.priority === 'high' ? 'selected' : ''}>Високий</option>
                       <option value="medium" ${state.salesTodoDraft.priority === 'medium' ? 'selected' : ''}>Середній</option>
                       <option value="low" ${state.salesTodoDraft.priority === 'low' ? 'selected' : ''}>Низький</option>
                     </select>
                   </div>
-                  <div class="todo-actions" style="margin-top:12px; justify-content:space-between; align-items:center;">
-                    <span class="small">PROFIT: <strong style="color:white;">${escapeHtml(pct(profitShare))}</strong></span>
-                    <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
+                  <div class="todo-composer-meta">
+                    <textarea data-sales-todo-draft="description" placeholder="Опис: що саме треба зробити, що перевірити, який очікуваний результат.">${escapeHtml(state.salesTodoDraft.description)}</textarea>
+                    <div class="metric-stack">
+                      <input data-sales-todo-draft="tags" placeholder="Мітки: profit, дебіторка, vip" value="${escapeHtml(state.salesTodoDraft.tags)}" />
+                      <div class="todo-actions" style="justify-content:flex-end;">
+                        <button class="button-primary" data-sales-todo-submit type="button">Створити задачу</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div class="todo-list-shell">
-                  <div class="control-grid">
-                    <input data-sales-todo-filter="search" placeholder="Пошук по задачах, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
+                  <div class="section-head" style="margin-bottom:10px;">
+                    <h2>Контроль задач</h2>
+                    <p class="muted">Фільтри і канбан по одному сценарію: знайти, взяти в роботу, закрити.</p>
+                  </div>
+                  <div class="todo-filter-grid">
+                    <input data-sales-todo-filter="search" placeholder="Пошук по задачах, опису, клієнту або тегах" value="${escapeHtml(state.salesTodoFilters.search)}" />
                     <select data-sales-todo-filter="status">
                       <option value="all" ${state.salesTodoFilters.status === 'all' ? 'selected' : ''}>Усі статуси</option>
                       <option value="todo" ${state.salesTodoFilters.status === 'todo' ? 'selected' : ''}>До роботи</option>
@@ -2737,88 +3211,77 @@
                       <option value="low" ${state.salesTodoFilters.priority === 'low' ? 'selected' : ''}>Низький</option>
                     </select>
                     <select data-sales-todo-filter="tag">
-                      <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі теги</option>
+                      <option value="all" ${state.salesTodoFilters.tag === 'all' ? 'selected' : ''}>Усі мітки</option>
                       ${todoTags.map((tag) => `<option value="${escapeHtml(tag)}" ${state.salesTodoFilters.tag === tag ? 'selected' : ''}>${escapeHtml(tag)}</option>`).join('')}
                     </select>
                   </div>
-                  <div class="todo-section-list">
+                  <div class="todo-board" style="margin-top:12px;">
                     ${lanes.map((status) => {
                       const laneRows = todoRows.filter((todo) => todo.status === status);
                       return `
-                        <section class="todo-section">
-                          <div class="todo-section-head">
+                        <section class="todo-lane ${laneRows.length ? '' : 'empty-lane'}">
+                          <div class="todo-lane-head">
                             <div>
                               <div class="todo-section-title">${escapeHtml(todoStatusLabel(status))}</div>
-                              <div class="todo-section-meta">Задач: ${escapeHtml(String(laneRows.length))}</div>
+                              <div class="todo-lane-copy">${status === 'todo' ? 'Щойно створені й відкладені задачі' : status === 'doing' ? 'Активна операційна робота' : 'Закриті задачі без шуму'}</div>
                             </div>
-                            <span class="todo-badge status-${escapeHtml(status)}">${escapeHtml(todoStatusLabel(status))}</span>
+                            <span class="todo-badge status-${escapeHtml(status)}">${escapeHtml(String(laneRows.length))}</span>
                           </div>
-                          ${laneRows.map((todo) => `
-                            <article class="todo-row">
-                              <div class="todo-row-main">
-                                <button class="todo-row-check ${todo.status === 'done' ? 'done' : ''}" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="${escapeHtml(toggleTodoDone(todo.status))}" type="button">${todo.status === 'done' ? '✓' : '○'}</button>
-                                <div class="todo-row-copy">
-                                  <div class="todo-row-title">${escapeHtml(todo.title)}</div>
-                                  <div class="todo-row-note">${escapeHtml(todo.clientName ? `${todo.clientName} · ` : '')}Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
-                                  <div class="todo-badges" style="margin-top:8px;">
-                                    <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
-                                    ${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}
+                          <div class="todo-section-list">
+                            ${laneRows.map((todo) => {
+                              const dueState = todoDueState(todo.dueDate);
+                              const clientReceivable = receivables.find((row) => row.clientName === todo.clientName || row.clientCode === todo.clientName || row.unifiedClientCode === todo.clientName);
+                              const clientDeficit = deficitClients.find((row) => row.clientName === todo.clientName);
+                              return `
+                                <article class="todo-row">
+                                  <div class="todo-row-main">
+                                    <div class="todo-row-copy">
+                                      <div class="todo-row-title">${escapeHtml(todo.title)}</div>
+                                      ${todo.description ? `<div class="todo-row-note">${escapeHtml(todo.description)}</div>` : ''}
+                                    </div>
+                                    <div class="todo-row-meta">
+                                      ${todo.clientName ? `<span class="todo-client-link">${escapeHtml(todo.clientName)}</span>` : ''}
+                                      <span class="todo-due ${escapeHtml(dueState)}">${escapeHtml(todoDueLabel(todo.dueDate))}</span>
+                                      <span class="todo-badge priority-${escapeHtml(todo.priority)}">${escapeHtml(todoPriorityLabel(todo.priority))}</span>
+                                      <span class="todo-badge status-${escapeHtml(todo.status)}">${escapeHtml(todoStatusLabel(todo.status))}</span>
+                                    </div>
+                                    ${(clientReceivable || clientDeficit || todo.tags.length) ? `
+                                      <div class="todo-badges">
+                                        ${clientReceivable && Number(clientReceivable.overdueDebt || 0) > 0 ? `<span class="todo-badge priority-high">Борг ${escapeHtml(money(clientReceivable.overdueDebt))}</span>` : ''}
+                                        ${clientDeficit ? `<span class="todo-badge priority-medium">Груп не вистачає: ${escapeHtml(String(clientDeficit.missingGroups))}</span>` : ''}
+                                        ${todo.tags.map((tag) => `<button class="chip" data-sales-todo-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`).join('')}
+                                      </div>
+                                    ` : ''}
+                                    <div class="small">Створено ${escapeHtml(new Date(todo.createdAt).toLocaleString('uk-UA'))}</div>
                                   </div>
-                                </div>
+                                  <div class="todo-actions" style="justify-content:space-between; align-items:center;">
+                                    <div class="todo-status-switch">
+                                      ${['todo', 'doing', 'done'].map((nextStatus) => `
+                                        <button
+                                          class="todo-status-btn ${todo.status === nextStatus ? 'is-active' : ''}"
+                                          data-sales-todo-status="${escapeHtml(todo.id)}"
+                                          data-sales-todo-next-status="${escapeHtml(nextStatus)}"
+                                          type="button"
+                                        >${escapeHtml(todoStatusLabel(nextStatus))}</button>
+                                      `).join('')}
+                                    </div>
+                                    <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
+                                  </div>
+                                </article>
+                              `;
+                            }).join('') || `
+                              <div class="todo-empty-card">
+                                <strong style="color:white;">Порожньо</strong>
+                                <span>Тут немає задач за поточними фільтрами.</span>
                               </div>
-                              <div class="todo-actions">
-                                ${todo.status !== 'todo' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="todo" type="button">До роботи</button>` : ''}
-                                ${todo.status !== 'doing' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="doing" type="button">В процес</button>` : ''}
-                                ${todo.status !== 'done' ? `<button class="button-primary" data-sales-todo-status="${escapeHtml(todo.id)}" data-sales-todo-next-status="done" type="button">Готово</button>` : ''}
-                                <button class="button-danger" data-sales-todo-delete="${escapeHtml(todo.id)}" type="button">Видалити</button>
-                              </div>
-                            </article>
-                          `).join('') || '<div class="empty">У цій секції немає задач за активними фільтрами.</div>'}
+                            `}
+                          </div>
                         </section>
                       `;
                     }).join('')}
                   </div>
                 </div>
               </div>
-
-              <aside class="todo-sidebar">
-                <div class="todo-list-shell">
-                  <div class="section-head" style="margin-bottom:12px;">
-                    <h2>Швидкі задачі з аналітики</h2>
-                    <p class="muted">Додаються одним кліком без ручного набору.</p>
-                  </div>
-                  <div class="control-grid">
-                    ${todoSuggestions.map((todo) => `
-                      <button class="filter-option" data-sales-todo-suggest='${escapeHtml(JSON.stringify(todo))}' type="button">
-                        <div style="font-weight:700;color:white;">${escapeHtml(todo.title)}</div>
-                        <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(todo.clientName || 'Загальна задача')} · ${escapeHtml(todoPriorityLabel(todo.priority))}</div>
-                        <div class="chips" style="margin-top:8px;">${todo.tags.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
-                      </button>
-                    `).join('') || '<div class="empty">Немає автоматичних задач для цього зрізу. Можна створити власну задачу вручну.</div>'}
-                  </div>
-                </div>
-
-                <div class="todo-list-shell">
-                  <div class="section-head" style="margin-bottom:12px;">
-                    <h2>Короткий підсумок</h2>
-                    <p class="muted">Ключові цифри по задачах і аналітичному резерву.</p>
-                  </div>
-                  <div class="todo-summary-list">
-                    <div class="metric-card">
-                      <div class="metric-label">Всього задач</div>
-                      <div class="metric-value">${escapeHtml(String(state.salesTodos.length))}</div>
-                    </div>
-                    <div class="metric-card">
-                      <div class="metric-label">Завершено</div>
-                      <div class="metric-value">${escapeHtml(String(doneTodoCount))}</div>
-                    </div>
-                    <div class="metric-card">
-                      <div class="metric-label">Cross-sell клієнти</div>
-                      <div class="metric-value">${escapeHtml(String(deficitClients.length))}</div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
             </div>
           </div>
         `;
@@ -2990,30 +3453,27 @@
           return;
         }
 
-        const todoSuggest = event.target.closest('[data-sales-todo-suggest]');
-        if (todoSuggest) {
-          try {
-            const payload = JSON.parse(todoSuggest.dataset.salesTodoSuggest || '{}');
-            addSalesTodo(payload);
-            renderTodo();
-          } catch {
-            return;
-          }
-          return;
-        }
-
         const todoSubmit = event.target.closest('[data-sales-todo-submit]');
         if (todoSubmit) {
           if (String(state.salesTodoDraft.title || '').trim()) {
             addSalesTodo({
               title: state.salesTodoDraft.title,
+              description: state.salesTodoDraft.description,
               clientName: state.salesTodoDraft.clientName,
+              dueDate: state.salesTodoDraft.dueDate,
               tags: parseTodoTags(state.salesTodoDraft.tags),
               priority: state.salesTodoDraft.priority
             });
-            state.salesTodoDraft = { title: '', clientName: '', tags: '', priority: 'medium' };
+            state.salesTodoDraft = { title: '', description: '', clientName: '', dueDate: '', tags: '', priority: 'medium' };
             renderTodo();
           }
+          return;
+        }
+
+        const salesGroupView = event.target.closest('[data-sales-group-view]');
+        if (salesGroupView) {
+          state.salesGroupView = salesGroupView.dataset.salesGroupView === 'planned' ? 'planned' : 'all';
+          renderSales();
           return;
         }
 
