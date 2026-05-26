@@ -7,28 +7,28 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg: #12161c;
-        --bg-elevated: #171c23;
-        --bg-top: #0f1318;
-        --card: #171c23;
-        --card-2: #1d232c;
-        --card-3: #232b35;
-        --ink: #f2f5f8;
-        --muted: #93a0b1;
-        --muted-strong: #b8c3d1;
-        --line: rgba(164, 179, 198, 0.14);
-        --line-strong: rgba(164, 179, 198, 0.28);
-        --accent: #76a9e5;
-        --accent-soft: rgba(118, 169, 229, 0.14);
-        --neutral-accent: #64748b;
-        --amber: #d4a04f;
-        --red: #d57669;
-        --green: #78b48c;
-        --lime: #8fcb73;
-        --shadow: 0 18px 40px rgba(2, 6, 12, 0.28);
-        --shadow-soft: 0 10px 24px rgba(4, 8, 14, 0.22);
-        --radius-panel: 18px;
-        --radius-control: 12px;
+        --bg: #151515;
+        --bg-elevated: #1a1a1a;
+        --bg-top: #101010;
+        --card: #1c1c1c;
+        --card-2: #212121;
+        --card-3: #252525;
+        --ink: #f4f4f4;
+        --muted: #969696;
+        --muted-strong: #bebebe;
+        --line: rgba(255, 255, 255, 0.08);
+        --line-strong: rgba(255, 255, 255, 0.18);
+        --accent: #ffffff;
+        --accent-soft: rgba(255, 255, 255, 0.08);
+        --neutral-accent: #8f8f8f;
+        --amber: #d8a33d;
+        --red: #d86f61;
+        --green: #68b07f;
+        --lime: #8dc46e;
+        --shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        --shadow-soft: none;
+        --radius-panel: 4px;
+        --radius-control: 4px;
         --radius-pill: 999px;
         --content-max: 1520px;
       }
@@ -40,9 +40,7 @@
         color: var(--ink);
         font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI Variable", "Segoe UI", sans-serif;
         text-rendering: optimizeLegibility;
-        background-image:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-          radial-gradient(circle at top left, rgba(118, 169, 229, 0.08), transparent 28%);
+        background-image: none;
       }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation: none !important; transition-duration: 0ms !important; }
@@ -54,27 +52,22 @@
       a { color: inherit; }
       .app-shell {
         min-height: 100vh;
-        background:
-          linear-gradient(180deg, rgba(11, 16, 22, 0.95), rgba(18, 22, 28, 0.96)),
-          var(--bg);
+        background: var(--bg);
       }
       .content-shell {
         min-width: 0;
         position: relative;
         overflow: hidden;
-        background:
-          linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0)),
-          transparent;
+        background: transparent;
       }
       .sidebar {
         display: none;
         position: sticky;
         top: 0;
         height: 100vh;
-        padding: 22px 16px 18px;
+        padding: 16px 10px;
         border-right: 1px solid var(--line);
-        background: rgba(14, 18, 24, 0.88);
-        backdrop-filter: blur(18px);
+        background: #121212;
       }
       .sidebar-title,
       .nav-section-label {
@@ -86,124 +79,43 @@
       }
       .sidebar-stack {
         display: grid;
-        gap: 18px;
+        gap: 16px;
         height: 100%;
+        justify-items: center;
       }
-      .nav-intro {
-        padding: 18px;
+      .rail-brand {
+        width: 42px;
+        height: 42px;
+        border-radius: 4px;
         border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
-        background: rgba(24, 30, 37, 0.92);
-        box-shadow: var(--shadow-soft);
-      }
-      .brand-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-      .brand-mark {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid rgba(118, 169, 229, 0.22);
-        background: rgba(118, 169, 229, 0.12);
+        background: #202020;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-      }
-      .brand-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: var(--radius-pill);
-        border: 1px solid var(--line);
-        background: rgba(255,255,255,0.03);
-        color: var(--muted-strong);
-        font-size: 11px;
-        font-weight: 700;
-      }
-      .brand-status::before {
-        content: "";
-        width: 7px;
-        height: 7px;
-        border-radius: 999px;
-        background: var(--green);
-      }
-      .nav-intro-title {
-        margin-top: 14px;
-        font-size: 20px;
-        font-weight: 620;
-        letter-spacing: 0;
         color: white;
-      }
-      .nav-intro-copy {
-        margin-top: 8px;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.6;
-      }
-      .nav-support {
-        margin-top: 14px;
-        display: grid;
-        gap: 10px;
-      }
-      .nav-support-item {
-        display: grid;
-        gap: 4px;
-        padding-top: 10px;
-        border-top: 1px solid var(--line);
-      }
-      .nav-support-item:first-child {
-        padding-top: 0;
-        border-top: 0;
-      }
-      .nav-support-label {
-        color: var(--muted);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-      .nav-support-value {
-        color: white;
-        font-size: 15px;
-        font-weight: 700;
       }
       .sidebar-nav {
         display: grid;
         gap: 8px;
         align-content: start;
-      }
-      .nav-logic {
-        padding: 16px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
-        background: rgba(24, 30, 37, 0.8);
-      }
-      .nav-logic-title {
-        margin-top: 8px;
-        font-size: 14px;
-        font-weight: 700;
-        color: white;
-      }
-      .nav-logic-list {
-        margin-top: 10px;
-        display: grid;
-        gap: 8px;
-        font-size: 14px;
-        line-height: 1.5;
-        color: var(--muted);
+        justify-items: center;
       }
       .sidebar-footer {
         margin-top: auto;
-        display: grid;
-        gap: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      .rail-status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 0 3px rgba(104, 176, 127, 0.14);
       }
       main {
         padding: 18px 18px 28px;
@@ -217,8 +129,7 @@
         display: block;
         padding: 12px 12px 10px;
         border-bottom: 1px solid var(--line);
-        background: rgba(14, 18, 24, 0.92);
-        backdrop-filter: blur(16px);
+        background: rgba(17, 17, 17, 0.96);
       }
       .mobile-nav-head {
         display: flex;
@@ -229,12 +140,23 @@
       }
       .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
       button, select, input { font: inherit; }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
       .signal-chip {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         border: 1px solid var(--line);
-        border-radius: var(--radius-pill);
+        border-radius: 999px;
         padding: 6px 12px;
         background: var(--card-2);
         color: var(--muted);
@@ -247,58 +169,80 @@
       .tab {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+        justify-content: center;
+        gap: 8px;
         border: 1px solid var(--line);
-        background: rgba(255,255,255,0.02);
+        background: #202020;
         color: var(--muted);
-        border-radius: 14px;
-        padding: 13px 14px;
+        border-radius: var(--radius-control);
+        padding: 11px 12px;
         cursor: pointer;
         text-align: left;
         transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
-      .tab::before {
-        content: attr(data-icon);
+      .tab-icon {
+        width: 16px;
+        height: 16px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 8px;
-        background: rgba(255,255,255,0.04);
-        color: var(--muted-strong);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
+        color: currentColor;
         flex: 0 0 auto;
       }
+      .tab-icon svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+        stroke: currentColor;
+      }
+      .tab-label { white-space: nowrap; }
       .tab:hover {
         border-color: var(--line-strong);
-        background: rgba(255,255,255,0.04);
+        background: #252525;
         transform: translateY(-1px);
       }
       .tab.active {
-        background: rgba(118, 169, 229, 0.12);
-        border-color: rgba(118, 169, 229, 0.34);
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #111111;
+      }
+      .rail-tab {
+        position: relative;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+      }
+      .rail-tab .tab-label { display: none; }
+      .rail-tab::after {
+        content: attr(data-label);
+        position: absolute;
+        left: calc(100% + 10px);
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 7px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: #111111;
         color: white;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 140ms ease;
       }
-      .tab.active::before {
-        background: rgba(118, 169, 229, 0.18);
-        color: var(--accent);
-      }
+      .rail-tab:hover::after { opacity: 1; }
       .page-header {
         display: flex;
         flex-wrap: wrap;
         align-items: end;
         justify-content: space-between;
         gap: 16px;
-        margin-bottom: 18px;
-        padding: 20px 22px;
-        border: 1px solid var(--line);
-        border-radius: calc(var(--radius-panel) + 4px);
-        background: rgba(23, 28, 35, 0.88);
-        box-shadow: var(--shadow-soft);
+        margin-bottom: 12px;
+        padding: 4px 0 10px;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        box-shadow: none;
         animation: fadeUp 420ms ease-out both;
       }
       .page-header h1 { margin: 0; }
@@ -310,28 +254,29 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 12px;
-        padding: 7px 12px;
-        border-radius: var(--radius-pill);
-        border: 1px solid rgba(118, 169, 229, 0.18);
-        background: rgba(118, 169, 229, 0.08);
-        color: var(--muted-strong);
+        margin-bottom: 10px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: .14em;
       }
       .page-header-stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(120px, 1fr));
-        gap: 10px;
-        min-width: min(100%, 420px);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-width: 0;
+        justify-content: flex-end;
       }
       .page-header-stat {
-        padding: 14px 14px 12px;
+        min-width: 156px;
+        padding: 10px 12px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(255,255,255,0.02);
+        border-radius: var(--radius-control);
+        background: transparent;
       }
       .page-header-stat-label {
         color: var(--muted);
@@ -341,16 +286,16 @@
         text-transform: uppercase;
       }
       .page-header-stat-value {
-        margin-top: 8px;
+        margin-top: 6px;
         color: white;
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 680;
         letter-spacing: -0.01em;
       }
       .page-header-stat-copy {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
       }
       .toolbar {
         display: grid;
@@ -358,13 +303,13 @@
         z-index: 40;
         isolation: isolate;
         overflow: visible;
-        gap: 16px;
-        margin: 18px 0;
+        gap: 12px;
+        margin: 16px 0 18px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 16px;
-        background: rgba(23, 28, 35, 0.88);
-        box-shadow: var(--shadow-soft);
+        padding: 14px;
+        background: transparent;
+        box-shadow: none;
         transition: border-color 180ms ease, background-color 180ms ease;
         animation: fadeUp 420ms ease-out both;
       }
@@ -380,38 +325,40 @@
         gap: 12px;
       }
       .toolbar-title {
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 700;
         color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
       .toolbar-copy {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
       }
       .toolbar-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
       }
-      .toolbar label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; flex: 1 1 220px; min-width: 0; text-transform: uppercase; letter-spacing: 0.06em; }
+      .toolbar label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; flex: 1 1 220px; min-width: 0; text-transform: uppercase; letter-spacing: 0.08em; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
       input, select {
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
-        background: rgba(13, 17, 23, 0.82);
+        background: #181818;
         color: var(--ink);
         padding: 12px 14px;
         min-width: 0;
         width: 100%;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        box-shadow: none;
         transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
       }
       input:hover, select:hover { border-color: var(--line-strong); }
       input:focus-visible, select:focus-visible, button:focus-visible {
         outline: none;
-        border-color: rgba(118, 169, 229, 0.44);
-        box-shadow: 0 0 0 3px rgba(118, 169, 229, 0.14);
+        border-color: rgba(255, 255, 255, 0.34);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
       }
       select {
         appearance: none;
@@ -420,8 +367,8 @@
       .mode-pills { display: flex; flex-wrap: wrap; gap: 8px; }
       .mode-pill {
         border: 1px solid var(--line);
-        border-radius: var(--radius-pill);
-        background: rgba(255,255,255,0.03);
+        border-radius: var(--radius-control);
+        background: #202020;
         color: var(--muted);
         padding: 10px 14px;
         font-size: 13px;
@@ -433,9 +380,9 @@
         transform: translateY(-1px);
       }
       .mode-pill.active {
-        border-color: rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.12);
-        color: white;
+        border-color: white;
+        background: white;
+        color: #111111;
       }
       .search-wrap { position: relative; z-index: 80; }
       .search-suggestions {
@@ -447,8 +394,8 @@
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
-        background: rgba(13, 17, 23, 0.96);
-        box-shadow: var(--shadow-soft);
+        background: #111111;
+        box-shadow: var(--shadow);
       }
       .search-suggestions-grid {
         display: grid;
@@ -471,7 +418,7 @@
       }
       .search-suggestion:hover {
         border-color: var(--line-strong);
-        background: rgba(118, 169, 229, 0.1);
+        background: #262626;
       }
       h1 { margin: 6px 0 4px; font-size: clamp(24px, 3.4vw, 34px); font-weight: 680; letter-spacing: -0.02em; }
       h2 { margin: 0; font-size: 20px; font-weight: 680; letter-spacing: -0.01em; }
@@ -483,9 +430,7 @@
       .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
       .two-up { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr); }
       .three-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-      .overview-kpis .kpi:first-child {
-        grid-column: span 2;
-      }
+      .overview-kpis .kpi:first-child { grid-column: span 2; }
       .overview-hero {
         display: grid;
         gap: 16px;
@@ -495,8 +440,8 @@
       .action-panel {
         border: 1px solid var(--line);
         border-radius: calc(var(--radius-panel) + 2px);
-        background: rgba(23, 28, 35, 0.9);
-        box-shadow: var(--shadow-soft);
+        background: transparent;
+        box-shadow: none;
       }
       .hero-panel {
         padding: 18px;
@@ -528,18 +473,18 @@
       .action-copy {
         margin-top: 6px;
         color: var(--muted);
-        font-size: 13px;
-        line-height: 1.6;
-        max-width: 60ch;
+        font-size: 11px;
+        line-height: 1.45;
+        max-width: 40ch;
       }
       .hero-chip {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         padding: 7px 11px;
-        border-radius: var(--radius-pill);
+        border-radius: var(--radius-control);
         border: 1px solid var(--line);
-        background: rgba(255,255,255,0.03);
+        background: #1f1f1f;
         color: var(--muted-strong);
         font-size: 11px;
         font-weight: 800;
@@ -556,8 +501,8 @@
       .hero-stat {
         padding: 14px 14px 12px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(255,255,255,0.02);
+        border-radius: var(--radius-control);
+        background: #1c1c1c;
       }
       .hero-stat-label {
         color: var(--muted);
@@ -595,8 +540,8 @@
         gap: 6px;
         padding: 13px 14px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(255,255,255,0.02);
+        border-radius: var(--radius-control);
+        background: #1c1c1c;
       }
       .action-item-meta {
         display: flex;
@@ -617,8 +562,8 @@
       }
       .action-item-copy {
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.5;
+        font-size: 11px;
+        line-height: 1.45;
       }
       .tone-success { color: var(--green); }
       .tone-warning { color: var(--amber); }
@@ -629,14 +574,14 @@
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
         padding: 16px;
-        box-shadow: var(--shadow-soft);
+        box-shadow: none;
         transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
         animation: fadeUp 420ms ease-out both;
       }
       .card:hover {
         transform: translateY(-1px);
         border-color: var(--line-strong);
-        box-shadow: 0 14px 30px rgba(4, 8, 14, 0.18);
+        box-shadow: none;
       }
       .kpi {
         position: relative;
@@ -648,10 +593,10 @@
         content: '';
         position: absolute;
         left: 0;
-        top: 14px;
-        bottom: 14px;
-        width: 3px;
-        border-radius: 99px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        border-radius: 0;
         background: var(--kpi-accent, var(--accent));
       }
       .kpi::after {
@@ -667,7 +612,7 @@
       .kpi .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; max-width: 22ch; line-height: 1.35; }
       .kpi .value { margin-top: 16px; font-size: clamp(23px, 2.2vw, 30px); line-height: 1; font-weight: 700; color: white; letter-spacing: -0.03em; }
       .kpi .muted { margin-top: 14px; font-size: 12px; line-height: 1.55; max-width: 34ch; }
-      .kpi.info { --kpi-accent: var(--accent); }
+      .kpi.info { --kpi-accent: #ffffff; }
       .kpi.success { --kpi-accent: var(--green); }
       .kpi.warning { --kpi-accent: var(--amber); }
       .kpi.danger { --kpi-accent: var(--red); }
@@ -678,9 +623,9 @@
         gap: 0;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: rgba(23, 28, 35, 0.86);
+        background: transparent;
         overflow: hidden;
-        box-shadow: var(--shadow-soft);
+        box-shadow: none;
       }
       .metric-strip-item {
         min-width: 0;
@@ -708,12 +653,12 @@
         font-size: 12px;
         line-height: 1.45;
       }
-      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--card); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: var(--shadow-soft); }
+      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: transparent; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: none; }
       .table-wrap.tall { max-height: 30rem; overflow-y: auto; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { position: relative; }
-      th { background: rgba(29, 35, 44, 0.96); font-weight: 750; color: var(--ink); }
+      th { background: #1d1d1d; font-weight: 750; color: var(--ink); }
       td { color: var(--ink); }
       .table-wrap.tall th { position: sticky; top: 0; z-index: 1; }
       tr:last-child td { border-bottom: 0; }
@@ -748,9 +693,9 @@
         cursor: pointer;
       }
       .filter-trigger.active {
-        border-color: rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.12);
-        color: white;
+        border-color: white;
+        background: white;
+        color: #111111;
       }
       .filter-panel {
         display: grid;
@@ -758,8 +703,8 @@
         padding: 14px;
         border-radius: var(--radius-panel);
         border: 1px solid var(--line);
-        background: rgba(13, 17, 23, 0.96);
-        box-shadow: var(--shadow-soft);
+        background: #111111;
+        box-shadow: var(--shadow);
       }
       .filter-panel-wrap {
         position: relative;
@@ -790,8 +735,9 @@
       }
       .filter-option:hover { border-color: var(--line-strong); transform: none; }
       .filter-option.active {
-        border-color: rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.12);
+        border-color: white;
+        background: #f2f2f2;
+        color: #111111;
       }
       .filter-summary { display: flex; flex-wrap: wrap; gap: 8px; }
       .filter-summary-chip {
@@ -799,9 +745,9 @@
         align-items: center;
         gap: 8px;
         padding: 7px 10px;
-        border-radius: var(--radius-pill);
-        border: 1px solid rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.12);
+        border-radius: var(--radius-control);
+        border: 1px solid var(--line-strong);
+        background: #232323;
         color: white;
         font-size: 12px;
         font-weight: 700;
@@ -816,7 +762,7 @@
       }
       .table-count {
         padding: 10px 14px;
-        border-radius: var(--radius-pill);
+        border-radius: var(--radius-control);
         border: 1px solid var(--line);
         background: var(--card-2);
         color: white;
@@ -833,23 +779,23 @@
         border: 1px solid var(--line);
         font-size: 10px;
         font-weight: 700;
-        color: var(--accent);
-        background: rgba(118, 169, 229, 0.12);
+        color: white;
+        background: #202020;
       }
       .bar-list { display: grid; gap: 10px; }
       .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; transition: background-color 140ms ease; }
       .bar-row:hover { background: rgba(255,255,255,0.03); }
-      .bar-bg { height: 12px; overflow: hidden; border-radius: var(--radius-pill); background: rgba(164, 179, 198, 0.12); }
-      .bar { height: 100%; border-radius: inherit; background: var(--accent); transition: width 260ms ease, filter 140ms ease; }
+      .bar-bg { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+      .bar { height: 100%; border-radius: inherit; background: #efefef; transition: width 260ms ease, filter 140ms ease; }
       .bar-row:hover .bar { filter: saturate(1.12) brightness(1.08); }
       .status-red { color: var(--red); font-weight: 800; }
       .status-green { color: var(--green); font-weight: 800; }
       .status-lime { color: var(--lime); font-weight: 900; }
       .danger { color: var(--red); }
       .ok { color: var(--green); }
-      .empty { padding: 24px; border: 1px dashed var(--line); border-radius: var(--radius-panel); background: rgba(23, 28, 35, 0.78); color: var(--muted); }
+      .empty { padding: 20px; border: 1px dashed var(--line); border-radius: var(--radius-panel); background: transparent; color: var(--muted); }
       .small { font-size: 12px; color: var(--muted); }
-      .pill { display: inline-block; padding: 5px 9px; border-radius: var(--radius-pill); background: rgba(118, 169, 229, 0.12); color: var(--ink); font-size: 12px; font-weight: 700; }
+      .pill { display: inline-block; padding: 5px 9px; border-radius: var(--radius-control); background: #232323; color: var(--ink); font-size: 12px; font-weight: 700; }
       .expandable-row { cursor: pointer; }
       .expandable-row:hover { background: rgba(255,255,255,0.03); }
       .expand-card {
@@ -866,7 +812,7 @@
         align-items: center;
         padding: 6px 10px;
         border-radius: var(--radius-pill);
-        background: rgba(118, 169, 229, 0.12);
+        background: #232323;
         color: var(--ink);
         font-size: 12px;
         font-weight: 700;
@@ -910,11 +856,11 @@
       .chart-shell {
         display: grid;
         gap: 14px;
-        padding: 18px;
+        padding: 16px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: rgba(23, 28, 35, 0.88);
-        box-shadow: var(--shadow-soft);
+        background: transparent;
+        box-shadow: none;
       }
       .chart-title { font-size: 15px; font-weight: 750; letter-spacing: -0.01em; }
       .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
@@ -930,9 +876,9 @@
         pointer-events: none;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: rgba(13, 17, 23, 0.98);
+        background: #101010;
         color: white;
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow);
         padding: 10px 12px;
         opacity: 0;
         transform: translateY(6px);
@@ -943,8 +889,8 @@
       .chart-tooltip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
       .chart-tooltip-row strong { color: white; }
       .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 18px; background: var(--card-2); box-shadow: var(--shadow-soft); }
-      .insight .meta { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 18px; background: transparent; box-shadow: none; }
+      .insight .meta { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
       .insight .big { margin-top: 10px; color: white; font-size: 28px; font-weight: 900; letter-spacing: -0.03em; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
       .metric-stack { display: grid; gap: 10px; }
@@ -952,8 +898,8 @@
         padding: 14px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: var(--card-2);
-        box-shadow: var(--shadow-soft);
+        background: transparent;
+        box-shadow: none;
       }
       .metric-label {
         color: var(--muted);
@@ -985,13 +931,13 @@
         transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
       .button-primary {
-        border: 1px solid rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.12);
-        color: white;
+        border: 1px solid white;
+        background: white;
+        color: #111111;
       }
       .button-danger {
-        border: 1px solid rgba(201, 107, 93, 0.32);
-        background: rgba(201, 107, 93, 0.12);
+        border: 1px solid rgba(216, 111, 97, 0.4);
+        background: transparent;
         color: var(--red);
       }
       .button-primary:hover,
@@ -1002,8 +948,8 @@
       .todo-list-shell {
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: var(--card);
-        box-shadow: var(--shadow-soft);
+        background: transparent;
+        box-shadow: none;
         padding: 16px;
       }
       .todo-quick-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
@@ -1018,14 +964,14 @@
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        background: var(--card-2);
-        box-shadow: var(--shadow-soft);
+        background: #1d1d1d;
+        box-shadow: none;
         transition: border-color 160ms ease, background-color 160ms ease;
       }
       .todo-row:hover {
         transform: translateY(-1px);
         border-color: var(--line-strong);
-        background: var(--card-3);
+        background: #222222;
       }
       .todo-row-main { display: flex; align-items: flex-start; gap: 10px; }
       .todo-row-check {
@@ -1036,8 +982,8 @@
         height: 20px;
         margin-top: 2px;
         border-radius: 8px;
-        border: 1px solid rgba(118, 169, 229, 0.34);
-        background: rgba(118, 169, 229, 0.08);
+        border: 1px solid var(--line-strong);
+        background: #232323;
         color: white;
         font-size: 10px;
         font-weight: 800;
@@ -1062,7 +1008,7 @@
         font-size: 11px;
         font-weight: 700;
       }
-      .todo-badge.status-todo { border-color: rgba(118, 169, 229, 0.34); background: rgba(118, 169, 229, 0.12); color: white; }
+      .todo-badge.status-todo { border-color: var(--line-strong); background: #232323; color: white; }
       .todo-badge.status-doing { border-color: rgba(192, 139, 62, 0.42); background: rgba(192, 139, 62, 0.14); color: var(--amber); }
       .todo-badge.status-done { border-color: rgba(120, 166, 106, 0.42); background: rgba(120, 166, 106, 0.12); color: var(--green); }
       .todo-badge.priority-high { border-color: rgba(201, 107, 93, 0.38); background: rgba(201, 107, 93, 0.14); color: var(--red); }
@@ -1071,7 +1017,7 @@
       .todo-sidebar { display: grid; gap: 14px; }
       .todo-summary-list { display: grid; gap: 10px; margin-top: 12px; }
       @media (min-width: 980px) {
-        .app-shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); }
+        .app-shell { display: grid; grid-template-columns: 72px minmax(0, 1fr); }
         .sidebar { display: block; }
         .mobile-nav { display: none; }
         main { padding: 22px 22px 28px; }
@@ -1103,9 +1049,7 @@
         }
         .table-meta { align-items: stretch; }
         th, td { padding: 10px 10px; }
-        .tab {
-          min-width: 132px;
-        }
+        .tab { min-width: 104px; }
       }
       @media (max-width: 640px) {
         h1 { font-size: 25px; }
@@ -1133,56 +1077,36 @@
     <div class="app-shell">
       <aside class="sidebar">
         <div class="sidebar-stack">
-          <div class="nav-intro">
-            <div class="brand-row">
-              <div class="brand-mark">CTP</div>
-              <div class="brand-status">System online</div>
-            </div>
-            <div class="nav-intro-title">Revenue control cockpit</div>
-            <div class="nav-intro-copy">Операційна панель для місячного темпу, структури продажів, дебіторки та щоденних дій команди.</div>
-            <div class="nav-support">
-              <div class="nav-support-item">
-                <div class="nav-support-label">Primary source</div>
-                <div class="nav-support-value">Олексієнко.xlsx</div>
-              </div>
-              <div class="nav-support-item">
-                <div class="nav-support-label">Primary scenario</div>
-                <div class="nav-support-value">План, тиск, дія</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="sidebar-title" style="margin:2px 0 10px;">Навігація</div>
-            <nav class="sidebar-nav">
-              <button class="tab active" data-tab="overview" data-icon="OV">Огляд</button>
-              <button class="tab" data-tab="sales" data-icon="SL">Продажі</button>
-              <button class="tab" data-tab="todo" data-icon="TD">Todo</button>
-              <button class="tab" data-tab="groups" data-icon="GP">План груп</button>
-              <button class="tab" data-tab="receivables" data-icon="AR">Дебіторка</button>
-              <button class="tab" data-tab="tires" data-icon="TR">Шини</button>
-            </nav>
-          </div>
+          <div class="rail-brand" aria-hidden="true">CTP</div>
+          <nav class="sidebar-nav" aria-label="Навігація">
+            <button class="tab rail-tab active" data-tab="overview" data-label="Огляд" aria-label="Огляд" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg></span>
+              <span class="tab-label">Огляд</span>
+            </button>
+            <button class="tab rail-tab" data-tab="sales" data-label="Продажі" aria-label="Продажі" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 20V10"></path><path d="M12 20V4"></path><path d="M20 20v-7"></path></svg></span>
+              <span class="tab-label">Продажі</span>
+            </button>
+            <button class="tab rail-tab" data-tab="todo" data-label="Todo" aria-label="Todo" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M9 11l2 2 4-4"></path><rect x="4" y="4" width="16" height="16"></rect></svg></span>
+              <span class="tab-label">Todo</span>
+            </button>
+            <button class="tab rail-tab" data-tab="groups" data-label="План груп" aria-label="План груп" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16"></path><path d="M4 16h16"></path><path d="M8 4v16"></path></svg></span>
+              <span class="tab-label">План груп</span>
+            </button>
+            <button class="tab rail-tab" data-tab="receivables" data-label="Дебіторка" aria-label="Дебіторка" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16v8H4z"></path><path d="M8 12h4"></path></svg></span>
+              <span class="tab-label">Дебіторка</span>
+            </button>
+            <button class="tab rail-tab" data-tab="tires" data-label="Шини" aria-label="Шини" type="button">
+              <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></span>
+              <span class="tab-label">Шини</span>
+            </button>
+          </nav>
 
           <div class="sidebar-footer">
-            <div class="nav-logic">
-              <div class="nav-section-label">Logic</div>
-              <div class="nav-logic-title">Three questions</div>
-              <div class="nav-logic-list">
-                <div>Where are we behind?</div>
-                <div>Why is it happening?</div>
-                <div>What should be done next?</div>
-              </div>
-            </div>
-            <div class="nav-logic">
-              <div class="nav-section-label">Operating mode</div>
-              <div class="nav-logic-title">Compact, analytical, daily-use</div>
-              <div class="nav-logic-list">
-                <div>Numbers must read instantly</div>
-                <div>Filters must match visible data</div>
-                <div>No fake states, no decorative noise</div>
-              </div>
-            </div>
+            <div class="rail-status-dot" title="System online"></div>
           </div>
         </div>
       </aside>
@@ -1192,42 +1116,42 @@
           <div class="mobile-nav-head">
             <div>
               <div class="nav-section-label">CargoTP</div>
-              <div style="margin-top:4px;font-size:14px;font-weight:700;color:white;">Revenue control cockpit</div>
+              <div style="margin-top:4px;font-size:13px;font-weight:700;color:white;">Dashboard</div>
             </div>
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;">Live ops</div>
+            <div class="rail-status-dot" title="System online"></div>
           </div>
           <div class="mobile-tabs">
-            <button class="tab active" data-tab="overview" data-icon="OV">Огляд</button>
-            <button class="tab" data-tab="sales" data-icon="SL">Продажі</button>
-            <button class="tab" data-tab="todo" data-icon="TD">Todo</button>
-            <button class="tab" data-tab="groups" data-icon="GP">План груп</button>
-            <button class="tab" data-tab="receivables" data-icon="AR">Дебіторка</button>
-            <button class="tab" data-tab="tires" data-icon="TR">Шини</button>
+            <button class="tab active" data-tab="overview" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg></span><span class="tab-label">Огляд</span></button>
+            <button class="tab" data-tab="sales" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 20V10"></path><path d="M12 20V4"></path><path d="M20 20v-7"></path></svg></span><span class="tab-label">Продажі</span></button>
+            <button class="tab" data-tab="todo" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M9 11l2 2 4-4"></path><rect x="4" y="4" width="16" height="16"></rect></svg></span><span class="tab-label">Todo</span></button>
+            <button class="tab" data-tab="groups" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16"></path><path d="M4 16h16"></path><path d="M8 4v16"></path></svg></span><span class="tab-label">Групи</span></button>
+            <button class="tab" data-tab="receivables" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 8h16v8H4z"></path><path d="M8 12h4"></path></svg></span><span class="tab-label">Борг</span></button>
+            <button class="tab" data-tab="tires" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></span><span class="tab-label">Шини</span></button>
           </div>
         </div>
 
         <main>
           <section class="page-header">
             <div class="page-header-meta">
-              <div class="page-kicker">Control center · <span id="page-kicker-label">Огляд</span></div>
+              <div class="page-kicker"><span id="page-kicker-label">Огляд</span></div>
               <h1 id="page-title">Огляд</h1>
               <p class="muted" id="updated">Завантаження даних...</p>
             </div>
             <div class="page-header-stats">
               <div class="page-header-stat">
-                <div class="page-header-stat-label" id="header-stat-1-label">Main scenario</div>
-                <div class="page-header-stat-value" id="header-stat-1-value">Tempo to action</div>
-                <div class="page-header-stat-copy" id="header-stat-1-copy">Один головний рабочий контур на экран</div>
+                <div class="page-header-stat-label" id="header-stat-1-label">Фокус</div>
+                <div class="page-header-stat-value" id="header-stat-1-value">Темп</div>
+                <div class="page-header-stat-copy" id="header-stat-1-copy">Один головний контур на екран</div>
               </div>
               <div class="page-header-stat">
-                <div class="page-header-stat-label" id="header-stat-2-label">Density</div>
+                <div class="page-header-stat-label" id="header-stat-2-label">Щільність</div>
                 <div class="page-header-stat-value" id="header-stat-2-value">Compact</div>
-                <div class="page-header-stat-copy" id="header-stat-2-copy">Метрики, графики и таблицы без перегруза</div>
+                <div class="page-header-stat-copy" id="header-stat-2-copy">Метрики й таблиці без шуму</div>
               </div>
               <div class="page-header-stat">
-                <div class="page-header-stat-label" id="header-stat-3-label">Visual tone</div>
+                <div class="page-header-stat-label" id="header-stat-3-label">Тон</div>
                 <div class="page-header-stat-value" id="header-stat-3-value">Calm premium</div>
-                <div class="page-header-stat-copy" id="header-stat-3-copy">Тихий контраст и рабочая иерархия</div>
+                <div class="page-header-stat-copy" id="header-stat-3-copy">Тихий контраст і робоча ієрархія</div>
               </div>
             </div>
           </section>
@@ -1235,12 +1159,8 @@
           <div class="toolbar">
             <div class="toolbar-head">
               <div>
-                <div class="toolbar-title">Command bar</div>
-                <div class="toolbar-copy">Місяць, пошук, план і режим зрізу керують усіма робочими блоками нижче.</div>
-              </div>
-              <div class="toolbar-actions">
-                <div class="signal-chip">State <strong>Live</strong></div>
-                <div class="signal-chip">Mode <strong>Operational</strong></div>
+                <div class="toolbar-title">Фільтри</div>
+                <div class="toolbar-copy">Один набір керує всіма блоками на поточній вкладці.</div>
               </div>
             </div>
             <div class="toolbar-grid">
@@ -1277,7 +1197,7 @@
       const PROFIT_GROUP_NAME = 'PROFIT';
       const PROFIT_PLAN_PERCENT = 9;
       const TODO_STORAGE_KEY = 'cargotp-sales-todos-v1';
-      const COLORS = ['#76a9e5', '#78b48c', '#d4a04f', '#d57669', '#64748b', '#9db7d6', '#a0b4c8', '#8aa57f'];
+      const COLORS = ['#f0f0f0', '#68b07f', '#d8a33d', '#d86f61', '#8f8f8f', '#d0d0d0', '#b4b4b4', '#7f7f7f'];
       let state = {
         data: null,
         activeTab: 'overview',
@@ -1328,12 +1248,12 @@
         tires: 'Шини'
       };
       const pageKickers = {
-        overview: 'Operations overview',
-        sales: 'Sales workspace',
-        todo: 'Action workspace',
-        groups: 'Group pace',
-        receivables: 'Payment pressure',
-        tires: 'Segment watch'
+        overview: 'Операційний зріз',
+        sales: 'Робочий контур продажів',
+        todo: 'Черга дій',
+        groups: 'Темп груп',
+        receivables: 'Платіжний контур',
+        tires: 'Шинний сегмент'
       };
 
       const money = (value) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -1835,39 +1755,39 @@
         const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
 
         if (tabId === 'sales') {
-          setHeaderStat(1, 'Visible turnover', money(salesTotal), `Фільтри застосовані до всіх блоків за ${state.month}`);
-          setHeaderStat(2, 'PROFIT share', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · cross-sell клієнтів: ${deficitClients.length}`);
-          setHeaderStat(3, 'Tempo delta', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у command bar');
+          setHeaderStat(1, 'Оборот зрізу', money(salesTotal), `Фільтри застосовані до всіх блоків за ${state.month}`);
+          setHeaderStat(2, 'Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · cross-sell клієнтів: ${deficitClients.length}`);
+          setHeaderStat(3, 'Темп', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у фільтрах');
           return;
         }
         if (tabId === 'todo') {
-          setHeaderStat(1, 'Open tasks', String(openTodoCount), `Завершено: ${doneTodoCount}`);
-          setHeaderStat(2, 'Cross-sell queue', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
-          setHeaderStat(3, 'Receivable pressure', money(overdue), 'Підказки для задач формуються з аналітики');
+          setHeaderStat(1, 'Активні задачі', String(openTodoCount), `Завершено: ${doneTodoCount}`);
+          setHeaderStat(2, 'Черга cross-sell', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+          setHeaderStat(3, 'Тиск дебіторки', money(overdue), 'Підказки для задач формуються з аналітики');
           return;
         }
         if (tabId === 'groups') {
-          setHeaderStat(1, 'Lagging groups', String(laggingGroups.length), `Групи нижче темпу у ${state.month}`);
-          setHeaderStat(2, 'Worst gap', laggingGroups[0] ? money(laggingGroups[0].tempoDelta) : money(0), laggingGroups[0] ? laggingGroups[0].productGroup : 'Критичного відставання не видно');
-          setHeaderStat(3, 'Required/day', money(sum(groupRows, (row) => row.requiredPerDay)), 'Сумарний ритм для закриття плану');
+          setHeaderStat(1, 'Групи нижче темпу', String(laggingGroups.length), `Поточний місяць: ${state.month}`);
+          setHeaderStat(2, 'Найгірший розрив', laggingGroups[0] ? money(laggingGroups[0].tempoDelta) : money(0), laggingGroups[0] ? laggingGroups[0].productGroup : 'Критичного відставання не видно');
+          setHeaderStat(3, 'Потрібно в день', money(sum(groupRows, (row) => row.requiredPerDay)), 'Сумарний темп для закриття плану');
           return;
         }
         if (tabId === 'receivables') {
-          setHeaderStat(1, 'Overdue debt', money(overdue), 'Клієнти з прострочкою потребують пріоритезації');
-          setHeaderStat(2, '31+ share', pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0), 'Частка найважчого вікового бакета');
-          setHeaderStat(3, 'Risk clients', String(receivables.filter((row) => row.overdueDebt > 0).length), 'Клієнтів з активним overdue');
+          setHeaderStat(1, 'Прострочка', money(overdue), 'Клієнти з прострочкою потребують пріоритезації');
+          setHeaderStat(2, 'Частка 31+', pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0), 'Найважчий віковий бакет');
+          setHeaderStat(3, 'Ризикові клієнти', String(receivables.filter((row) => row.overdueDebt > 0).length), 'Клієнтів з активним overdue');
           return;
         }
         if (tabId === 'tires') {
-          setHeaderStat(1, 'Tire turnover', money(sum(tireSales, (row) => row.amountEur)), `Клієнтів сегмента: ${new Set(tireSales.map((row) => row.clientName)).size}`);
-          setHeaderStat(2, 'Avg margin', pct(avg(tireSales, (row) => row.netMargin)), 'Окремий контроль сегмента шин');
-          setHeaderStat(3, 'Overdue clients', String(new Set(tireSales.filter((sale) => (state.data.receivables.find((row) => row.clientName === sale.clientName || row.clientCode === sale.clientCode)?.overdueDebt || 0) > 0).map((row) => row.clientName)).size), 'Шини + оплатний ризик');
+          setHeaderStat(1, 'Оборот шин', money(sum(tireSales, (row) => row.amountEur)), `Клієнтів сегмента: ${new Set(tireSales.map((row) => row.clientName)).size}`);
+          setHeaderStat(2, 'Сер. маржа', pct(avg(tireSales, (row) => row.netMargin)), 'Окремий контроль сегмента шин');
+          setHeaderStat(3, 'Клієнти з боргом', String(new Set(tireSales.filter((sale) => (state.data.receivables.find((row) => row.clientName === sale.clientName || row.clientCode === sale.clientCode)?.overdueDebt || 0) > 0).map((row) => row.clientName)).size), 'Шини + оплатний ризик');
           return;
         }
 
-        setHeaderStat(1, 'Tempo delta', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у command bar');
-        setHeaderStat(2, 'Overdue debt', money(overdue), `31+ у структурі: ${pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0)}`);
-        setHeaderStat(3, 'Cross-sell reserve', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+        setHeaderStat(1, 'Темп', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у фільтрах');
+        setHeaderStat(2, 'Прострочка', money(overdue), `31+ у структурі: ${pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0)}`);
+        setHeaderStat(3, 'Cross-sell резерв', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
       }
 
       function groupTempoRows(rows) {
@@ -2113,7 +2033,7 @@
         `;
       }
 
-      function bars(rows, valueFormatter = money, color = '#76a9e5') {
+      function bars(rows, valueFormatter = money, color = '#f0f0f0') {
         if (!rows.length) return empty();
         const max = Math.max(...rows.map((row) => row.value), 1);
         const total = sum(rows, (row) => row.value);
@@ -2193,7 +2113,7 @@
           <div class="card chart-shell">
             <div class="chart-title">Щоденна динаміка місяця</div>
             <div class="chart-legend">
-              <span><i class="legend-swatch" style="background:#76a9e5"></i>Оборот</span>
+              <span><i class="legend-swatch" style="background:#f0f0f0"></i>Оборот</span>
               <span><i class="legend-swatch" style="background:#78a66a"></i>Оборот для валового плану</span>
               <span><i class="legend-swatch" style="background:#d4a04f"></i>Шини</span>
             </div>
@@ -2204,7 +2124,7 @@
                 const x = paddingX + step * index + 3;
                 const barHeight = row.turnover / maxValue * plotHeight;
                 const y = height - paddingY - barHeight;
-                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#76a9e5" opacity="0.8"></rect>`;
+                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#f0f0f0" opacity="0.78"></rect>`;
               }).join('')}
               <polyline fill="none" stroke="#78a66a" stroke-width="3" points="${grossPlanLine}"></polyline>
               <polyline fill="none" stroke="#d4a04f" stroke-width="3" points="${tireLine}"></polyline>
@@ -2280,21 +2200,21 @@
             value: grossPlanReady ? money(pace.varianceToTempo) : 'План не задано',
             copy: grossPlanReady
               ? (pace.varianceToTempo >= 0
-                ? `Йдемо вище темпу. Прогноз закриття: ${pct(pace.projectedCompletionPercent)}.`
-                : `До планового ритму не вистачає ${money(Math.abs(pace.varianceToTempo))}.`)
-              : 'Задайте валовий план у верхньому command bar, щоб увімкнути pace-аналітику.',
+                ? `Вище темпу. Прогноз: ${pct(pace.projectedCompletionPercent)}.`
+                : `До ритму не вистачає ${money(Math.abs(pace.varianceToTempo))}.`)
+              : 'Задайте валовий план, щоб увімкнути pace.',
             tone: grossPlanReady ? (pace.varianceToTempo >= 0 ? 'tone-success' : 'tone-warning') : 'tone-info'
           },
           {
             label: 'Найбільша прострочка',
             value: topOverdueClients[0] ? money(topOverdueClients[0].value) : money(0),
-            copy: topOverdueClients[0] ? `${topOverdueClients[0].name} зараз найбільше тисне на оплатний контур.` : 'Критичної прострочки в поточному зрізі не видно.',
+            copy: topOverdueClients[0] ? `${topOverdueClients[0].name} найбільше тисне на оплату.` : 'Критичної прострочки не видно.',
             tone: topOverdueClients[0] ? 'tone-danger' : 'tone-success'
           },
           {
             label: 'Cross-sell перший хід',
             value: topGapClient ? pct(topGapClient.missingPlanShare) : pct(0),
-            copy: topGapClient ? `${topGapClient.clientName} має найбільший незакритий плановий резерв.` : 'Планові групи по активних клієнтах закриті без явного дефіциту.',
+            copy: topGapClient ? `${topGapClient.clientName} має найбільший резерв.` : 'Явного дефіциту по групах немає.',
             tone: topGapClient ? 'tone-info' : 'tone-success'
           }
         ];
@@ -2305,9 +2225,9 @@
               <div class="hero-panel">
                 <div class="hero-head">
                   <div>
-                    <div class="hero-kicker">Main scenario</div>
-                    <div class="hero-title">План, темп і потрібна дія в одному фреймі</div>
-                    <div class="hero-copy">Overview починається не з декоративних KPI, а з відповіді на головне питання дня: ми вище чи нижче темпу, який обсяг треба добирати і де перший операційний тиск.</div>
+                    <div class="hero-kicker">Стан місяця</div>
+                    <div class="hero-title">Темп, план і перша точка тиску</div>
+                    <div class="hero-copy">Три сигнали для швидкого рішення.</div>
                   </div>
                   <div class="hero-chip">${escapeHtml(state.month)}</div>
                 </div>
@@ -2332,9 +2252,9 @@
               <aside class="action-panel">
                 <div class="action-head">
                   <div>
-                    <div class="action-kicker">Priority actions</div>
+                    <div class="action-kicker">Пріоритет</div>
                     <div class="action-title">Що варто робити далі</div>
-                    <div class="action-copy">Короткий action-layer зібраний з темпу, дебіторки та незакритих груп.</div>
+                    <div class="action-copy">Три найближчі точки дії.</div>
                   </div>
                 </div>
                 <div class="action-stack">
@@ -2351,27 +2271,9 @@
               </aside>
             </section>
 
-            <section class="metric-strip">
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Валовий план</div>
-                <div class="metric-strip-value">${escapeHtml(grossPlanReady ? pct(completion) : '—')}</div>
-                <div class="metric-strip-copy">${grossPlanReady ? `Активний місяць: ${state.month}` : 'Задайте валовий план для pace-контролю'}</div>
-              </div>
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Прострочка</div>
-                <div class="metric-strip-value">${escapeHtml(money(sum(receivables, (row) => row.overdueDebt)))}</div>
-                <div class="metric-strip-copy">Поточний ризик оплат</div>
-              </div>
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Cross-sell резерв</div>
-                <div class="metric-strip-value">${escapeHtml(String(groupGaps.filter((row) => row.missingGroups > 0).length))}</div>
-                <div class="metric-strip-copy">Клієнтів з незакритими групами</div>
-              </div>
-            </section>
-
             <div class="grid overview-kpis">
               ${kpi('Загальний оборот', money(total), `Валовий оборот за ${state.month}`, 'info')}
-              ${kpi('Виконання валового плану', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у command bar', grossPlanReady ? completionTone : 'secondary')}
+              ${kpi('Виконання валового плану', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у фільтрах', grossPlanReady ? completionTone : 'secondary')}
               ${kpi('Темп місяця', grossPlanReady ? money(pace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (pace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від усієї дебіторки`, debtTone)}
               ${kpi('Активні клієнти', String(activeClients), `Середній день: ${money(avgDailyTurnover)}`, 'secondary')}
@@ -2388,14 +2290,13 @@
             <div class="two-up">
               <div class="chart-shell">
                 <div class="chart-title">Планові долі груп</div>
-                <div class="small" style="margin-bottom:12px;">Факт показано як долю від обороту місяця, праворуч ціль групи. PROFIT рахується окремо з ціллю 9%.</div>
                 <div class="search-suggestions-grid">
                   ${groupShareTargets.map((row) => `
                     <div class="filter-option" style="cursor:default;">
                       <div style="font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
                       <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(row.turnover))} · ${escapeHtml(pct(row.turnoverShare))} · ${escapeHtml(pct(row.targetShare))}</div>
-                      <div style="margin-top:10px;height:8px;overflow:hidden;background:rgba(224,216,198,0.12);">
-                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;background:#76a9e5;"></div>
+                      <div style="margin-top:10px;height:8px;overflow:hidden;background:rgba(255,255,255,0.08);">
+                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;background:#f0f0f0;"></div>
                       </div>
                     </div>
                   `).join('') || empty('Немає планових груп')}
@@ -2403,13 +2304,13 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Топ клієнтів за прострочкою</div>
-                ${bars(topOverdueClients, money, '#c96b5d')}
+                ${bars(topOverdueClients, money, '#d86f61')}
               </div>
             </div>
 
             <div class="section-head">
               <h2>Топ клієнтів місяця</h2>
-              <p class="muted">Детальні бренди й групи залишені на окремих сторінках, щоб overview показував тільки те, що потрібно для щоденного контролю.</p>
+              <p class="muted">Ключові клієнти по обороту</p>
             </div>
             ${table('topClients', topClients, [
               { title: 'Код клієнта', key: 'clientCode' },
@@ -2420,7 +2321,7 @@
 
             <div class="section-head">
               <h2>Клієнти, які не закривають планові групи</h2>
-              <p class="muted">Перемикайте список між усіма клієнтами місяця та лише тими, у кого є дефіцит по планових групах. Натисніть на рядок для деталей.</p>
+              <p class="muted">Головний список для cross-sell</p>
             </div>
             <div class="mode-pills">
               <button class="mode-pill ${state.groupGapMode === 'all' ? 'active' : ''}" data-group-gap-mode="all" type="button">Усі клієнти</button>
@@ -2528,38 +2429,38 @@
             value: `${pct(profitShare)} / ${pct(PROFIT_PLAN_PERCENT)}`,
             tone: profitGap > 0 ? 'warning' : 'success',
             description: profitGap > 0
-              ? `Бракує ${pct(profitGap)} до цілі PROFIT. Є сенс посилити клієнтів, де бренд вже присутній або ще не закритий у матриці.`
-              : 'Ціль PROFIT виконана. Можна утримувати частку та переносити фокус на інші резерви росту.'
+              ? `Бракує ${pct(profitGap)} до цілі. Перший фокус: активні клієнти без повного покриття.`
+              : 'Ціль виконана. Можна переносити фокус на інші резерви.'
           },
           {
             title: 'Cross-sell резерв',
             value: `${deficitClients.length} клієнтів`,
             tone: deficitClients.length ? 'secondary' : 'success',
             description: deficitClients.length
-              ? `${deficitClients[0].clientName} має найбільший дефіцит по планових групах. Це перша точка для допродажу.`
-              : 'У видимому зрізі активні клієнти вже закривають планові групи без явного дефіциту.'
+              ? `${deficitClients[0].clientName} має найбільший дефіцит по групах.`
+              : 'Активні клієнти закривають планові групи без явного дефіциту.'
           },
           {
             title: 'Темп місяця',
             value: money(monthPace.varianceToTempo),
             tone: monthPace.varianceToTempo >= 0 ? 'success' : 'warning',
-            description: `Пройдено ${pct(monthPace.elapsedShare * 100)} місяця. Порівняння йде з очікуваним оборотом до поточного дня.`
+            description: `Пройдено ${pct(monthPace.elapsedShare * 100)} місяця. Порівняння з очікуваним оборотом на сьогодні.`
           },
           {
             title: 'Знижка тисне на маржу',
             value: money(discountPressureTurnover),
             tone: riskyRows.length ? 'danger' : 'success',
             description: riskyRows.length
-              ? `${riskyRows.length} продажів потребують рев'ю: висока знижка або маржа нижче бази ${pct(marginThreshold)}.`
-              : 'Критичних рядків по знижці та маржі в поточному зрізі не видно.'
+              ? `${riskyRows.length} продажів потребують рев'ю. База маржі: ${pct(marginThreshold)}.`
+              : 'Критичних рядків по маржі та знижці не видно.'
           },
           {
             title: 'Дебіторка в продажах',
             value: money(sum(receivables, (row) => row.overdueDebt)),
             tone: sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success',
             description: sum(receivables, (row) => row.overdueDebt) > 0
-              ? `${topOverdueClients[0]?.name || 'Клієнт'} має найбільшу прострочку серед видимих продажів.`
-              : 'По видимих клієнтах немає прострочки, яка прямо блокує продажну активність.'
+              ? `${topOverdueClients[0]?.name || 'Клієнт'} має найбільшу прострочку у зрізі.`
+              : 'У зрізі немає прострочки, що блокує продажну активність.'
           }
         ];
         const topClientsChart = byTop(tableRows, (row) => row.clientName, (row) => row.amountEur, 8);
@@ -2568,27 +2469,9 @@
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
-            <section class="metric-strip">
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Факт проти темпу</div>
-                <div class="metric-strip-value">${escapeHtml(grossPlanReady ? money(monthPace.varianceToTempo) : '—')}</div>
-                <div class="metric-strip-copy">${grossPlanReady ? 'Очікування на поточну дату' : 'Потрібен валовий план для pace-аналітики'}</div>
-              </div>
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Частка PROFIT</div>
-                <div class="metric-strip-value">${escapeHtml(pct(profitShare))}</div>
-                <div class="metric-strip-copy">Ціль: ${escapeHtml(pct(PROFIT_PLAN_PERCENT))}</div>
-              </div>
-              <div class="metric-strip-item">
-                <div class="metric-strip-label">Ризикові продажі</div>
-                <div class="metric-strip-value">${escapeHtml(String(riskyRows.length))}</div>
-                <div class="metric-strip-copy">Маржа, знижки та оплати</div>
-              </div>
-            </section>
-
             <div class="grid">
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
-              ${kpi('Валовий план', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у command bar', grossPlanReady ? (completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger') : 'secondary')}
+              ${kpi('Валовий план', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у фільтрах', grossPlanReady ? (completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger') : 'secondary')}
               ${kpi('Темп місяця', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (monthPace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
               ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'secondary')}
@@ -2615,9 +2498,12 @@
             <div class="three-up">
               <div class="chart-shell">
                 <div class="chart-title">Концентрація клієнтів</div>
-                <div class="card">
-                  <div class="big" style="color:white;font-size:28px;font-weight:900;">${escapeHtml(pct(concentrationShare))}</div>
-                  <div class="copy" style="margin-top:10px;">Частка топ-3 клієнтів у видимому обороті. Якщо вона росте, результат стає більш крихким до зсуву одного клієнта.</div>
+                <div class="metric-stack">
+                  <div class="metric-card">
+                    <div class="metric-label">Частка топ-3</div>
+                    <div class="metric-value">${escapeHtml(pct(concentrationShare))}</div>
+                    <div class="metric-copy">Якщо показник росте, результат сильніше залежить від кількох клієнтів.</div>
+                  </div>
                 </div>
               </div>
               <div class="chart-shell">
@@ -2644,7 +2530,7 @@
                 ], { rowKey: (row) => row.productGroup })}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">PROFIT penetration по клієнтах</div>
+                <div class="chart-title">Покриття PROFIT по клієнтах</div>
                 ${table('profitClients', profitClients, [
                   { title: 'Код клієнта', key: 'clientCode' },
                   { title: 'Клієнт', key: 'clientName' },
@@ -2658,26 +2544,19 @@
 
             <div class="two-up">
               <div class="chart-shell">
-                <div class="chart-title">PROFIT penetration по групах</div>
+                <div class="chart-title">Покриття PROFIT по групах</div>
                 ${table('profitGroups', profitGroups, [
                   { title: 'Група', key: 'productGroup' },
                   { title: 'Клієнтів', key: 'clients', sortValue: (row) => row.clients },
                   { title: 'З PROFIT', key: 'clientsWithProfit', sortValue: (row) => row.clientsWithProfit },
-                  { title: 'Penetration %', key: 'penetrationPercent', sortValue: (row) => row.penetrationPercent, render: (row) => pct(row.penetrationPercent) },
+                  { title: 'Покриття %', key: 'penetrationPercent', sortValue: (row) => row.penetrationPercent, render: (row) => pct(row.penetrationPercent) },
                   { title: 'Потенціал без PROFIT', key: 'potentialTurnover', sortValue: (row) => row.potentialTurnover, render: (row) => money(row.potentialTurnover) },
                   { title: 'Оборот групи', key: 'turnover', sortValue: (row) => row.turnover, render: (row) => money(row.turnover) }
                 ], { rowKey: (row) => row.productGroup })}
               </div>
               <div class="chart-shell">
-                <div class="chart-title">Todo винесено окремо</div>
-                <div class="card">
-                  <div class="big" style="color:white;font-size:28px;font-weight:900;">${escapeHtml(String(state.salesTodos.filter((todo) => todo.status !== 'done').length))}</div>
-                  <div class="copy" style="margin-top:10px;">Окрема дошка todo / doing / done, локальні задачі з тегами, фільтрами та швидкими підказками тепер живе у вкладці <strong>Todo</strong>.</div>
-                </div>
-                <div class="chart-shell" style="margin-top:14px;">
-                  <div class="chart-title">Найбільша прострочка</div>
-                  ${bars(topOverdueClients, money, '#c96b5d')}
-                </div>
+                <div class="chart-title">Найбільша прострочка</div>
+                ${bars(topOverdueClients, money, '#d86f61')}
               </div>
             </div>
 
@@ -2977,7 +2856,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Ризик: найбільша прострочка</div>
-                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, '#c96b5d')}
+                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, '#d86f61')}
               </div>
             </div>
             ${table('receivables', rows, [
