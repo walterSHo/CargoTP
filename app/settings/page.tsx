@@ -16,7 +16,7 @@ export default function SettingsPage() {
           <span className="filter-label">Валовий план</span>
           <input className="filter-input" min="0" name="grossPlan" required type="number" />
         </label>
-        <button className="self-end rounded-[12px] border border-[rgba(78,161,255,0.38)] bg-[rgba(78,161,255,0.16)] px-4 py-3 font-semibold text-white transition hover:border-[rgba(78,161,255,0.54)]" type="submit">Зберегти</button>
+        <button className="self-end border border-[rgba(199,181,138,0.38)] bg-[rgba(199,181,138,0.14)] px-4 py-3 font-semibold text-white transition hover:border-[rgba(199,181,138,0.54)]" type="submit">Зберегти</button>
       </form>
       <SettingsClient monthlyPlans={monthlyPlans} />
       <p className="text-sm text-muted">Форма зберігає план у data/processed/monthly-plans.json; після деплою за потреби можна додати автокоміт через scripts/git-auto-commit.ts.</p>

@@ -4,7 +4,9 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Label, Legend, Line, Pie, PieChart, ResponsiveContainer, Sector, Tooltip, XAxis, YAxis } from 'recharts';
 import { money, percent } from '@/lib/format';
 
-const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
+const COLORS = ['#c7b58a', '#78a66a', '#c08b3e', '#c96b5d', '#9a8f7d', '#d1c4a3', '#8f6d4f', '#a97b55'];
+const CHART_GRID = 'rgba(224,216,198,0.14)';
+const CHART_AXIS = 'rgba(175,167,151,0.82)';
 
 function shortLabel(value: string | number, limit = 16) {
   const label = String(value ?? '');
@@ -13,7 +15,7 @@ function shortLabel(value: string | number, limit = 16) {
 
 function ChartShell({ children, title }: { children: ReactNode; title?: string }) {
   return (
-    <div className="chart-shell-card motion-fade-up h-80 rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.2)]">
+    <div className="chart-shell-card motion-fade-up h-80 border border-line bg-[var(--panel)] p-3">
       {title ? <div className="mb-4 text-sm font-semibold text-[var(--ink)]">{title}</div> : null}
       <div className={title ? 'h-[calc(100%-2rem)]' : 'h-full'}>{children}</div>
     </div>
@@ -21,7 +23,7 @@ function ChartShell({ children, title }: { children: ReactNode; title?: string }
 }
 
 function TooltipShell({ children }: { children: ReactNode }) {
-  return <div className="rounded-[14px] border border-line bg-[rgba(8,15,28,0.96)] px-3 py-2 text-sm text-white shadow-[0_16px_36px_rgba(0,0,0,0.28)]">{children}</div>;
+  return <div className="border border-line bg-[var(--panel)] px-3 py-2 text-sm text-white">{children}</div>;
 }
 
 function BarChartTooltip({
@@ -46,7 +48,7 @@ function BarChartTooltip({
         {payload.map((entry) => (
           <div className="flex items-center justify-between gap-3" key={`${entry.name}-${entry.value}`}>
             <span className="inline-flex items-center gap-2 text-muted">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color ?? '#4ea1ff' }} />
+              <span className="h-2.5 w-2.5" style={{ backgroundColor: entry.color ?? '#c7b58a' }} />
               <span>{entry.name}</span>
             </span>
             <span className="text-right">
@@ -106,7 +108,7 @@ export function SimpleBarChart({
   title,
   barLabels = {},
   valueFormatter = money,
-  barColor = '#4ea1ff',
+  barColor = '#c7b58a',
   valueLabel = 'Значення'
 }: {
   data: Array<Record<string, string | number>>;
@@ -131,16 +133,16 @@ export function SimpleBarChart({
           onMouseLeave={() => setActiveIndex(null)}
           onMouseMove={(state) => setActiveIndex(typeof state.activeTooltipIndex === 'number' ? state.activeTooltipIndex : null)}
         >
-          <CartesianGrid stroke="rgba(141,162,199,0.16)" strokeDasharray="3 3" />
-          <XAxis dataKey="name" interval={0} minTickGap={12} stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} tickFormatter={(value) => shortLabel(value)} />
-          <YAxis stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
+          <CartesianGrid stroke={CHART_GRID} strokeDasharray="3 3" />
+          <XAxis dataKey="name" interval={0} minTickGap={12} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} tickFormatter={(value) => shortLabel(value)} />
+          <YAxis stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
           <Tooltip
             content={(props: {
               active?: boolean;
               label?: string | number;
               payload?: Array<{ name?: string | number; value?: number | string; dataKey?: string | number; color?: string }>;
             }) => <BarChartTooltip {...props} totalsByKey={totalsByKey} valueFormatter={valueFormatter} />}
-            cursor={{ fill: 'rgba(78,161,255,0.08)', radius: 10 }}
+            cursor={{ fill: 'rgba(199,181,138,0.08)' }}
           />
           {bars.length > 1 ? <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{barLabels[String(value)] ?? String(value)}</span>} /> : null}
           {bars.map((bar, index) => (
@@ -153,7 +155,7 @@ export function SimpleBarChart({
               fill={bars.length === 1 ? barColor : COLORS[index % COLORS.length]}
               key={bar}
               name={barLabels[bar] ?? (bars.length === 1 ? valueLabel : bar)}
-              radius={[4, 4, 0, 0]}
+              radius={[0, 0, 0, 0]}
             >
               {data.map((row, rowIndex) => {
                 const fill = bars.length === 1 ? barColor : COLORS[index % COLORS.length];
@@ -188,7 +190,7 @@ export function SimplePieChart({ data, title }: { data: Array<{ name: string; va
             activeIndex={activeIndex}
             activeShape={(props: { outerRadius?: number }) => (
               <g>
-                <Sector {...props} outerRadius={Number(props.outerRadius ?? 92) + 8} cornerRadius={8} />
+                <Sector {...props} outerRadius={Number(props.outerRadius ?? 92) + 8} cornerRadius={0} />
                 <Sector {...props} fill="rgba(255,255,255,0.15)" innerRadius={Number(props.outerRadius ?? 92) + 11} outerRadius={Number(props.outerRadius ?? 92) + 13} />
               </g>
             )}
@@ -210,13 +212,13 @@ export function SimplePieChart({ data, title }: { data: Array<{ name: string; va
                 if (!viewBox || !('cx' in viewBox) || !('cy' in viewBox)) return null;
                 return (
                   <g>
-                    <text fill="#f1f5ff" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) - 16}>
+                    <text fill="#f3efe5" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) - 16}>
                       {money(total)}
                     </text>
-                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 2}>
+                    <text fill={CHART_AXIS} fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 2}>
                       -
                     </text>
-                    <text fill="rgba(141,162,199,0.92)" fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 20}>
+                    <text fill={CHART_AXIS} fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 20}>
                       {title ?? 'Структура'}
                     </text>
                   </g>
@@ -263,22 +265,22 @@ export function DailySalesChart({ data, title }: { data: Array<{ label: string; 
           onMouseLeave={() => setActiveIndex(null)}
           onMouseMove={(state) => setActiveIndex(typeof state.activeTooltipIndex === 'number' ? state.activeTooltipIndex : null)}
         >
-          <CartesianGrid stroke="rgba(141,162,199,0.16)" strokeDasharray="3 3" />
-          <XAxis dataKey="label" stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
-          <YAxis stroke="rgba(141,162,199,0.75)" tick={{ fill: 'rgba(141,162,199,0.82)', fontSize: 12 }} />
+          <CartesianGrid stroke={CHART_GRID} strokeDasharray="3 3" />
+          <XAxis dataKey="label" stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+          <YAxis stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
           <Tooltip
             content={(props: {
               active?: boolean;
               label?: string | number;
               payload?: Array<{ name?: string | number; value?: number | string; payload?: { clients?: number } }>;
             }) => <DailyChartTooltip {...props} turnoverTotal={turnoverTotal} />}
-            cursor={{ stroke: 'rgba(78,161,255,0.35)', strokeWidth: 1.5, strokeDasharray: '4 4' }}
+            cursor={{ stroke: 'rgba(199,181,138,0.35)', strokeWidth: 1.5, strokeDasharray: '4 4' }}
           />
           <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{String(value)}</span>} />
-          <Bar activeBar={{ fillOpacity: 1, stroke: 'rgba(255,255,255,0.28)', strokeWidth: 1 }} animationDuration={700} dataKey="turnover" fill="#4ea1ff" name="Оборот" radius={[8, 8, 0, 0]}>
+          <Bar activeBar={{ fillOpacity: 1, stroke: 'rgba(255,255,255,0.28)', strokeWidth: 1 }} animationDuration={700} dataKey="turnover" fill="#c7b58a" name="Оборот" radius={[0, 0, 0, 0]}>
             {data.map((row, rowIndex) => (
               <Cell
-                fill="#4ea1ff"
+                fill="#c7b58a"
                 fillOpacity={activeIndex !== null && activeIndex !== rowIndex ? 0.42 : 1}
                 key={`${row.label}-${rowIndex}`}
                 stroke={activeIndex === rowIndex ? 'rgba(255,255,255,0.2)' : 'transparent'}
@@ -286,8 +288,8 @@ export function DailySalesChart({ data, title }: { data: Array<{ label: string; 
               />
             ))}
           </Bar>
-          <Line activeDot={{ fill: '#2dd4bf', r: 5, stroke: '#dffff7', strokeWidth: 1.5 }} animationDuration={780} dataKey="grossPlanTurnover" dot={{ fill: '#2dd4bf', r: 0 }} name="Оборот для валового плану" stroke="#2dd4bf" strokeWidth={2.5} type="monotone" />
-          <Line activeDot={{ fill: '#f59e0b', r: 5, stroke: '#fff4db', strokeWidth: 1.5 }} animationDuration={840} dataKey="tireTurnover" dot={{ fill: '#f59e0b', r: 0 }} name="Шини" stroke="#f59e0b" strokeWidth={2.5} type="monotone" />
+          <Line activeDot={{ fill: '#78a66a', r: 5, stroke: '#dce8d7', strokeWidth: 1.5 }} animationDuration={780} dataKey="grossPlanTurnover" dot={{ fill: '#78a66a', r: 0 }} name="Оборот для валового плану" stroke="#78a66a" strokeWidth={2.5} type="monotone" />
+          <Line activeDot={{ fill: '#c08b3e', r: 5, stroke: '#f3efe5', strokeWidth: 1.5 }} animationDuration={840} dataKey="tireTurnover" dot={{ fill: '#c08b3e', r: 0 }} name="Шини" stroke="#c08b3e" strokeWidth={2.5} type="monotone" />
         </ComposedChart>
       </ResponsiveContainer>
     </ChartShell>

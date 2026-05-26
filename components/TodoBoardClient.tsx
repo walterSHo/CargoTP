@@ -91,15 +91,15 @@ function toggleDone(status: TodoStatus): TodoStatus {
 }
 
 function priorityBadgeClassName(priority: TodoPriority) {
-  if (priority === 'high') return 'border-[rgba(251,113,133,0.4)] bg-[rgba(251,113,133,0.14)] text-[var(--danger)]';
-  if (priority === 'low') return 'border-line bg-[rgba(8,15,28,0.72)] text-muted';
-  return 'border-[rgba(45,212,191,0.4)] bg-[rgba(45,212,191,0.14)] text-[var(--accent-2)]';
+  if (priority === 'high') return 'border-[rgba(201,107,93,0.42)] bg-[rgba(201,107,93,0.12)] text-[var(--danger)]';
+  if (priority === 'low') return 'border-line bg-[var(--panel)] text-muted';
+  return 'border-[rgba(192,139,62,0.42)] bg-[rgba(192,139,62,0.12)] text-[var(--warning)]';
 }
 
 function statusBadgeClassName(status: TodoStatus) {
-  if (status === 'done') return 'border-[rgba(52,211,153,0.4)] bg-[rgba(52,211,153,0.14)] text-[var(--success)]';
-  if (status === 'doing') return 'border-[rgba(245,158,11,0.42)] bg-[rgba(245,158,11,0.14)] text-[var(--warning)]';
-  return 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white';
+  if (status === 'done') return 'border-[rgba(120,166,106,0.42)] bg-[rgba(120,166,106,0.12)] text-[var(--success)]';
+  if (status === 'doing') return 'border-[rgba(192,139,62,0.42)] bg-[rgba(192,139,62,0.14)] text-[var(--warning)]';
+  return 'border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] text-white';
 }
 
 function matchesReceivables(row: ReceivableRecord, clientKeys: Set<string>) {
@@ -237,7 +237,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
   }
 
   if (!month) {
-    return <div className="rounded-[18px] border border-line bg-[rgba(10,18,33,0.94)] p-6 text-sm text-muted">Немає оброблених Excel-даних для класичного todo-списку.</div>;
+    return <div className="border border-line bg-[var(--panel)] p-6 text-sm text-muted">Немає оброблених Excel-даних для класичного todo-списку.</div>;
   }
 
   return (
@@ -280,36 +280,21 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
-      <section className="page-hero motion-fade-up">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <div className="signal-chip">
-              <strong>Classic todo</strong>
-              <span>Список задач по статусам</span>
-            </div>
-            <h2 className="hero-title">Класичний робочий список, де задачі легко додати, швидко знайти і без шуму провести від "до роботи" до "готово".</h2>
-            <p className="hero-note">
-              Ми залишили аналітичні підказки, теги і пріоритети, але сам сценарій зробили ближчим до звичного todo-list:
-              компактні секції, короткі дії по рядку і швидкий фокус на наступному кроці.
-            </p>
-            <div className="hero-chip-row">
-              <span className="signal-chip"><strong>{suggestedTodos.length}</strong><span>підказок з аналітики</span></span>
-              <span className="signal-chip"><strong>{todos.length}</strong><span>усього задач</span></span>
-              <span className="signal-chip"><strong>{completedCount}</strong><span>вже завершено</span></span>
-            </div>
-          </div>
-          <div className="hero-side">
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">Активні задачі</div>
-              <div className="metric-card-value">{todos.length - completedCount}</div>
-              <div className="metric-card-copy">Скільки пунктів зараз залишилось у роботі або в черзі на старт.</div>
-            </div>
-            <div className="metric-card metric-card-compact">
-              <div className="metric-card-label">PROFIT gap</div>
-              <div className="metric-card-value">{percent(profitGap)}</div>
-              <div className="metric-card-copy">Скільки ще бракує до цільових {percent(PROFIT_PLAN_PERCENT)} у вибраному місяці.</div>
-            </div>
-          </div>
+      <section className="metric-strip motion-fade-up">
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Активні задачі</div>
+          <div className="metric-strip-value">{todos.length - completedCount}</div>
+          <div className="metric-strip-copy">У роботі або в черзі</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">Підказки</div>
+          <div className="metric-strip-value">{suggestedTodos.length}</div>
+          <div className="metric-strip-copy">Автоматичні задачі з аналітики</div>
+        </div>
+        <div className="metric-strip-item">
+          <div className="metric-strip-label">PROFIT gap</div>
+          <div className="metric-strip-value">{percent(profitGap)}</div>
+          <div className="metric-strip-copy">До цільових {percent(PROFIT_PLAN_PERCENT)}</div>
         </div>
       </section>
 
@@ -321,7 +306,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                 <div className="text-sm font-semibold text-white">Швидке додавання</div>
                 <div className="mt-1 text-xs text-muted">Короткий класичний ввід: задача, клієнт, теги і пріоритет.</div>
               </div>
-              <span className="signal-chip"><strong>{percent(profitShare)}</strong><span>частка PROFIT</span></span>
+              <span className="text-xs font-semibold text-muted">PROFIT: <span className="text-white">{percent(profitShare)}</span></span>
             </div>
             <div className="todo-quick-grid mt-3">
               <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))} placeholder="Назва задачі" value={draft.title} />
@@ -335,7 +320,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                   {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
               </label>
-              <button className="rounded-[10px] border border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-[rgba(78,161,255,0.56)] hover:bg-[rgba(78,161,255,0.22)]" onClick={submitTodo} type="button">
+              <button className="border border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-[rgba(199,181,138,0.56)] hover:bg-[rgba(199,181,138,0.2)]" onClick={submitTodo} type="button">
                 Додати задачу
               </button>
             </div>
@@ -359,7 +344,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                         <div className="todo-section-title">{statusLabels[status]}</div>
                         <div className="todo-section-meta">Задач: {laneRows.length}</div>
                       </div>
-                      <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${statusBadgeClassName(status)}`}>{statusLabels[status]}</span>
+                      <span className={`border px-2 py-1 text-[11px] font-semibold ${statusBadgeClassName(status)}`}>{statusLabels[status]}</span>
                     </div>
                     {laneRows.length ? laneRows.map((todo) => (
                       <article className="todo-row" key={todo.id}>
@@ -379,9 +364,9 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                               Створено {new Date(todo.createdAt).toLocaleString('uk-UA')}
                             </div>
                             <div className="todo-row-meta">
-                              <span className={`rounded-[999px] border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
+                              <span className={`border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
                               {todo.tags.map((tag) => (
-                                <button className={`rounded-[999px] border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(78,161,255,0.42)] bg-[rgba(78,161,255,0.16)] text-white' : 'border-line bg-[rgba(8,15,28,0.72)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
+                                <button className={`border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] text-white' : 'border-line bg-[rgba(20,19,16,0.9)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
                                   {tag}
                                 </button>
                               ))}
@@ -390,21 +375,21 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                         </div>
                         <div className="todo-row-actions">
                           {todo.status !== 'todo' ? (
-                            <button className="todo-action-button border-line bg-[rgba(11,15,22,0.86)] text-muted hover:text-white" onClick={() => setTodoStatus(todo.id, 'todo')} type="button">
+                            <button className="todo-action-button border-line bg-[rgba(20,19,16,0.9)] text-muted hover:text-white" onClick={() => setTodoStatus(todo.id, 'todo')} type="button">
                               До роботи
                             </button>
                           ) : null}
                           {todo.status !== 'doing' ? (
-                            <button className="todo-action-button border-[rgba(245,158,11,0.28)] bg-[rgba(245,158,11,0.1)] text-[var(--warning)] hover:border-[rgba(245,158,11,0.44)]" onClick={() => setTodoStatus(todo.id, 'doing')} type="button">
+                            <button className="todo-action-button border-[rgba(192,139,62,0.28)] bg-[rgba(192,139,62,0.1)] text-[var(--warning)] hover:border-[rgba(192,139,62,0.44)]" onClick={() => setTodoStatus(todo.id, 'doing')} type="button">
                               В процес
                             </button>
                           ) : null}
                           {todo.status !== 'done' ? (
-                            <button className="todo-action-button border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.1)] text-[var(--success)] hover:border-[rgba(52,211,153,0.44)]" onClick={() => setTodoStatus(todo.id, 'done')} type="button">
+                            <button className="todo-action-button border-[rgba(120,166,106,0.32)] bg-[rgba(120,166,106,0.1)] text-[var(--success)] hover:border-[rgba(120,166,106,0.48)]" onClick={() => setTodoStatus(todo.id, 'done')} type="button">
                               Готово
                             </button>
                           ) : null}
-                          <button className="todo-action-button border-[rgba(251,113,133,0.32)] bg-[rgba(251,113,133,0.12)] text-[var(--danger)] hover:border-[rgba(251,113,133,0.5)]" onClick={() => removeTodo(todo.id)} type="button">
+                          <button className="todo-action-button border-[rgba(201,107,93,0.32)] bg-[rgba(201,107,93,0.12)] text-[var(--danger)] hover:border-[rgba(201,107,93,0.5)]" onClick={() => removeTodo(todo.id)} type="button">
                             Видалити
                           </button>
                         </div>
@@ -425,12 +410,12 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
             <div className="mt-1 text-xs text-muted">Додаються одним кліком без ручного набору.</div>
             <div className="mt-3 grid gap-2">
               {suggestedTodos.length ? suggestedTodos.map((todo) => (
-                <button className="rounded-[12px] border border-line bg-[rgba(8,15,28,0.72)] p-3 text-left transition hover:border-[rgba(78,161,255,0.38)] hover:bg-[rgba(78,161,255,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
+                <button className="border border-line bg-[rgba(20,19,16,0.9)] p-3 text-left transition hover:border-[rgba(199,181,138,0.38)] hover:bg-[rgba(199,181,138,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
                   <div className="text-sm font-semibold text-white">{todo.title}</div>
                   <div className="mt-1 text-xs text-muted">{todo.clientName || 'Загальна задача'} · {priorityLabels[todo.priority]}</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {todo.tags.map((tag) => (
-                      <span className="rounded-[999px] border border-line px-2 py-1 text-[11px] text-muted" key={`${todo.title}-${tag}`}>{tag}</span>
+                      <span className="border border-line px-2 py-1 text-[11px] text-muted" key={`${todo.title}-${tag}`}>{tag}</span>
                     ))}
                   </div>
                 </button>

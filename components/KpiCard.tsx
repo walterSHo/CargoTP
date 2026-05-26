@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { BarChartIcon, CircleAlertIcon, GaugeIcon, NetworkIcon, PercentIcon, WalletIcon } from '@/components/UiIcons';
 
-type KpiTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'teal';
+type KpiTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'secondary';
 
 function iconForTitle(title: string): ReactNode {
   const normalized = title.toLowerCase();
@@ -31,7 +31,7 @@ export function KpiCard({
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{title}</div>
           <div className="kpi-icon">{iconForTitle(title)}</div>
         </div>
-        <div className="mt-2.5 text-[26px] font-black leading-none tracking-[-0.03em] text-white">{value}</div>
+        <div className="mt-2.5 text-[24px] font-semibold leading-none tracking-normal text-white">{value}</div>
         {hint ? <div className="mt-2.5 text-xs leading-5 text-muted">{hint}</div> : null}
       </div>
     </div>
