@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DailySalesChart, SimpleBarChart, SimplePieChart } from './Charts';
+import { DashboardFilterBar } from './DashboardFilterBar';
 import { DataTable } from './DataTable';
 import { KpiCard } from './KpiCard';
 import { AGGREGATE_PLAN_GROUP, PROFIT_GROUP_NAME, PROFIT_PLAN_PERCENT } from '@/lib/constants';
+import { type DashboardSearchMode } from '@/lib/dashboard-ui';
 import {
   availableMonths,
   byTop,
@@ -29,21 +31,12 @@ import { money, percent } from '@/lib/format';
 import { normalizeProductGroup } from '@/lib/product-groups';
 import type { ProcessedData, SalesRecord } from '@/lib/types';
 
-type SearchMode = 'code' | 'client' | 'brand' | 'group';
-
 type ActionSignal = {
   title: string;
   value: string;
   tone: 'success' | 'warning' | 'danger' | 'secondary';
   description: string;
 };
-
-const searchModes: Array<{ value: SearchMode; label: string }> = [
-  { value: 'code', label: 'Код' },
-  { value: 'client', label: 'Клієнт' },
-  { value: 'brand', label: 'Бренд' },
-  { value: 'group', label: 'Група' }
-];
 
 const salesColumns: ColumnDef<SalesRecord>[] = [
   { accessorKey: 'date', header: 'Дата' },
@@ -118,7 +111,7 @@ const profitGroupColumns: ColumnDef<ProfitGroupPenetrationRow>[] = [
   { accessorKey: 'turnover', header: 'Оборот групи', cell: (info) => money(Number(info.getValue())) }
 ];
 
-function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
+function matchesSales(row: SalesRecord, mode: DashboardSearchMode, query: string) {
   if (!query) return true;
   const value = query.toLowerCase();
   if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
@@ -128,7 +121,7 @@ function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
   return row.productGroup.toLowerCase().includes(value);
 }
 
-function suggestionValues(data: ProcessedData, mode: SearchMode) {
+function suggestionValues(data: ProcessedData, mode: DashboardSearchMode) {
   const values = new Set<string>();
   if (mode === 'code') {
     data.sales.forEach((row) => {
@@ -162,27 +155,11 @@ function applyColumnFilters(rows: SalesRecord[], filters: Record<string, string[
 export function SalesClient({ data }: { data: ProcessedData }) {
   const months = availableMonths(data.sales).sort().reverse();
   const [month, setMonth] = useState(months[0] ?? '');
-  const [searchMode, setSearchMode] = useState<SearchMode>('code');
+  const [searchMode, setSearchMode] = useState<DashboardSearchMode>('code');
   const [query, setQuery] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
   const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const searchRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (searchRef.current?.contains(event.target as Node)) return;
-      setSearchOpen(false);
-    }
-
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, []);
 
   const suggestions = useMemo(() => suggestionValues(data, searchMode), [data, searchMode]);
-  const normalizedQuery = query.trim().toLowerCase();
-  const visibleSuggestions = normalizedQuery
-    ? suggestions.filter((item) => item.toLowerCase().includes(normalizedQuery))
-    : suggestions;
   const baseSales = useMemo(
     () => salesForMonth(data.sales, month).filter((row) => matchesSales(row, searchMode, query)),
     [data.sales, month, query, searchMode]
@@ -277,74 +254,17 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
   return (
     <div className="space-y-6">
-      <section className="filter-bar motion-fade-up">
-        <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto]">
-          <label className="grid gap-2">
-            <span className="filter-label">Місяць</span>
-            <select className="filter-select" onChange={(event) => setMonth(event.target.value)} value={month}>
-              {months.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-          <div className={`search-shell grid gap-2 ${searchOpen ? 'search-shell-open' : ''}`} ref={searchRef}>
-            <span className="filter-label">Пошук</span>
-            <div className="relative">
-              <input
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                className="filter-input"
-                inputMode="search"
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setSearchOpen(true);
-                }}
-                onFocus={() => setSearchOpen(true)}
-                placeholder={`Фільтр за полем: ${searchModes.find((item) => item.value === searchMode)?.label.toLowerCase()}`}
-                spellCheck={false}
-                value={query}
-              />
-              {searchOpen && visibleSuggestions.length ? (
-                <div className="search-suggestion-popover">
-                  <div className={`search-suggestion-grid ${searchMode === 'group' || searchMode === 'brand' ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2'}`}>
-                    {visibleSuggestions.map((item) => (
-                      <button
-                        className="search-suggestion-option"
-                        key={item}
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                          setQuery(item);
-                          setSearchOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <span className="filter-label">Режим</span>
-            <div className="flex flex-wrap gap-2">
-              {searchModes.map((item) => (
-                <button
-                  className={`filter-pill ${searchMode === item.value ? 'filter-pill-active' : ''}`}
-                  key={item.value}
-                  onClick={() => {
-                    setSearchMode(item.value);
-                    setSearchOpen(true);
-                  }}
-                  type="button"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <DashboardFilterBar
+        month={month}
+        months={months}
+        onMonthChange={setMonth}
+        onQueryChange={setQuery}
+        onSearchModeChange={setSearchMode}
+        query={query}
+        searchMode={searchMode}
+        suggestionGridClassName={searchMode === 'group' || searchMode === 'brand' ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2'}
+        suggestions={suggestions}
+      />
 
       <section className="metric-strip motion-fade-up">
         <div className="metric-strip-item">

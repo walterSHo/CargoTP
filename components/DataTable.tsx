@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from '@tanstack/react-table';
+import { resolveFilterPopoverSide } from '@/lib/dashboard-ui';
 
 function columnIdOf<T>(column: ColumnDef<T>) {
   if (column.id) return String(column.id);
@@ -214,7 +215,7 @@ export function DataTable<T>({
                   const columnId = header.column.id;
                   const hasFilter = Boolean(resolvedFilterOptions[columnId]?.length);
                   const selectedCount = resolvedFilters[columnId]?.length ?? 0;
-                  const alignFilterLeft = headerIndex <= 1;
+                  const alignFilterLeft = resolveFilterPopoverSide(headerIndex, headerGroup.headers.length) === 'left';
 
                   return (
                     <th className="relative whitespace-nowrap border-b border-line px-3 py-2.5 text-left font-semibold text-[var(--ink)]" key={header.id}>

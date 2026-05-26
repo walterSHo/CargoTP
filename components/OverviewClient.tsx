@@ -1,25 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DailySalesChart, SimpleBarChart } from '@/components/Charts';
+import { DashboardFilterBar } from '@/components/DashboardFilterBar';
 import { DataTable } from '@/components/DataTable';
 import { InfoHint } from '@/components/InfoHint';
 import { KpiCard } from '@/components/KpiCard';
 import { PageHeader } from '@/components/PageHeader';
 import { AGGREGATE_PLAN_GROUP, PROFIT_GROUP_NAME } from '@/lib/constants';
+import { type DashboardSearchMode } from '@/lib/dashboard-ui';
 import { availableMonths, avg, clientGroupShareGaps, dailySalesSeries, dashboardKpis, groupPlanAudit, salesForMonth, topClientsByTurnover, byTop, type ClientGroupGapRow, type TopClientRow } from '@/lib/analytics';
 import { money, percent } from '@/lib/format';
 import type { ProcessedData, ReceivableRecord, SalesRecord } from '@/lib/types';
-
-type SearchMode = 'code' | 'client' | 'brand' | 'group';
-
-const searchModes: Array<{ value: SearchMode; label: string }> = [
-  { value: 'code', label: 'Код' },
-  { value: 'client', label: 'Клієнт' },
-  { value: 'brand', label: 'Бренд' },
-  { value: 'group', label: 'Група' }
-];
 
 type GroupGapMode = 'all' | 'deficit';
 
@@ -57,7 +50,7 @@ function gapColumns(): ColumnDef<ClientGroupGapRow>[] {
   ];
 }
 
-function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
+function matchesSales(row: SalesRecord, mode: DashboardSearchMode, query: string) {
   if (!query) return true;
   const value = query.toLowerCase();
   if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
@@ -67,7 +60,7 @@ function matchesSales(row: SalesRecord, mode: SearchMode, query: string) {
   return row.productGroup.toLowerCase().includes(value);
 }
 
-function matchesReceivables(row: ReceivableRecord, mode: SearchMode, query: string) {
+function matchesReceivables(row: ReceivableRecord, mode: DashboardSearchMode, query: string) {
   if (!query) return true;
   const value = query.toLowerCase();
   if (mode === 'code') return `${row.clientCode} ${row.unifiedClientCode}`.toLowerCase().includes(value);
@@ -75,7 +68,7 @@ function matchesReceivables(row: ReceivableRecord, mode: SearchMode, query: stri
   return false;
 }
 
-function suggestionValues(data: ProcessedData, mode: SearchMode) {
+function suggestionValues(data: ProcessedData, mode: DashboardSearchMode) {
   const values = new Set<string>();
   if (mode === 'code') {
     [...data.sales, ...data.receivables].forEach((row) => {
@@ -97,21 +90,9 @@ function suggestionValues(data: ProcessedData, mode: SearchMode) {
 export function OverviewClient({ data }: { data: ProcessedData }) {
   const months = availableMonths(data.sales).sort().reverse();
   const [month, setMonth] = useState(months[0] ?? '');
-  const [searchMode, setSearchMode] = useState<SearchMode>('code');
+  const [searchMode, setSearchMode] = useState<DashboardSearchMode>('code');
   const [query, setQuery] = useState('');
   const [groupGapMode, setGroupGapMode] = useState<GroupGapMode>('all');
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (searchRef.current?.contains(event.target as Node)) return;
-      setSearchOpen(false);
-    }
-
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, []);
 
   if (!month) {
     return (
@@ -152,10 +133,6 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
     ? (receivables.reduce((total, row) => total + row.bucket31Plus, 0) / Math.max(receivables.reduce((total, row) => total + row.totalDebt, 0), 1)) * 100
     : 0;
   const suggestions = suggestionValues(data, searchMode);
-  const normalizedQuery = query.trim().toLowerCase();
-  const visibleSuggestions = normalizedQuery
-    ? suggestions.filter((item) => item.toLowerCase().includes(normalizedQuery))
-    : suggestions;
   const completionTone = kpis.grossPlanCompletion >= 100 ? 'success' : kpis.grossPlanCompletion >= 85 ? 'warning' : 'danger';
   const debtTone = kpis.overdueDebt > 0 ? 'danger' : 'success';
   const suggestionGridClassName = searchMode === 'group' || searchMode === 'brand'
@@ -195,74 +172,17 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
         </div>
       </section>
 
-      <section className="filter-bar">
-        <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto]">
-          <label className="grid gap-2">
-            <span className="filter-label">Місяць</span>
-            <select className="filter-select" onChange={(event) => setMonth(event.target.value)} value={month}>
-              {months.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-          <div className={`search-shell grid gap-2 ${searchOpen ? 'search-shell-open' : ''}`} ref={searchRef}>
-            <span className="filter-label">Пошук</span>
-            <div className="relative">
-              <input
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                className="filter-input"
-                inputMode="search"
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setSearchOpen(true);
-                }}
-                onFocus={() => setSearchOpen(true)}
-                placeholder={`Фільтр за полем: ${searchModes.find((item) => item.value === searchMode)?.label.toLowerCase()}`}
-                spellCheck={false}
-                value={query}
-              />
-              {searchOpen && visibleSuggestions.length ? (
-                <div className="search-suggestion-popover">
-                  <div className={`search-suggestion-grid ${suggestionGridClassName}`}>
-                    {visibleSuggestions.map((item) => (
-                      <button
-                        className="search-suggestion-option"
-                        key={item}
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                          setQuery(item);
-                          setSearchOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <span className="filter-label">Режим</span>
-            <div className="flex flex-wrap gap-2">
-              {searchModes.map((item) => (
-                <button
-                  className={`filter-pill ${searchMode === item.value ? 'filter-pill-active' : ''}`}
-                  key={item.value}
-                  onClick={() => {
-                    setSearchMode(item.value);
-                    setSearchOpen(true);
-                  }}
-                  type="button"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <DashboardFilterBar
+        month={month}
+        months={months}
+        onMonthChange={setMonth}
+        onQueryChange={setQuery}
+        onSearchModeChange={setSearchMode}
+        query={query}
+        searchMode={searchMode}
+        suggestionGridClassName={suggestionGridClassName}
+        suggestions={suggestions}
+      />
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard hint={`Валовий оборот за ${month}`} title="Загальний оборот" tone="info" value={money(kpis.totalTurnover)} />

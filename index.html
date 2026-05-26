@@ -2308,6 +2308,12 @@
         return `${tableId}:${rowKey}`;
       }
 
+      function resolveFilterPanelAlign(columnIndex, totalColumns) {
+        if (columnIndex <= 1) return 'align-left';
+        if (columnIndex >= totalColumns - 2) return 'align-right';
+        return 'align-right';
+      }
+
       function table(tableId, rows, columns, options = {}) {
         const availableFilterOptions = options.filterOptions || uniqueFilterOptions(rows, columns, columns.map((column) => column.filterKey || column.key).filter(Boolean));
         const filtered = filteredTableRows(tableId, rows, columns);
@@ -2356,7 +2362,7 @@
                     const filterKey = column.filterKey || column.key;
                     const filterOptions = availableFilterOptions[filterKey] || [];
                     const selectedCount = (state.tableFilters[tableId]?.[filterKey] || []).length;
-                    const filterSideClass = columnIndex <= 1 ? 'align-left' : 'align-right';
+                    const filterSideClass = resolveFilterPanelAlign(columnIndex, columns.length);
                     const filterButton = filterOptions.length ? `
                       <div style="position:relative;" data-table-filter-root="true">
                         <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">

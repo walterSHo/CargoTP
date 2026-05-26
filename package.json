@@ -7,6 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "build:pages": "node scripts/build-static.mjs",
+    "smoke:pages": "node scripts/smoke-static-dashboard.mjs",
+    "verify:pages": "npm run build:pages && npm run smoke:pages",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
