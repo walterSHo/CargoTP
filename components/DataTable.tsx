@@ -210,10 +210,11 @@ export function DataTable<T>({
           <thead className="sticky top-0 z-[1] bg-[var(--panel-alt)]">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, headerIndex) => {
                   const columnId = header.column.id;
                   const hasFilter = Boolean(resolvedFilterOptions[columnId]?.length);
                   const selectedCount = resolvedFilters[columnId]?.length ?? 0;
+                  const alignFilterLeft = headerIndex <= 1;
 
                   return (
                     <th className="relative whitespace-nowrap border-b border-line px-3 py-2.5 text-left font-semibold text-[var(--ink)]" key={header.id}>
@@ -246,7 +247,7 @@ export function DataTable<T>({
                                 <span>{selectedCount ? `${selectedCount}` : '▾'}</span>
                               </button>
                               {openFilterColumn === columnId ? (
-                                <div className="absolute right-0 top-[calc(100%+0.55rem)] z-20 w-[19rem] border border-line bg-[var(--panel)] p-3 shadow-2xl">
+                                <div className={`absolute top-[calc(100%+0.55rem)] z-20 w-[min(19rem,calc(100vw-2rem))] border border-line bg-[var(--panel)] p-3 shadow-2xl ${alignFilterLeft ? 'left-0' : 'right-0'}`}>
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
                                       <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Вибір значень</div>

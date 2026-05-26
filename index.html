@@ -604,6 +604,8 @@
       .tone-danger { color: var(--red); }
       .tone-info { color: var(--accent); }
       .card {
+        position: relative;
+        isolation: isolate;
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
@@ -613,6 +615,7 @@
         animation: fadeUp 420ms ease-out both;
       }
       .card:hover {
+        z-index: 3;
         transform: translateY(-1px);
         border-color: var(--line-strong);
         box-shadow: none;
@@ -747,10 +750,11 @@
       }
       .filter-panel-wrap {
         position: absolute;
-        right: 0;
         top: calc(100% + 8px);
         z-index: 90;
       }
+      .filter-panel-wrap.align-left { left: 0; right: auto; }
+      .filter-panel-wrap.align-right { right: 0; left: auto; }
       .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--accent); }
       .filter-clear {
         border: 0;
@@ -953,6 +957,8 @@
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
       .metric-stack { display: grid; gap: 10px; }
       .metric-card {
+        position: relative;
+        isolation: isolate;
         padding: 12px 13px;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
@@ -2342,7 +2348,7 @@
             <table>
               <thead>
                 <tr>
-                  ${columns.map((column) => {
+                  ${columns.map((column, columnIndex) => {
                     const sortKey = column.sortKey || column.key;
                     const sortable = Boolean(sortKey);
                     const mark = currentSort.key === sortKey ? (currentSort.dir === 'asc' ? '▲' : '▼') : '↕';
@@ -2350,6 +2356,7 @@
                     const filterKey = column.filterKey || column.key;
                     const filterOptions = availableFilterOptions[filterKey] || [];
                     const selectedCount = (state.tableFilters[tableId]?.[filterKey] || []).length;
+                    const filterSideClass = columnIndex <= 1 ? 'align-left' : 'align-right';
                     const filterButton = filterOptions.length ? `
                       <div style="position:relative;" data-table-filter-root="true">
                         <button class="filter-trigger ${selectedCount ? 'active' : ''}" data-table-filter-open="${tableId}" data-filter-key="${filterKey}" type="button">
@@ -2357,7 +2364,7 @@
                           <span>${selectedCount || '▾'}</span>
                         </button>
                         ${openFilterKey === filterKey ? `
-                          <div class="filter-panel-wrap">
+                          <div class="filter-panel-wrap ${filterSideClass}">
                             <div class="filter-panel">
                               <div class="filter-menu-head">
                                 <span>Вибір значень: ${escapeHtml(tableColumnTitle(columns, openFilterKey))}</span>

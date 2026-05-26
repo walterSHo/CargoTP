@@ -65,7 +65,6 @@
 
   .interactive-lift {
     transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
-    will-change: transform;
   }
 
   .interactive-lift:hover {
@@ -125,6 +124,8 @@
 
   .panel-card {
     @apply border;
+    position: relative;
+    isolation: isolate;
     border-radius: var(--radius-panel);
     border-color: var(--line);
     background: var(--panel);
@@ -136,6 +137,7 @@
   .soft-panel:hover,
   .filter-bar:hover,
   .insight-tile:hover {
+    z-index: 3;
     transform: none;
     border-color: var(--line-strong);
     box-shadow: none;
@@ -143,6 +145,8 @@
 
   .soft-panel {
     @apply border;
+    position: relative;
+    isolation: isolate;
     border-radius: var(--radius-panel);
     border-color: var(--line);
     background: var(--panel-alt);
@@ -251,6 +255,8 @@
 
   .insight-tile {
     @apply border p-3;
+    position: relative;
+    isolation: isolate;
     border-radius: var(--radius-panel);
     border-color: var(--line);
     background: var(--panel-alt);
@@ -271,6 +277,8 @@
 
   .metric-card {
     @apply border p-3;
+    position: relative;
+    isolation: isolate;
     border-radius: var(--radius-panel);
     border-color: var(--line);
     background: var(--panel-alt);
