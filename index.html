@@ -7,33 +7,42 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg: #06080d;
-        --bg-top: #151b26;
-        --card: rgba(15, 20, 29, 0.96);
-        --card-2: rgba(19, 25, 36, 0.94);
-        --ink: #edf2fb;
-        --muted: #9eabbe;
-        --line: rgba(151, 163, 184, 0.14);
-        --line-strong: rgba(151, 163, 184, 0.24);
-        --blue: #4ea1ff;
-        --teal: #2dd4bf;
-        --amber: #f59e0b;
-        --violet: #8b5cf6;
-        --red: #fb7185;
-        --green: #34d399;
-        --lime: #a3e635;
-        --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
-        --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.18);
-        --radius-panel: 20px;
+        --bg: #12161c;
+        --bg-elevated: #171c23;
+        --bg-top: #0f1318;
+        --card: #171c23;
+        --card-2: #1d232c;
+        --card-3: #232b35;
+        --ink: #f2f5f8;
+        --muted: #93a0b1;
+        --muted-strong: #b8c3d1;
+        --line: rgba(164, 179, 198, 0.14);
+        --line-strong: rgba(164, 179, 198, 0.28);
+        --accent: #76a9e5;
+        --accent-soft: rgba(118, 169, 229, 0.14);
+        --neutral-accent: #64748b;
+        --amber: #d4a04f;
+        --red: #d57669;
+        --green: #78b48c;
+        --lime: #8fcb73;
+        --shadow: 0 18px 40px rgba(2, 6, 12, 0.28);
+        --shadow-soft: 0 10px 24px rgba(4, 8, 14, 0.22);
+        --radius-panel: 18px;
         --radius-control: 12px;
+        --radius-pill: 999px;
+        --content-max: 1520px;
       }
       * { box-sizing: border-box; }
+      html { background: var(--bg-top); }
       body {
         margin: 0;
         background: var(--bg);
         color: var(--ink);
-        font-family: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
+        font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI Variable", "Segoe UI", sans-serif;
         text-rendering: optimizeLegibility;
+        background-image:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+          radial-gradient(circle at top left, rgba(118, 169, 229, 0.08), transparent 28%);
       }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation: none !important; transition-duration: 0ms !important; }
@@ -42,67 +51,140 @@
         from { opacity: 0; transform: translateY(12px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .app-shell { min-height: 100vh; }
+      a { color: inherit; }
+      .app-shell {
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(11, 16, 22, 0.95), rgba(18, 22, 28, 0.96)),
+          var(--bg);
+      }
       .content-shell {
         min-width: 0;
         position: relative;
         overflow: hidden;
-      }
-      .content-shell::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
         background:
-          linear-gradient(180deg, rgba(255,255,255,0.02), transparent 18%),
-          linear-gradient(90deg, rgba(255,255,255,0.02), transparent 12%, transparent 88%, rgba(255,255,255,0.02));
-        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
+          linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0)),
+          transparent;
       }
       .sidebar {
         display: none;
         position: sticky;
         top: 0;
         height: 100vh;
-        padding: 24px 14px;
+        padding: 22px 16px 18px;
         border-right: 1px solid var(--line);
-        background: rgba(11,14,20,.98);
+        background: rgba(14, 18, 24, 0.88);
         backdrop-filter: blur(18px);
       }
       .sidebar-title,
       .nav-section-label {
         color: var(--muted);
-        letter-spacing: .16em;
+        letter-spacing: .14em;
         text-transform: uppercase;
         font-size: 11px;
         font-weight: 800;
       }
+      .sidebar-stack {
+        display: grid;
+        gap: 18px;
+        height: 100%;
+      }
       .nav-intro {
-        padding: 16px;
+        padding: 18px;
         border: 1px solid var(--line);
-        border-radius: 18px;
-        background: rgba(18,24,34,0.8);
+        border-radius: var(--radius-panel);
+        background: rgba(24, 30, 37, 0.92);
         box-shadow: var(--shadow-soft);
       }
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid rgba(118, 169, 229, 0.22);
+        background: rgba(118, 169, 229, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+      .brand-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.03);
+        color: var(--muted-strong);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .brand-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--green);
+      }
       .nav-intro-title {
-        margin-top: 8px;
+        margin-top: 14px;
         font-size: 20px;
-        font-weight: 900;
-        letter-spacing: -.03em;
+        font-weight: 620;
+        letter-spacing: 0;
         color: white;
       }
       .nav-intro-copy {
         margin-top: 8px;
         color: var(--muted);
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.6;
       }
-      .sidebar-nav { display: grid; gap: 8px; }
+      .nav-support {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+      }
+      .nav-support-item {
+        display: grid;
+        gap: 4px;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+      }
+      .nav-support-item:first-child {
+        padding-top: 0;
+        border-top: 0;
+      }
+      .nav-support-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .nav-support-value {
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .sidebar-nav {
+        display: grid;
+        gap: 8px;
+        align-content: start;
+      }
       .nav-logic {
-        margin-top: auto;
         padding: 16px;
         border: 1px solid var(--line);
-        border-radius: 18px;
-        background: rgba(18,24,34,0.72);
+        border-radius: var(--radius-panel);
+        background: rgba(24, 30, 37, 0.8);
       }
       .nav-logic-title {
         margin-top: 8px;
@@ -118,15 +200,24 @@
         line-height: 1.5;
         color: var(--muted);
       }
-      main { padding: 16px 18px 20px; }
+      .sidebar-footer {
+        margin-top: auto;
+        display: grid;
+        gap: 14px;
+      }
+      main {
+        padding: 18px 18px 28px;
+        width: min(100%, var(--content-max));
+        margin: 0 auto;
+      }
       .mobile-nav {
         position: sticky;
         top: 0;
         z-index: 15;
         display: block;
-        padding: 14px;
+        padding: 12px 12px 10px;
         border-bottom: 1px solid var(--line);
-        background: rgba(11,14,20,.98);
+        background: rgba(14, 18, 24, 0.92);
         backdrop-filter: blur(16px);
       }
       .mobile-nav-head {
@@ -136,16 +227,16 @@
         gap: 12px;
         margin-bottom: 12px;
       }
-      .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+      .mobile-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
       button, select, input { font: inherit; }
       .signal-chip {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         border: 1px solid var(--line);
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
         padding: 6px 12px;
-        background: rgba(14, 19, 28, 0.9);
+        background: var(--card-2);
         color: var(--muted);
         font-size: 11px;
         font-weight: 700;
@@ -154,50 +245,112 @@
       }
       .signal-chip strong { color: white; }
       .tab {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
         border: 1px solid var(--line);
-        background: rgba(18,24,34,0.88);
+        background: rgba(255,255,255,0.02);
         color: var(--muted);
-        border-radius: 16px;
-        padding: 12px 14px;
+        border-radius: 14px;
+        padding: 13px 14px;
         cursor: pointer;
         text-align: left;
-        transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+        transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
-      .tab:hover { transform: translateY(-1px); }
+      .tab::before {
+        content: attr(data-icon);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted-strong);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        flex: 0 0 auto;
+      }
+      .tab:hover {
+        border-color: var(--line-strong);
+        background: rgba(255,255,255,0.04);
+        transform: translateY(-1px);
+      }
       .tab.active {
-        background: rgba(78,161,255,0.16);
-        border-color: rgba(78,161,255,0.4);
+        background: rgba(118, 169, 229, 0.12);
+        border-color: rgba(118, 169, 229, 0.34);
         color: white;
+      }
+      .tab.active::before {
+        background: rgba(118, 169, 229, 0.18);
+        color: var(--accent);
       }
       .page-header {
         display: flex;
         flex-wrap: wrap;
         align-items: end;
         justify-content: space-between;
-        gap: 12px;
+        gap: 16px;
         margin-bottom: 18px;
-        padding: 22px 24px;
+        padding: 20px 22px;
         border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
-        background: rgba(15, 20, 29, 0.98);
-        box-shadow: var(--shadow);
+        border-radius: calc(var(--radius-panel) + 4px);
+        background: rgba(23, 28, 35, 0.88);
+        box-shadow: var(--shadow-soft);
         animation: fadeUp 420ms ease-out both;
       }
       .page-header h1 { margin: 0; }
+      .page-header-meta {
+        display: grid;
+        gap: 8px;
+      }
       .page-kicker {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         margin-bottom: 12px;
-        padding: 6px 12px;
-        border-radius: 999px;
-        border: 1px solid rgba(78, 161, 255, 0.22);
-        background: rgba(78, 161, 255, 0.08);
-        color: #cfe1ff;
+        padding: 7px 12px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(118, 169, 229, 0.18);
+        background: rgba(118, 169, 229, 0.08);
+        color: var(--muted-strong);
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: .16em;
+        letter-spacing: .14em;
+      }
+      .page-header-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+        gap: 10px;
+        min-width: min(100%, 420px);
+      }
+      .page-header-stat {
+        padding: 14px 14px 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+      }
+      .page-header-stat-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .page-header-stat-value {
+        margin-top: 8px;
+        color: white;
+        font-size: 18px;
+        font-weight: 680;
+        letter-spacing: -0.01em;
+      }
+      .page-header-stat-copy {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
       }
       .toolbar {
         display: grid;
@@ -205,32 +358,60 @@
         z-index: 40;
         isolation: isolate;
         overflow: visible;
-        gap: 14px;
+        gap: 16px;
         margin: 18px 0;
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 18px;
-        background: rgba(15, 20, 29, 0.94);
+        padding: 16px;
+        background: rgba(23, 28, 35, 0.88);
         box-shadow: var(--shadow-soft);
-        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        transition: border-color 180ms ease, background-color 180ms ease;
         animation: fadeUp 420ms ease-out both;
       }
       .toolbar-grid {
         display: grid;
         gap: 14px;
-        grid-template-columns: 220px minmax(0, 1fr) auto;
+        grid-template-columns: 220px minmax(0, 1fr) 220px;
       }
-      .toolbar label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; flex: 1 1 220px; min-width: 0; }
+      .toolbar-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .toolbar-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: white;
+      }
+      .toolbar-copy {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .toolbar label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; flex: 1 1 220px; min-width: 0; text-transform: uppercase; letter-spacing: 0.06em; }
       label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
       input, select {
         border: 1px solid var(--line);
         border-radius: var(--radius-control);
-        background: rgba(11, 15, 22, 0.94);
+        background: rgba(13, 17, 23, 0.82);
         color: var(--ink);
         padding: 12px 14px;
         min-width: 0;
         width: 100%;
-        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+      }
+      input:hover, select:hover { border-color: var(--line-strong); }
+      input:focus-visible, select:focus-visible, button:focus-visible {
+        outline: none;
+        border-color: rgba(118, 169, 229, 0.44);
+        box-shadow: 0 0 0 3px rgba(118, 169, 229, 0.14);
       }
       select {
         appearance: none;
@@ -239,18 +420,21 @@
       .mode-pills { display: flex; flex-wrap: wrap; gap: 8px; }
       .mode-pill {
         border: 1px solid var(--line);
-        border-radius: var(--radius-control);
-        background: rgba(10, 18, 33, 0.82);
+        border-radius: var(--radius-pill);
+        background: rgba(255,255,255,0.03);
         color: var(--muted);
         padding: 10px 14px;
         font-size: 13px;
         font-weight: 700;
         transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
-      .mode-pill:hover { transform: translateY(-1px); }
+      .mode-pill:hover {
+        border-color: var(--line-strong);
+        transform: translateY(-1px);
+      }
       .mode-pill.active {
-        border-color: rgba(78, 161, 255, 0.45);
-        background: rgba(78,161,255,0.16);
+        border-color: rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.12);
         color: white;
       }
       .search-wrap { position: relative; z-index: 80; }
@@ -262,9 +446,9 @@
         z-index: 120;
         padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(8, 15, 28, 0.98);
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        border-radius: var(--radius-control);
+        background: rgba(13, 17, 23, 0.96);
+        box-shadow: var(--shadow-soft);
       }
       .search-suggestions-grid {
         display: grid;
@@ -276,57 +460,199 @@
       .search-suggestion {
         width: 100%;
         border: 1px solid var(--line);
-        border-radius: 10px;
-        background: rgba(12, 20, 36, 0.95);
+        border-radius: var(--radius-control);
+        background: var(--card-2);
         color: var(--ink);
         padding: 9px 10px;
         text-align: left;
         font-size: 13px;
         cursor: pointer;
-        transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+        transition: border-color 140ms ease, background-color 140ms ease;
       }
       .search-suggestion:hover {
-        border-color: rgba(78, 161, 255, 0.36);
-        background: rgba(78, 161, 255, 0.12);
-        transform: translateY(-1px);
+        border-color: var(--line-strong);
+        background: rgba(118, 169, 229, 0.1);
       }
-      h1 { margin: 12px 0 4px; font-size: clamp(28px, 4vw, 42px); }
-      h2 { margin: 0; font-size: 24px; }
+      h1 { margin: 6px 0 4px; font-size: clamp(24px, 3.4vw, 34px); font-weight: 680; letter-spacing: -0.02em; }
+      h2 { margin: 0; font-size: 20px; font-weight: 680; letter-spacing: -0.01em; }
       .muted { color: var(--muted); }
       .section { display: none; }
       .section.active { display: block; }
-      .section-stack { display: grid; gap: 16px; }
+      .section-stack { display: grid; gap: 18px; }
       .section-head { display: grid; gap: 6px; }
-      .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-      .two-up { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      .two-up { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr); }
       .three-up { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .overview-kpis .kpi:first-child {
+        grid-column: span 2;
+      }
+      .overview-hero {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+      }
+      .hero-panel,
+      .action-panel {
+        border: 1px solid var(--line);
+        border-radius: calc(var(--radius-panel) + 2px);
+        background: rgba(23, 28, 35, 0.9);
+        box-shadow: var(--shadow-soft);
+      }
+      .hero-panel {
+        padding: 18px;
+      }
+      .hero-head,
+      .action-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .hero-kicker,
+      .action-kicker {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .hero-title,
+      .action-title {
+        margin-top: 8px;
+        color: white;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .hero-copy,
+      .action-copy {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+        max-width: 60ch;
+      }
+      .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.03);
+        color: var(--muted-strong);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+      }
+      .hero-grid {
+        margin-top: 18px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .hero-stat {
+        padding: 14px 14px 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+      }
+      .hero-stat-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .hero-stat-value {
+        margin-top: 8px;
+        color: white;
+        font-size: 21px;
+        font-weight: 720;
+        letter-spacing: -0.03em;
+      }
+      .hero-stat-copy {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .hero-stat-value.tone-success { color: var(--green); }
+      .hero-stat-value.tone-warning { color: var(--amber); }
+      .hero-stat-value.tone-danger { color: var(--red); }
+      .action-panel {
+        padding: 18px;
+      }
+      .action-stack {
+        margin-top: 16px;
+        display: grid;
+        gap: 10px;
+      }
+      .action-item {
+        display: grid;
+        gap: 6px;
+        padding: 13px 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+      }
+      .action-item-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .action-item-label {
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .action-item-value {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .action-item-copy {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .tone-success { color: var(--green); }
+      .tone-warning { color: var(--amber); }
+      .tone-danger { color: var(--red); }
+      .tone-info { color: var(--accent); }
       .card {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: var(--radius-panel);
-        padding: 15px;
+        padding: 16px;
         box-shadow: var(--shadow-soft);
-        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+        transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
         animation: fadeUp 420ms ease-out both;
       }
       .card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(148,163,184,0.28);
-        box-shadow: 0 18px 36px rgba(0,0,0,0.24);
+        transform: translateY(-1px);
+        border-color: var(--line-strong);
+        box-shadow: 0 14px 30px rgba(4, 8, 14, 0.18);
       }
       .kpi {
         position: relative;
         overflow: hidden;
-        padding-left: 22px;
+        min-height: 138px;
+        padding: 18px 18px 16px 20px;
       }
       .kpi::before {
         content: '';
         position: absolute;
         left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: var(--kpi-accent, var(--blue));
+        top: 14px;
+        bottom: 14px;
+        width: 3px;
+        border-radius: 99px;
+        background: var(--kpi-accent, var(--accent));
       }
       .kpi::after {
         content: '';
@@ -338,23 +664,63 @@
         pointer-events: none;
       }
       .kpi:hover::after { opacity: 1; }
-      .kpi .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
-      .kpi .value { margin-top: 10px; font-size: 30px; line-height: 1; font-weight: 900; color: white; letter-spacing: -.03em; }
-      .kpi .muted { margin-top: 10px; font-size: 12px; line-height: 1.5; }
-      .kpi.info { --kpi-accent: var(--blue); }
+      .kpi .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; max-width: 22ch; line-height: 1.35; }
+      .kpi .value { margin-top: 16px; font-size: clamp(23px, 2.2vw, 30px); line-height: 1; font-weight: 700; color: white; letter-spacing: -0.03em; }
+      .kpi .muted { margin-top: 14px; font-size: 12px; line-height: 1.55; max-width: 34ch; }
+      .kpi.info { --kpi-accent: var(--accent); }
       .kpi.success { --kpi-accent: var(--green); }
       .kpi.warning { --kpi-accent: var(--amber); }
       .kpi.danger { --kpi-accent: var(--red); }
-      .kpi.teal { --kpi-accent: var(--teal); }
-      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: rgba(9,16,30,0.96); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: var(--shadow); }
+      .kpi.secondary { --kpi-accent: var(--neutral-accent); }
+      .metric-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(23, 28, 35, 0.86);
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+      }
+      .metric-strip-item {
+        min-width: 0;
+        padding: 14px 16px;
+        border-right: 1px solid var(--line);
+      }
+      .metric-strip-item:last-child { border-right: 0; }
+      .metric-strip-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+      }
+      .metric-strip-value {
+        margin-top: 8px;
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .metric-strip-copy {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--card); -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-shadow: var(--shadow-soft); }
       .table-wrap.tall { max-height: 30rem; overflow-y: auto; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
-      th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
       th { position: relative; }
-      th { background: rgba(16, 28, 51, 0.95); font-weight: 750; color: var(--ink); }
+      th { background: rgba(29, 35, 44, 0.96); font-weight: 750; color: var(--ink); }
       td { color: var(--ink); }
       .table-wrap.tall th { position: sticky; top: 0; z-index: 1; }
       tr:last-child td { border-bottom: 0; }
+      tbody tr {
+        transition: background-color 140ms ease;
+      }
+      tbody tr:hover { background: rgba(255,255,255,0.02); }
       .th-sort {
         display: inline-flex;
         align-items: center;
@@ -373,34 +739,34 @@
         align-items: center;
         gap: 6px;
         padding: 5px 9px;
-        border-radius: 10px;
+        border-radius: var(--radius-pill);
         border: 1px solid var(--line);
-        background: rgba(8, 15, 28, 0.72);
+        background: var(--card);
         color: var(--muted);
         font-size: 11px;
         font-weight: 700;
         cursor: pointer;
       }
       .filter-trigger.active {
-        border-color: rgba(78, 161, 255, 0.45);
-        background: rgba(78, 161, 255, 0.16);
+        border-color: rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.12);
         color: white;
       }
       .filter-panel {
         display: grid;
         gap: 10px;
         padding: 14px;
-        border-radius: 14px;
+        border-radius: var(--radius-panel);
         border: 1px solid var(--line);
-        background: rgba(8, 15, 28, 0.98);
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        background: rgba(13, 17, 23, 0.96);
+        box-shadow: var(--shadow-soft);
       }
       .filter-panel-wrap {
         position: relative;
         z-index: 90;
         margin-bottom: 12px;
       }
-      .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--blue); }
+      .filter-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; color: var(--accent); }
       .filter-clear {
         border: 0;
         background: transparent;
@@ -413,19 +779,19 @@
       .filter-option {
         width: 100%;
         border: 1px solid var(--line);
-        border-radius: 10px;
-        background: rgba(12, 20, 36, 0.95);
+        border-radius: var(--radius-control);
+        background: var(--card-2);
         color: var(--ink);
         padding: 9px 10px;
         text-align: left;
         font-size: 13px;
         cursor: pointer;
-        transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+        transition: border-color 140ms ease, background-color 140ms ease;
       }
-      .filter-option:hover { transform: translateY(-1px); }
+      .filter-option:hover { border-color: var(--line-strong); transform: none; }
       .filter-option.active {
-        border-color: rgba(78, 161, 255, 0.45);
-        background: rgba(78, 161, 255, 0.16);
+        border-color: rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.12);
       }
       .filter-summary { display: flex; flex-wrap: wrap; gap: 8px; }
       .filter-summary-chip {
@@ -433,9 +799,9 @@
         align-items: center;
         gap: 8px;
         padding: 7px 10px;
-        border-radius: 10px;
-        border: 1px solid rgba(78, 161, 255, 0.38);
-        background: rgba(78, 161, 255, 0.14);
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.12);
         color: white;
         font-size: 12px;
         font-weight: 700;
@@ -450,9 +816,9 @@
       }
       .table-count {
         padding: 10px 14px;
-        border-radius: 10px;
+        border-radius: var(--radius-pill);
         border: 1px solid var(--line);
-        background: rgba(8, 15, 28, 0.72);
+        background: var(--card-2);
         color: white;
         font-size: 13px;
       }
@@ -467,31 +833,31 @@
         border: 1px solid var(--line);
         font-size: 10px;
         font-weight: 700;
-        color: var(--blue);
-        background: rgba(78, 161, 255, 0.12);
+        color: var(--accent);
+        background: rgba(118, 169, 229, 0.12);
       }
       .bar-list { display: grid; gap: 10px; }
-      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; transition: background-color 140ms ease, transform 140ms ease; }
-      .bar-row:hover { background: rgba(78,161,255,0.08); transform: translateX(2px); }
-      .bar-bg { height: 12px; overflow: hidden; border-radius: 8px; background: rgba(148, 163, 184, 0.16); }
-      .bar { height: 100%; border-radius: inherit; background: var(--blue); transition: width 260ms ease, filter 140ms ease; }
+      .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; transition: background-color 140ms ease; }
+      .bar-row:hover { background: rgba(255,255,255,0.03); }
+      .bar-bg { height: 12px; overflow: hidden; border-radius: var(--radius-pill); background: rgba(164, 179, 198, 0.12); }
+      .bar { height: 100%; border-radius: inherit; background: var(--accent); transition: width 260ms ease, filter 140ms ease; }
       .bar-row:hover .bar { filter: saturate(1.12) brightness(1.08); }
       .status-red { color: var(--red); font-weight: 800; }
       .status-green { color: var(--green); font-weight: 800; }
       .status-lime { color: var(--lime); font-weight: 900; }
       .danger { color: var(--red); }
       .ok { color: var(--green); }
-      .empty { padding: 22px; border: 1px dashed var(--line); border-radius: 14px; background: rgba(10,18,33,0.9); color: var(--muted); }
+      .empty { padding: 24px; border: 1px dashed var(--line); border-radius: var(--radius-panel); background: rgba(23, 28, 35, 0.78); color: var(--muted); }
       .small { font-size: 12px; color: var(--muted); }
-      .pill { display: inline-block; padding: 4px 8px; border-radius: 10px; background: rgba(78, 161, 255, 0.14); color: #9ecbff; font-size: 12px; font-weight: 700; }
+      .pill { display: inline-block; padding: 5px 9px; border-radius: var(--radius-pill); background: rgba(118, 169, 229, 0.12); color: var(--ink); font-size: 12px; font-weight: 700; }
       .expandable-row { cursor: pointer; }
-      .expandable-row:hover { background: rgba(78, 161, 255, 0.06); }
+      .expandable-row:hover { background: rgba(255,255,255,0.03); }
       .expand-card {
         display: grid;
-        gap: 8px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        background: rgba(15, 25, 45, 0.92);
+        gap: 10px;
+        padding: 16px;
+        border-radius: var(--radius-panel);
+        background: var(--card);
         border: 1px solid var(--line);
       }
       .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -499,9 +865,9 @@
         display: inline-flex;
         align-items: center;
         padding: 6px 10px;
-        border-radius: 10px;
-        background: rgba(78, 161, 255, 0.14);
-        color: #9ecbff;
+        border-radius: var(--radius-pill);
+        background: rgba(118, 169, 229, 0.12);
+        color: var(--ink);
         font-size: 12px;
         font-weight: 700;
       }
@@ -510,17 +876,17 @@
         display: grid;
         gap: 14px;
         align-content: start;
-        transition: transform 180ms ease, filter 180ms ease;
+        transition: filter 180ms ease;
       }
-      .pie-chart:hover { transform: translateY(-2px); filter: saturate(1.06); }
+      .pie-chart:hover { filter: saturate(1.06); }
       .pie-stacked-bar {
         display: flex;
         width: 100%;
         height: 18px;
         overflow: hidden;
-        border-radius: 999px;
-        background: rgba(148, 163, 184, 0.12);
-        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: var(--radius-pill);
+        background: rgba(164, 179, 198, 0.12);
+        border: 1px solid rgba(164, 179, 198, 0.12);
       }
       .pie-stacked-segment { height: 100%; min-width: 2px; transition: opacity 160ms ease, filter 160ms ease; }
       .pie-stacked-bar:hover .pie-stacked-segment { opacity: 0.92; filter: saturate(1.08); }
@@ -528,8 +894,8 @@
         display: grid;
         gap: 10px;
         padding: 18px;
-        border-radius: 16px;
-        background: rgba(10, 18, 33, 0.96);
+        border-radius: var(--radius-panel);
+        background: var(--card);
         border: 1px solid var(--line);
         text-align: center;
       }
@@ -538,14 +904,22 @@
       .pie-center-divider,
       .pie-center-label { color: var(--muted); font-size: 12px; font-weight: 700; }
       .legend-list { display: grid; gap: 10px; }
-      .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; transition: background-color 140ms ease, transform 140ms ease; }
-      .legend-item:hover { background: rgba(78,161,255,0.08); transform: translateX(2px); }
-      .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-      .chart-shell { display: grid; gap: 14px; }
-      .chart-title { font-size: 15px; font-weight: 750; }
+      .legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; transition: background-color 140ms ease; }
+      .legend-item:hover { background: rgba(255,255,255,0.03); }
+      .legend-dot { width: 12px; height: 12px; border-radius: var(--radius-control); }
+      .chart-shell {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: rgba(23, 28, 35, 0.88);
+        box-shadow: var(--shadow-soft);
+      }
+      .chart-title { font-size: 15px; font-weight: 750; letter-spacing: -0.01em; }
       .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
       .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
-      .legend-swatch { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+      .legend-swatch { width: 10px; height: 10px; border-radius: var(--radius-control); display: inline-block; }
       .line-chart { width: 100%; height: 250px; }
       .line-chart text { font-size: 11px; fill: var(--muted); }
       .chart-point { cursor: pointer; }
@@ -555,10 +929,10 @@
         max-width: 280px;
         pointer-events: none;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(8, 15, 28, 0.96);
+        border-radius: var(--radius-panel);
+        background: rgba(13, 17, 23, 0.98);
         color: white;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        box-shadow: var(--shadow-soft);
         padding: 10px 12px;
         opacity: 0;
         transform: translateY(6px);
@@ -568,53 +942,17 @@
       .chart-tooltip-title { color: var(--ink); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
       .chart-tooltip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
       .chart-tooltip-row strong { color: white; }
-      .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 16px; background: var(--card-2); box-shadow: var(--shadow-soft); }
-      .insight .meta { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-      .insight .big { margin-top: 8px; color: white; font-size: 28px; font-weight: 900; }
+      .insight-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .insight { border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 18px; background: var(--card-2); box-shadow: var(--shadow-soft); }
+      .insight .meta { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+      .insight .big { margin-top: 10px; color: white; font-size: 28px; font-weight: 900; letter-spacing: -0.03em; }
       .insight .copy { margin-top: 8px; font-size: 13px; color: var(--muted); }
-      .hero-panel {
-        display: grid;
-        gap: 14px;
-        margin-bottom: 16px;
-        padding: 18px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
-        background: rgba(15, 20, 29, 0.98);
-        box-shadow: var(--shadow);
-        animation: fadeUp 420ms ease-out both;
-      }
-      .hero-grid {
-        display: grid;
-        gap: 14px;
-        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-      }
-      .hero-title {
-        margin: 10px 0 0;
-        font-size: clamp(24px, 3.4vw, 34px);
-        line-height: 1.08;
-        letter-spacing: -.04em;
-        color: white;
-      }
-      .hero-copy {
-        margin-top: 10px;
-        max-width: 62ch;
-        color: var(--muted);
-        line-height: 1.6;
-        font-size: 14px;
-      }
-      .hero-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 12px;
-      }
       .metric-stack { display: grid; gap: 10px; }
       .metric-card {
-        padding: 12px;
+        padding: 14px;
         border: 1px solid var(--line);
-        border-radius: 16px;
-        background: rgba(14, 19, 28, 0.9);
+        border-radius: var(--radius-panel);
+        background: var(--card-2);
         box-shadow: var(--shadow-soft);
       }
       .metric-label {
@@ -628,7 +966,7 @@
         margin-top: 10px;
         font-size: 24px;
         font-weight: 900;
-        letter-spacing: -.03em;
+        letter-spacing: -0.02em;
         color: white;
       }
       .metric-copy {
@@ -639,21 +977,21 @@
       }
       .button-primary,
       .button-danger {
-        border-radius: 12px;
+        border-radius: var(--radius-control);
         padding: 9px 12px;
         font-size: 12px;
         font-weight: 700;
         cursor: pointer;
-        transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+        transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
       }
       .button-primary {
-        border: 1px solid rgba(78, 161, 255, 0.42);
-        background: rgba(78, 161, 255, 0.16);
+        border: 1px solid rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.12);
         color: white;
       }
       .button-danger {
-        border: 1px solid rgba(251, 113, 133, 0.32);
-        background: rgba(251, 113, 133, 0.12);
+        border: 1px solid rgba(201, 107, 93, 0.32);
+        background: rgba(201, 107, 93, 0.12);
         color: var(--red);
       }
       .button-primary:hover,
@@ -663,10 +1001,10 @@
       .todo-main { display: grid; gap: 14px; }
       .todo-list-shell {
         border: 1px solid var(--line);
-        border-radius: 18px;
-        background: rgba(15, 20, 29, 0.94);
+        border-radius: var(--radius-panel);
+        background: var(--card);
         box-shadow: var(--shadow-soft);
-        padding: 14px;
+        padding: 16px;
       }
       .todo-quick-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
       .todo-section-list { display: grid; gap: 14px; margin-top: 14px; }
@@ -679,15 +1017,15 @@
         gap: 10px;
         padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(18, 24, 35, 0.94);
+        border-radius: var(--radius-panel);
+        background: var(--card-2);
         box-shadow: var(--shadow-soft);
-        transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+        transition: border-color 160ms ease, background-color 160ms ease;
       }
       .todo-row:hover {
         transform: translateY(-1px);
-        border-color: rgba(148, 163, 184, 0.24);
-        background: rgba(20, 27, 39, 0.96);
+        border-color: var(--line-strong);
+        background: var(--card-3);
       }
       .todo-row-main { display: flex; align-items: flex-start; gap: 10px; }
       .todo-row-check {
@@ -697,17 +1035,17 @@
         width: 20px;
         height: 20px;
         margin-top: 2px;
-        border-radius: 999px;
-        border: 1px solid rgba(78, 161, 255, 0.34);
-        background: rgba(78, 161, 255, 0.08);
+        border-radius: 8px;
+        border: 1px solid rgba(118, 169, 229, 0.34);
+        background: rgba(118, 169, 229, 0.08);
         color: white;
         font-size: 10px;
         font-weight: 800;
         cursor: pointer;
       }
       .todo-row-check.done {
-        border-color: rgba(52, 211, 153, 0.34);
-        background: rgba(52, 211, 153, 0.12);
+        border-color: rgba(120, 166, 106, 0.42);
+        background: rgba(120, 166, 106, 0.12);
         color: var(--green);
       }
       .todo-row-copy { min-width: 0; flex: 1; }
@@ -719,62 +1057,132 @@
         display: inline-flex;
         align-items: center;
         padding: 5px 9px;
-        border-radius: 999px;
+        border-radius: var(--radius-control);
         border: 1px solid var(--line);
         font-size: 11px;
         font-weight: 700;
       }
-      .todo-badge.status-todo { border-color: rgba(78, 161, 255, 0.42); background: rgba(78, 161, 255, 0.16); color: white; }
-      .todo-badge.status-doing { border-color: rgba(245, 158, 11, 0.42); background: rgba(245, 158, 11, 0.14); color: var(--amber); }
-      .todo-badge.status-done { border-color: rgba(52, 211, 153, 0.42); background: rgba(52, 211, 153, 0.14); color: var(--green); }
-      .todo-badge.priority-high { border-color: rgba(251, 113, 133, 0.38); background: rgba(251, 113, 133, 0.14); color: var(--red); }
-      .todo-badge.priority-medium { border-color: rgba(45, 212, 191, 0.38); background: rgba(45, 212, 191, 0.14); color: var(--teal); }
-      .todo-badge.priority-low { background: rgba(8, 15, 28, 0.72); color: var(--muted); }
+      .todo-badge.status-todo { border-color: rgba(118, 169, 229, 0.34); background: rgba(118, 169, 229, 0.12); color: white; }
+      .todo-badge.status-doing { border-color: rgba(192, 139, 62, 0.42); background: rgba(192, 139, 62, 0.14); color: var(--amber); }
+      .todo-badge.status-done { border-color: rgba(120, 166, 106, 0.42); background: rgba(120, 166, 106, 0.12); color: var(--green); }
+      .todo-badge.priority-high { border-color: rgba(201, 107, 93, 0.38); background: rgba(201, 107, 93, 0.14); color: var(--red); }
+      .todo-badge.priority-medium { border-color: rgba(192, 139, 62, 0.42); background: rgba(192, 139, 62, 0.12); color: var(--amber); }
+      .todo-badge.priority-low { background: var(--card); color: var(--muted); }
       .todo-sidebar { display: grid; gap: 14px; }
       .todo-summary-list { display: grid; gap: 10px; margin-top: 12px; }
       @media (min-width: 980px) {
-        .app-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); }
+        .app-shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); }
         .sidebar { display: block; }
         .mobile-nav { display: none; }
-        main { padding: 20px 20px 24px; }
+        main { padding: 22px 22px 28px; }
       }
       @media (max-width: 979px) {
-        .hero-grid { grid-template-columns: 1fr; }
+        .page-header {
+          padding: 16px;
+        }
+        .page-header-stats {
+          grid-template-columns: 1fr;
+          min-width: 100%;
+        }
+        .overview-hero {
+          grid-template-columns: 1fr;
+        }
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+        .two-up { grid-template-columns: 1fr; }
         .todo-shell { grid-template-columns: 1fr; }
         .pie-wrap { grid-template-columns: 1fr; }
         .pie-chart { width: 180px; height: 180px; }
         main { padding: 12px 12px 18px; }
         .toolbar { gap: 10px; }
         .toolbar-grid { grid-template-columns: 1fr; }
+        .toolbar-head {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
         .table-meta { align-items: stretch; }
         th, td { padding: 10px 10px; }
+        .tab {
+          min-width: 132px;
+        }
+      }
+      @media (max-width: 640px) {
+        h1 { font-size: 25px; }
+        .grid { grid-template-columns: 1fr; }
+        .overview-kpis .kpi:first-child {
+          grid-column: span 1;
+        }
+        .metric-strip {
+          grid-template-columns: 1fr;
+        }
+        .metric-strip-item {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .metric-strip-item:last-child {
+          border-bottom: 0;
+        }
+        .kpi {
+          min-height: 0;
+        }
       }
     </style>
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar">
-        <div class="nav-intro">
-          <div class="nav-section-label">CargoTP</div>
-          <div class="nav-intro-title">Operational cockpit</div>
-          <div class="nav-intro-copy">Щоденний ритм плану, продажів, дебіторки та задач в одному контурі.</div>
-        </div>
-        <div class="sidebar-title" style="margin:14px 0 10px;">Навігація</div>
-        <nav class="sidebar-nav">
-          <button class="tab active" data-tab="overview">Огляд</button>
-          <button class="tab" data-tab="sales">Продажі</button>
-          <button class="tab" data-tab="todo">Todo</button>
-          <button class="tab" data-tab="groups">План груп</button>
-          <button class="tab" data-tab="receivables">Дебіторка</button>
-          <button class="tab" data-tab="tires">Шини</button>
-        </nav>
-        <div class="nav-logic">
-          <div class="nav-section-label">Logic</div>
-          <div class="nav-logic-title">Three questions</div>
-          <div class="nav-logic-list">
-            <div>Where are we behind?</div>
-            <div>Why is it happening?</div>
-            <div>What should be done next?</div>
+        <div class="sidebar-stack">
+          <div class="nav-intro">
+            <div class="brand-row">
+              <div class="brand-mark">CTP</div>
+              <div class="brand-status">System online</div>
+            </div>
+            <div class="nav-intro-title">Revenue control cockpit</div>
+            <div class="nav-intro-copy">Операційна панель для місячного темпу, структури продажів, дебіторки та щоденних дій команди.</div>
+            <div class="nav-support">
+              <div class="nav-support-item">
+                <div class="nav-support-label">Primary source</div>
+                <div class="nav-support-value">Олексієнко.xlsx</div>
+              </div>
+              <div class="nav-support-item">
+                <div class="nav-support-label">Primary scenario</div>
+                <div class="nav-support-value">План, тиск, дія</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="sidebar-title" style="margin:2px 0 10px;">Навігація</div>
+            <nav class="sidebar-nav">
+              <button class="tab active" data-tab="overview" data-icon="OV">Огляд</button>
+              <button class="tab" data-tab="sales" data-icon="SL">Продажі</button>
+              <button class="tab" data-tab="todo" data-icon="TD">Todo</button>
+              <button class="tab" data-tab="groups" data-icon="GP">План груп</button>
+              <button class="tab" data-tab="receivables" data-icon="AR">Дебіторка</button>
+              <button class="tab" data-tab="tires" data-icon="TR">Шини</button>
+            </nav>
+          </div>
+
+          <div class="sidebar-footer">
+            <div class="nav-logic">
+              <div class="nav-section-label">Logic</div>
+              <div class="nav-logic-title">Three questions</div>
+              <div class="nav-logic-list">
+                <div>Where are we behind?</div>
+                <div>Why is it happening?</div>
+                <div>What should be done next?</div>
+              </div>
+            </div>
+            <div class="nav-logic">
+              <div class="nav-section-label">Operating mode</div>
+              <div class="nav-logic-title">Compact, analytical, daily-use</div>
+              <div class="nav-logic-list">
+                <div>Numbers must read instantly</div>
+                <div>Filters must match visible data</div>
+                <div>No fake states, no decorative noise</div>
+              </div>
+            </div>
           </div>
         </div>
       </aside>
@@ -784,30 +1192,57 @@
           <div class="mobile-nav-head">
             <div>
               <div class="nav-section-label">CargoTP</div>
-              <div style="margin-top:4px;font-size:14px;font-weight:700;color:white;">Sales control system</div>
+              <div style="margin-top:4px;font-size:14px;font-weight:700;color:white;">Revenue control cockpit</div>
             </div>
-            <div class="signal-chip"><strong>Live</strong><span>Ops</span></div>
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;">Live ops</div>
           </div>
           <div class="mobile-tabs">
-            <button class="tab active" data-tab="overview">Огляд</button>
-            <button class="tab" data-tab="sales">Продажі</button>
-            <button class="tab" data-tab="todo">Todo</button>
-            <button class="tab" data-tab="groups">План груп</button>
-            <button class="tab" data-tab="receivables">Дебіторка</button>
-            <button class="tab" data-tab="tires">Шини</button>
+            <button class="tab active" data-tab="overview" data-icon="OV">Огляд</button>
+            <button class="tab" data-tab="sales" data-icon="SL">Продажі</button>
+            <button class="tab" data-tab="todo" data-icon="TD">Todo</button>
+            <button class="tab" data-tab="groups" data-icon="GP">План груп</button>
+            <button class="tab" data-tab="receivables" data-icon="AR">Дебіторка</button>
+            <button class="tab" data-tab="tires" data-icon="TR">Шини</button>
           </div>
         </div>
 
         <main>
           <section class="page-header">
-            <div>
+            <div class="page-header-meta">
               <div class="page-kicker">Control center · <span id="page-kicker-label">Огляд</span></div>
               <h1 id="page-title">Огляд</h1>
               <p class="muted" id="updated">Завантаження даних...</p>
             </div>
+            <div class="page-header-stats">
+              <div class="page-header-stat">
+                <div class="page-header-stat-label" id="header-stat-1-label">Main scenario</div>
+                <div class="page-header-stat-value" id="header-stat-1-value">Tempo to action</div>
+                <div class="page-header-stat-copy" id="header-stat-1-copy">Один головний рабочий контур на экран</div>
+              </div>
+              <div class="page-header-stat">
+                <div class="page-header-stat-label" id="header-stat-2-label">Density</div>
+                <div class="page-header-stat-value" id="header-stat-2-value">Compact</div>
+                <div class="page-header-stat-copy" id="header-stat-2-copy">Метрики, графики и таблицы без перегруза</div>
+              </div>
+              <div class="page-header-stat">
+                <div class="page-header-stat-label" id="header-stat-3-label">Visual tone</div>
+                <div class="page-header-stat-value" id="header-stat-3-value">Calm premium</div>
+                <div class="page-header-stat-copy" id="header-stat-3-copy">Тихий контраст и рабочая иерархия</div>
+              </div>
+            </div>
           </section>
 
           <div class="toolbar">
+            <div class="toolbar-head">
+              <div>
+                <div class="toolbar-title">Command bar</div>
+                <div class="toolbar-copy">Місяць, пошук, план і режим зрізу керують усіма робочими блоками нижче.</div>
+              </div>
+              <div class="toolbar-actions">
+                <div class="signal-chip">State <strong>Live</strong></div>
+                <div class="signal-chip">Mode <strong>Operational</strong></div>
+              </div>
+            </div>
             <div class="toolbar-grid">
               <label>Місяць <select id="month"></select></label>
               <label>Пошук <div class="search-wrap"><input id="search" placeholder="Фільтр за активним режимом..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="search" /><div class="search-suggestions" id="search-suggestions" hidden></div></div></label>
@@ -842,9 +1277,10 @@
       const PROFIT_GROUP_NAME = 'PROFIT';
       const PROFIT_PLAN_PERCENT = 9;
       const TODO_STORAGE_KEY = 'cargotp-sales-todos-v1';
-      const COLORS = ['#2563eb', '#0f766e', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#65a30d', '#ea580c'];
+      const COLORS = ['#76a9e5', '#78b48c', '#d4a04f', '#d57669', '#64748b', '#9db7d6', '#a0b4c8', '#8aa57f'];
       let state = {
         data: null,
+        activeTab: 'overview',
         month: '',
         search: '',
         searchMode: 'code',
@@ -1368,6 +1804,72 @@
         };
       }
 
+      function hasGrossPlan() {
+        return Number(state.grossPlan || 0) > 0;
+      }
+
+      function setHeaderStat(index, label, value, copy) {
+        const labelNode = document.getElementById(`header-stat-${index}-label`);
+        const valueNode = document.getElementById(`header-stat-${index}-value`);
+        const copyNode = document.getElementById(`header-stat-${index}-copy`);
+        if (labelNode) labelNode.textContent = label;
+        if (valueNode) valueNode.textContent = value;
+        if (copyNode) copyNode.textContent = copy;
+      }
+
+      function updateHeaderStats(tabId = state.activeTab || 'overview') {
+        if (!state.data) return;
+        const sales = filteredSales();
+        const receivables = state.data.receivables.filter((row) => matchesReceivableSearch(row));
+        const monthPace = monthPaceSnapshot(sales);
+        const grossPlanReady = hasGrossPlan();
+        const overdue = sum(receivables, (row) => row.overdueDebt);
+        const totalDebt = sum(receivables, (row) => row.totalDebt);
+        const salesTotal = sum(sales, (row) => row.amountEur);
+        const profitShare = salesTotal ? sum(sales.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur) / salesTotal * 100 : 0;
+        const deficitClients = clientGroupShareGaps(sales).filter((row) => row.missingGroups > 0);
+        const groupRows = groupTempoRows(sales);
+        const laggingGroups = groupRows.filter((row) => row.tempoDelta < 0);
+        const tireSales = sales.filter((row) => isTireGroup(row.productGroup));
+        const openTodoCount = state.salesTodos.filter((todo) => todo.status !== 'done').length;
+        const doneTodoCount = state.salesTodos.filter((todo) => todo.status === 'done').length;
+
+        if (tabId === 'sales') {
+          setHeaderStat(1, 'Visible turnover', money(salesTotal), `Фільтри застосовані до всіх блоків за ${state.month}`);
+          setHeaderStat(2, 'PROFIT share', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · cross-sell клієнтів: ${deficitClients.length}`);
+          setHeaderStat(3, 'Tempo delta', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у command bar');
+          return;
+        }
+        if (tabId === 'todo') {
+          setHeaderStat(1, 'Open tasks', String(openTodoCount), `Завершено: ${doneTodoCount}`);
+          setHeaderStat(2, 'Cross-sell queue', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+          setHeaderStat(3, 'Receivable pressure', money(overdue), 'Підказки для задач формуються з аналітики');
+          return;
+        }
+        if (tabId === 'groups') {
+          setHeaderStat(1, 'Lagging groups', String(laggingGroups.length), `Групи нижче темпу у ${state.month}`);
+          setHeaderStat(2, 'Worst gap', laggingGroups[0] ? money(laggingGroups[0].tempoDelta) : money(0), laggingGroups[0] ? laggingGroups[0].productGroup : 'Критичного відставання не видно');
+          setHeaderStat(3, 'Required/day', money(sum(groupRows, (row) => row.requiredPerDay)), 'Сумарний ритм для закриття плану');
+          return;
+        }
+        if (tabId === 'receivables') {
+          setHeaderStat(1, 'Overdue debt', money(overdue), 'Клієнти з прострочкою потребують пріоритезації');
+          setHeaderStat(2, '31+ share', pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0), 'Частка найважчого вікового бакета');
+          setHeaderStat(3, 'Risk clients', String(receivables.filter((row) => row.overdueDebt > 0).length), 'Клієнтів з активним overdue');
+          return;
+        }
+        if (tabId === 'tires') {
+          setHeaderStat(1, 'Tire turnover', money(sum(tireSales, (row) => row.amountEur)), `Клієнтів сегмента: ${new Set(tireSales.map((row) => row.clientName)).size}`);
+          setHeaderStat(2, 'Avg margin', pct(avg(tireSales, (row) => row.netMargin)), 'Окремий контроль сегмента шин');
+          setHeaderStat(3, 'Overdue clients', String(new Set(tireSales.filter((sale) => (state.data.receivables.find((row) => row.clientName === sale.clientName || row.clientCode === sale.clientCode)?.overdueDebt || 0) > 0).map((row) => row.clientName)).size), 'Шини + оплатний ризик');
+          return;
+        }
+
+        setHeaderStat(1, 'Tempo delta', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у command bar');
+        setHeaderStat(2, 'Overdue debt', money(overdue), `31+ у структурі: ${pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0)}`);
+        setHeaderStat(3, 'Cross-sell reserve', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+      }
+
       function groupTempoRows(rows) {
         const progress = monthProgress();
         return groupPlanRows(rows)
@@ -1611,7 +2113,7 @@
         `;
       }
 
-      function bars(rows, valueFormatter = money, color = '#4ea1ff') {
+      function bars(rows, valueFormatter = money, color = '#76a9e5') {
         if (!rows.length) return empty();
         const max = Math.max(...rows.map((row) => row.value), 1);
         const total = sum(rows, (row) => row.value);
@@ -1691,28 +2193,28 @@
           <div class="card chart-shell">
             <div class="chart-title">Щоденна динаміка місяця</div>
             <div class="chart-legend">
-              <span><i class="legend-swatch" style="background:#2563eb"></i>Оборот</span>
-              <span><i class="legend-swatch" style="background:#0f766e"></i>Оборот для валового плану</span>
-              <span><i class="legend-swatch" style="background:#d97706"></i>Шини</span>
+              <span><i class="legend-swatch" style="background:#76a9e5"></i>Оборот</span>
+              <span><i class="legend-swatch" style="background:#78a66a"></i>Оборот для валового плану</span>
+              <span><i class="legend-swatch" style="background:#d4a04f"></i>Шини</span>
             </div>
             <svg class="line-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
-              <line x1="${paddingX}" y1="${height - paddingY}" x2="${width - paddingX}" y2="${height - paddingY}" stroke="#cbd5e1" />
-              <line x1="${paddingX}" y1="${paddingY}" x2="${paddingX}" y2="${height - paddingY}" stroke="#cbd5e1" />
+              <line x1="${paddingX}" y1="${height - paddingY}" x2="${width - paddingX}" y2="${height - paddingY}" stroke="rgba(175,167,151,0.52)" />
+              <line x1="${paddingX}" y1="${paddingY}" x2="${paddingX}" y2="${height - paddingY}" stroke="rgba(175,167,151,0.52)" />
               ${rows.map((row, index) => {
                 const x = paddingX + step * index + 3;
                 const barHeight = row.turnover / maxValue * plotHeight;
                 const y = height - paddingY - barHeight;
-                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="#2563eb" opacity="0.75"></rect>`;
+                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#76a9e5" opacity="0.8"></rect>`;
               }).join('')}
-              <polyline fill="none" stroke="#0f766e" stroke-width="3" points="${grossPlanLine}"></polyline>
-              <polyline fill="none" stroke="#d97706" stroke-width="3" points="${tireLine}"></polyline>
+              <polyline fill="none" stroke="#78a66a" stroke-width="3" points="${grossPlanLine}"></polyline>
+              <polyline fill="none" stroke="#d4a04f" stroke-width="3" points="${tireLine}"></polyline>
               ${rows.map((row, index) => {
                 const x = paddingX + step * index + barWidth / 2 + 3;
                 const grossPlanY = height - paddingY - (row.grossPlanTurnover / maxValue) * (height - paddingY * 2);
                 const tireY = height - paddingY - (row.tireTurnover / maxValue) * (height - paddingY * 2);
                 return `
-                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот для валового плану::' + money(row.grossPlanTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${grossPlanY}" r="4" fill="#0f766e"></circle>
-                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Шини::' + money(row.tireTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${tireY}" r="4" fill="#d97706"></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот для валового плану::' + money(row.grossPlanTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${grossPlanY}" r="4" fill="#78a66a"></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Шини::' + money(row.tireTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${tireY}" r="4" fill="#d4a04f"></circle>
                 `;
               }).join('')}
               ${rows.map((row, index) => {
@@ -1767,45 +2269,112 @@
         const bucket31Plus = sum(receivables, (row) => row.bucket31Plus);
         const share31Plus = totalDebt ? bucket31Plus / totalDebt * 100 : 0;
         const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
+        const grossPlanReady = hasGrossPlan();
         const completionTone = completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger';
         const debtTone = sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success';
         const pace = monthPaceSnapshot(sales);
+        const topGapClient = visibleGroupGaps.find((row) => row.missingGroups > 0);
+        const strongestActionItems = [
+          {
+            label: 'Темп місяця',
+            value: grossPlanReady ? money(pace.varianceToTempo) : 'План не задано',
+            copy: grossPlanReady
+              ? (pace.varianceToTempo >= 0
+                ? `Йдемо вище темпу. Прогноз закриття: ${pct(pace.projectedCompletionPercent)}.`
+                : `До планового ритму не вистачає ${money(Math.abs(pace.varianceToTempo))}.`)
+              : 'Задайте валовий план у верхньому command bar, щоб увімкнути pace-аналітику.',
+            tone: grossPlanReady ? (pace.varianceToTempo >= 0 ? 'tone-success' : 'tone-warning') : 'tone-info'
+          },
+          {
+            label: 'Найбільша прострочка',
+            value: topOverdueClients[0] ? money(topOverdueClients[0].value) : money(0),
+            copy: topOverdueClients[0] ? `${topOverdueClients[0].name} зараз найбільше тисне на оплатний контур.` : 'Критичної прострочки в поточному зрізі не видно.',
+            tone: topOverdueClients[0] ? 'tone-danger' : 'tone-success'
+          },
+          {
+            label: 'Cross-sell перший хід',
+            value: topGapClient ? pct(topGapClient.missingPlanShare) : pct(0),
+            copy: topGapClient ? `${topGapClient.clientName} має найбільший незакритий плановий резерв.` : 'Планові групи по активних клієнтах закриті без явного дефіциту.',
+            tone: topGapClient ? 'tone-info' : 'tone-success'
+          }
+        ];
 
         document.getElementById('overview').innerHTML = `
           <div class="section-stack">
-            <section class="hero-panel">
-              <div class="hero-grid">
-                <div>
-                  <div class="signal-chip"><strong>Where behind</strong><span>Темп, план, penetration, дебіторка</span></div>
-                  <h2 class="hero-title">Один екран для трьох питань: де відстаємо, чому це стається і яка дія потрібна наступною.</h2>
-                  <div class="hero-copy">Огляд побудований як щоденний control room: верхній шар тримає ритм місяця, середній показує групи та клієнтів, а нижній дає короткий список точок для переходу в продажі або в задачі.</div>
-                  <div class="hero-chips">
-                    <span class="signal-chip"><strong>${escapeHtml(pct(completion))}</strong><span>виконання валового плану</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(money(sum(receivables, (row) => row.overdueDebt)))}</strong><span>прострочка у фокусі</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(String(activeClients))}</strong><span>активних клієнтів</span></span>
+            <section class="overview-hero">
+              <div class="hero-panel">
+                <div class="hero-head">
+                  <div>
+                    <div class="hero-kicker">Main scenario</div>
+                    <div class="hero-title">План, темп і потрібна дія в одному фреймі</div>
+                    <div class="hero-copy">Overview починається не з декоративних KPI, а з відповіді на головне питання дня: ми вище чи нижче темпу, який обсяг треба добирати і де перший операційний тиск.</div>
                   </div>
+                  <div class="hero-chip">${escapeHtml(state.month)}</div>
                 </div>
-                <div class="metric-stack">
-                  <div class="metric-card">
-                    <div class="metric-label">Темп місяця</div>
-                    <div class="metric-value">${escapeHtml(money(pace.varianceToTempo))}</div>
-                    <div class="metric-copy">Порівняння факту з очікуваним оборотом на поточну дату.</div>
+                <div class="hero-grid">
+                  <div class="hero-stat">
+                    <div class="hero-stat-label">Факт проти темпу</div>
+                    <div class="hero-stat-value ${grossPlanReady ? (pace.varianceToTempo >= 0 ? 'tone-success' : 'tone-warning') : 'tone-info'}">${escapeHtml(grossPlanReady ? money(pace.varianceToTempo) : 'План не задано')}</div>
+                    <div class="hero-stat-copy">${grossPlanReady ? `Очікувалось на поточну дату: ${money(pace.expectedTurnoverToDate)}` : 'Без валового плану pace-порівняння не показується.'}</div>
                   </div>
-                  <div class="metric-card">
-                    <div class="metric-label">Cross-sell резерв</div>
-                    <div class="metric-value">${escapeHtml(String(groupGaps.filter((row) => row.missingGroups > 0).length))}</div>
-                    <div class="metric-copy">Клієнтів мають незакриті планові групи у видимому зрізі.</div>
+                  <div class="hero-stat">
+                    <div class="hero-stat-label">Потрібно в день</div>
+                    <div class="hero-stat-value">${escapeHtml(grossPlanReady ? money(pace.requiredPerDay) : '—')}</div>
+                    <div class="hero-stat-copy">${grossPlanReady ? `Щоб закрити валовий план ${money(grossPlan)}` : 'Після задання плану тут з’явиться добовий required run-rate.'}</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="hero-stat-label">Прогноз закриття</div>
+                    <div class="hero-stat-value ${grossPlanReady ? (pace.projectedCompletionPercent >= 100 ? 'tone-success' : pace.projectedCompletionPercent >= 85 ? 'tone-warning' : 'tone-danger') : 'tone-info'}">${escapeHtml(grossPlanReady ? pct(pace.projectedCompletionPercent) : '—')}</div>
+                    <div class="hero-stat-copy">${grossPlanReady ? 'На основі поточного темпу місяця' : 'Прогноз стане доступним після задання плану.'}</div>
                   </div>
                 </div>
               </div>
+              <aside class="action-panel">
+                <div class="action-head">
+                  <div>
+                    <div class="action-kicker">Priority actions</div>
+                    <div class="action-title">Що варто робити далі</div>
+                    <div class="action-copy">Короткий action-layer зібраний з темпу, дебіторки та незакритих груп.</div>
+                  </div>
+                </div>
+                <div class="action-stack">
+                  ${strongestActionItems.map((item) => `
+                    <div class="action-item">
+                      <div class="action-item-meta">
+                        <div class="action-item-label">${escapeHtml(item.label)}</div>
+                        <div class="action-item-value ${escapeHtml(item.tone)}">${escapeHtml(item.value)}</div>
+                      </div>
+                      <div class="action-item-copy">${escapeHtml(item.copy)}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </aside>
             </section>
 
-            <div class="grid">
+            <section class="metric-strip">
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Валовий план</div>
+                <div class="metric-strip-value">${escapeHtml(grossPlanReady ? pct(completion) : '—')}</div>
+                <div class="metric-strip-copy">${grossPlanReady ? `Активний місяць: ${state.month}` : 'Задайте валовий план для pace-контролю'}</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Прострочка</div>
+                <div class="metric-strip-value">${escapeHtml(money(sum(receivables, (row) => row.overdueDebt)))}</div>
+                <div class="metric-strip-copy">Поточний ризик оплат</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Cross-sell резерв</div>
+                <div class="metric-strip-value">${escapeHtml(String(groupGaps.filter((row) => row.missingGroups > 0).length))}</div>
+                <div class="metric-strip-copy">Клієнтів з незакритими групами</div>
+              </div>
+            </section>
+
+            <div class="grid overview-kpis">
               ${kpi('Загальний оборот', money(total), `Валовий оборот за ${state.month}`, 'info')}
-              ${kpi('Виконання валового плану', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completionTone)}
-              ${kpi('Темп місяця', money(pace.varianceToTempo), `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}`, pace.varianceToTempo >= 0 ? 'success' : 'warning')}
+              ${kpi('Виконання валового плану', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у command bar', grossPlanReady ? completionTone : 'secondary')}
+              ${kpi('Темп місяця', grossPlanReady ? money(pace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (pace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від усієї дебіторки`, debtTone)}
-              ${kpi('Активні клієнти', String(activeClients), `Середній день: ${money(avgDailyTurnover)}`, 'teal')}
+              ${kpi('Активні клієнти', String(activeClients), `Середній день: ${money(avgDailyTurnover)}`, 'secondary')}
             </div>
 
             <div class="two-up">
@@ -1825,8 +2394,8 @@
                     <div class="filter-option" style="cursor:default;">
                       <div style="font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
                       <div class="small" style="font-size:11px;line-height:1.35;">${escapeHtml(money(row.turnover))} · ${escapeHtml(pct(row.turnoverShare))} · ${escapeHtml(pct(row.targetShare))}</div>
-                      <div style="margin-top:10px;height:8px;overflow:hidden;border-radius:999px;background:rgba(141,162,199,0.16);">
-                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;border-radius:999px;background:#4ea1ff;"></div>
+                      <div style="margin-top:10px;height:8px;overflow:hidden;background:rgba(224,216,198,0.12);">
+                        <div style="height:100%;width:${Math.min(row.completionPercent, 100)}%;background:#76a9e5;"></div>
                       </div>
                     </div>
                   `).join('') || empty('Немає планових груп')}
@@ -1834,7 +2403,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Топ клієнтів за прострочкою</div>
-                ${bars(topOverdueClients, money, '#fb7185')}
+                ${bars(topOverdueClients, money, '#c96b5d')}
               </div>
             </div>
 
@@ -1930,6 +2499,7 @@
         const total = sum(tableRows, (row) => row.amountEur);
         const planTurnover = sum(tableRows.filter((row) => isGrossPlanGroup(row.productGroup)), (row) => row.amountEur);
         const grossPlan = Number(state.grossPlan || 0);
+        const grossPlanReady = hasGrossPlan();
         const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
         const monthPace = monthPaceSnapshot(tableRows);
         const profitTurnover = sum(tableRows.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
@@ -1964,7 +2534,7 @@
           {
             title: 'Cross-sell резерв',
             value: `${deficitClients.length} клієнтів`,
-            tone: deficitClients.length ? 'teal' : 'success',
+            tone: deficitClients.length ? 'secondary' : 'success',
             description: deficitClients.length
               ? `${deficitClients[0].clientName} має найбільший дефіцит по планових групах. Це перша точка для допродажу.`
               : 'У видимому зрізі активні клієнти вже закривають планові групи без явного дефіциту.'
@@ -1998,39 +2568,30 @@
 
         document.getElementById('sales').innerHTML = `
           <div class="section-stack">
-            <section class="hero-panel">
-              <div class="hero-grid">
-                <div>
-                  <div class="signal-chip"><strong>Filtered dataset</strong><span>KPI, charts, tables, risks</span></div>
-                  <h2 class="hero-title">Продажі працюють як один контур: фільтри синхронно змінюють графіки, KPI, ризики та таблицю.</h2>
-                  <div class="hero-copy">Екран зібраний навколо темпу місяця, group pace, PROFIT penetration, cross-sell і контролю знижок, щоб швидко перейти від сигналу до конкретного клієнта або рядка продажу.</div>
-                  <div class="hero-chips">
-                    <span class="signal-chip"><strong>${escapeHtml(money(monthPace.varianceToTempo))}</strong><span>факт проти темпу</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>частка PROFIT</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(String(riskyRows.length))}</strong><span>ризикових продажів</span></span>
-                  </div>
-                </div>
-                <div class="metric-stack">
-                  <div class="metric-card">
-                    <div class="metric-label">Потрібно / день</div>
-                    <div class="metric-value">${escapeHtml(money(monthPace.requiredPerDay))}</div>
-                    <div class="metric-copy">Поточний run-rate, який потрібен, щоб закрити валовий план у ${escapeHtml(state.month)}.</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">Тиск концентрації</div>
-                    <div class="metric-value">${escapeHtml(pct(concentrationShare))}</div>
-                    <div class="metric-copy">Частка обороту, яка припадає на трьох найбільших клієнтів поточного зрізу.</div>
-                  </div>
-                </div>
+            <section class="metric-strip">
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Факт проти темпу</div>
+                <div class="metric-strip-value">${escapeHtml(grossPlanReady ? money(monthPace.varianceToTempo) : '—')}</div>
+                <div class="metric-strip-copy">${grossPlanReady ? 'Очікування на поточну дату' : 'Потрібен валовий план для pace-аналітики'}</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Частка PROFIT</div>
+                <div class="metric-strip-value">${escapeHtml(pct(profitShare))}</div>
+                <div class="metric-strip-copy">Ціль: ${escapeHtml(pct(PROFIT_PLAN_PERCENT))}</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Ризикові продажі</div>
+                <div class="metric-strip-value">${escapeHtml(String(riskyRows.length))}</div>
+                <div class="metric-strip-copy">Маржа, знижки та оплати</div>
               </div>
             </section>
 
             <div class="grid">
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
-              ${kpi('Валовий план', pct(completion), `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}`, completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger')}
-              ${kpi('Темп місяця', money(monthPace.varianceToTempo), `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}`, monthPace.varianceToTempo >= 0 ? 'success' : 'warning')}
+              ${kpi('Валовий план', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у command bar', grossPlanReady ? (completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger') : 'secondary')}
+              ${kpi('Темп місяця', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (monthPace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
-              ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'teal')}
+              ${kpi('Середня маржа', pct(avgMarginValue), 'Робоча база по видимих продажах', 'secondary')}
               ${kpi('Потрібно в день', money(monthPace.requiredPerDay), `Прогноз виконання: ${pct(monthPace.projectedCompletionPercent)}`, monthPace.projectedCompletionPercent >= 100 ? 'success' : 'warning')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від дебіторки`, sum(receivables, (row) => row.overdueDebt) > 0 ? 'danger' : 'success')}
             </div>
@@ -2061,7 +2622,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Клієнти для допродажу</div>
-                ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#2dd4bf')}
+                ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#8b8170')}
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Структура груп у зрізі</div>
@@ -2115,7 +2676,7 @@
                 </div>
                 <div class="chart-shell" style="margin-top:14px;">
                   <div class="chart-title">Найбільша прострочка</div>
-                  ${bars(topOverdueClients, money, '#fb7185')}
+                  ${bars(topOverdueClients, money, '#c96b5d')}
                 </div>
               </div>
             </div>
@@ -2240,30 +2801,21 @@
 
         document.getElementById('todo').innerHTML = `
           <div class="section-stack">
-            <section class="hero-panel">
-              <div class="hero-grid">
-                <div>
-                  <div class="signal-chip"><strong>Classic todo</strong><span>Список задач по статусам</span></div>
-                  <h2 class="hero-title">Класичний робочий список, де задачі легко додати, швидко знайти і без шуму провести від "до роботи" до "готово".</h2>
-                  <div class="hero-copy">Ми залишили аналітичні підказки, теги і пріоритети, але сам сценарій зробили ближчим до звичного todo-list: компактні секції, короткі дії по рядку і фокус на наступному кроці.</div>
-                  <div class="hero-chips">
-                    <span class="signal-chip"><strong>${escapeHtml(String(todoSuggestions.length))}</strong><span>підказок з аналітики</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(String(state.salesTodos.length))}</strong><span>усього задач</span></span>
-                    <span class="signal-chip"><strong>${escapeHtml(String(doneTodoCount))}</strong><span>вже завершено</span></span>
-                  </div>
-                </div>
-                <div class="metric-stack">
-                  <div class="metric-card">
-                    <div class="metric-label">Активні задачі</div>
-                    <div class="metric-value">${escapeHtml(String(openTodoCount))}</div>
-                    <div class="metric-copy">Скільки пунктів зараз залишилось у роботі або в черзі на старт.</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">PROFIT gap</div>
-                    <div class="metric-value">${escapeHtml(pct(profitGap))}</div>
-                    <div class="metric-copy">Скільки ще бракує до цільових ${escapeHtml(pct(PROFIT_PLAN_PERCENT))} у вибраному місяці.</div>
-                  </div>
-                </div>
+            <section class="metric-strip">
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Активні задачі</div>
+                <div class="metric-strip-value">${escapeHtml(String(openTodoCount))}</div>
+                <div class="metric-strip-copy">У роботі або в черзі</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">Підказки</div>
+                <div class="metric-strip-value">${escapeHtml(String(todoSuggestions.length))}</div>
+                <div class="metric-strip-copy">Автоматичні задачі з аналітики</div>
+              </div>
+              <div class="metric-strip-item">
+                <div class="metric-strip-label">PROFIT gap</div>
+                <div class="metric-strip-value">${escapeHtml(pct(profitGap))}</div>
+                <div class="metric-strip-copy">До цільових ${escapeHtml(pct(PROFIT_PLAN_PERCENT))}</div>
               </div>
             </section>
 
@@ -2285,7 +2837,7 @@
                     </select>
                   </div>
                   <div class="todo-actions" style="margin-top:12px; justify-content:space-between; align-items:center;">
-                    <span class="signal-chip"><strong>${escapeHtml(pct(profitShare))}</strong><span>частка PROFIT</span></span>
+                    <span class="small">PROFIT: <strong style="color:white;">${escapeHtml(pct(profitShare))}</strong></span>
                     <button class="button-primary" data-sales-todo-submit type="button">Додати задачу</button>
                   </div>
                 </div>
@@ -2409,12 +2961,12 @@
             <div class="grid">
               ${kpi('Загальна дебіторка', money(total), 'Уся сума по клієнтській дебіторці', 'info')}
               ${kpi('Прострочена', money(overdue), `${riskClients} клієнтів мають прострочення`, overdue ? 'danger' : 'success')}
-              ${kpi('Непрострочена', money(current), 'Сума без прострочення', 'teal')}
+              ${kpi('Непрострочена', money(current), 'Сума без прострочення', 'secondary')}
               ${kpi('31+ у структурі', pct(share31Plus), 'Частка 31+ від усієї дебіторки', share31Plus >= 25 ? 'danger' : share31Plus >= 10 ? 'warning' : 'success')}
             </div>
             <div class="grid">
               ${kpi('0–10 днів', money(bucket0To10), '', 'success')}
-              ${kpi('11–20 днів', money(bucket11To20), '', 'teal')}
+              ${kpi('11–20 днів', money(bucket11To20), '', 'secondary')}
               ${kpi('21–30 днів', money(bucket21To30), '', 'warning')}
               ${kpi('31+ днів', money(bucket31Plus), '', 'danger')}
             </div>
@@ -2425,7 +2977,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Ризик: найбільша прострочка</div>
-                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, '#fb7185')}
+                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, '#c96b5d')}
               </div>
             </div>
             ${table('receivables', rows, [
@@ -2486,13 +3038,16 @@
         renderGroups();
         renderReceivables();
         renderTires();
+        updateHeaderStats();
       }
 
       function setActiveTab(tabId) {
+        state.activeTab = tabId;
         document.querySelectorAll('.tab').forEach((button) => button.classList.toggle('active', button.dataset.tab === tabId));
         document.querySelectorAll('.section').forEach((element) => element.classList.toggle('active', element.id === tabId));
         document.getElementById('page-title').textContent = pageTitles[tabId] || 'Огляд';
         document.getElementById('page-kicker-label').textContent = pageKickers[tabId] || pageTitles[tabId] || 'Огляд';
+        updateHeaderStats(tabId);
       }
 
       async function loadData() {
