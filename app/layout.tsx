@@ -4,7 +4,7 @@ import './globals.css';
 import { Navigation } from '@/components/Navigation';
 
 export const metadata: Metadata = {
-  title: 'CargoTP Dashboard',
+  title: 'CargoTP Панель',
   description: 'Щоденний дашборд продажів, плану груп і дебіторської заборгованості'
 };
 

@@ -3,28 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CargoTP Dashboard</title>
+    <title>CargoTP Панель</title>
     <style>
       :root {
         color-scheme: dark;
-        --bg: #151515;
-        --bg-elevated: #1a1a1a;
-        --bg-top: #101010;
-        --card: #1c1c1c;
-        --card-2: #212121;
-        --card-3: #252525;
-        --ink: #f4f4f4;
-        --muted: #969696;
-        --muted-strong: #bebebe;
-        --line: rgba(255, 255, 255, 0.08);
-        --line-strong: rgba(255, 255, 255, 0.18);
-        --accent: #ffffff;
-        --accent-soft: rgba(255, 255, 255, 0.08);
-        --neutral-accent: #8f8f8f;
-        --amber: #d8a33d;
-        --red: #d86f61;
-        --green: #68b07f;
-        --lime: #8dc46e;
+        --bg: #101318;
+        --bg-elevated: #151a22;
+        --bg-top: #0c1016;
+        --card: #151a22;
+        --card-2: #1a202a;
+        --card-3: #202735;
+        --ink: #f4f7fb;
+        --muted: #9aa7b8;
+        --muted-strong: #c4ceda;
+        --line: rgba(148, 163, 184, 0.16);
+        --line-strong: rgba(96, 165, 250, 0.34);
+        --accent: #3b82f6;
+        --accent-soft: rgba(59, 130, 246, 0.14);
+        --neutral-accent: #7f8ea3;
+        --amber: #f2b84b;
+        --red: #ef6b63;
+        --green: #66c187;
+        --lime: #9bd672;
         --shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
         --shadow-soft: none;
         --radius-panel: 4px;
@@ -839,7 +839,7 @@
       .ok { color: var(--green); }
       .empty { padding: 20px; border: 1px dashed var(--line); border-radius: var(--radius-panel); background: transparent; color: var(--muted); }
       .small { font-size: 12px; color: var(--muted); }
-      .pill { display: inline-block; padding: 5px 9px; border-radius: var(--radius-control); background: #232323; color: var(--ink); font-size: 12px; font-weight: 700; }
+      .pill { display: inline-block; padding: 5px 9px; border-radius: var(--radius-control); background: var(--accent-soft); color: var(--ink); font-size: 12px; font-weight: 700; }
       .expandable-row { cursor: pointer; }
       .expandable-row:hover { background: rgba(255,255,255,0.03); }
       .expand-card {
@@ -856,10 +856,21 @@
         align-items: center;
         padding: 6px 10px;
         border-radius: var(--radius-pill);
-        background: #232323;
+        background: var(--accent-soft);
         color: var(--ink);
         font-size: 12px;
         font-weight: 700;
+      }
+      .structure-bars { display: grid; gap: 12px; }
+      .structure-summary {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-panel);
+        background: var(--card);
       }
       .pie-wrap { display: grid; gap: 16px; align-items: start; grid-template-columns: minmax(220px, 280px) 1fr; }
       .pie-chart {
@@ -1010,7 +1021,7 @@
       .plan-tile-progress > span {
         display: block;
         height: 100%;
-        background: #f0f0f0;
+        background: var(--accent);
       }
       .plan-tile-status {
         display: inline-flex;
@@ -1382,7 +1393,7 @@
           </nav>
 
           <div class="sidebar-footer">
-            <div class="rail-status-dot" title="System online"></div>
+            <div class="rail-status-dot" title="Система активна"></div>
           </div>
         </div>
       </aside>
@@ -1392,9 +1403,9 @@
           <div class="mobile-nav-head">
             <div>
               <div class="nav-section-label">CargoTP</div>
-              <div style="margin-top:4px;font-size:13px;font-weight:700;color:white;">Dashboard</div>
+              <div style="margin-top:4px;font-size:13px;font-weight:700;color:white;">Панель</div>
             </div>
-            <div class="rail-status-dot" title="System online"></div>
+            <div class="rail-status-dot" title="Система активна"></div>
           </div>
           <div class="mobile-tabs">
             <button class="tab active" data-tab="overview" type="button"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg></span><span class="tab-label">Огляд</span></button>
@@ -1421,12 +1432,12 @@
               </div>
               <div class="page-header-stat">
                 <div class="page-header-stat-label" id="header-stat-2-label">Щільність</div>
-                <div class="page-header-stat-value" id="header-stat-2-value">Compact</div>
+                <div class="page-header-stat-value" id="header-stat-2-value">Компактно</div>
                 <div class="page-header-stat-copy" id="header-stat-2-copy">Метрики й таблиці без шуму</div>
               </div>
               <div class="page-header-stat">
                 <div class="page-header-stat-label" id="header-stat-3-label">Тон</div>
-                <div class="page-header-stat-value" id="header-stat-3-value">Calm premium</div>
+                <div class="page-header-stat-value" id="header-stat-3-value">Спокійний контраст</div>
                 <div class="page-header-stat-copy" id="header-stat-3-copy">Тихий контраст і робоча ієрархія</div>
               </div>
             </div>
@@ -1453,6 +1464,16 @@
                 <button class="mode-pill" data-search-mode="group" type="button">Група</button>
               </div>
             </div>
+            <div>
+              <div class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Швидкий фокус</div>
+              <div class="mode-pills">
+                <button class="mode-pill active" data-quick-focus="all" type="button">Усі</button>
+                <button class="mode-pill" data-quick-focus="lagging" type="button">Відстають</button>
+                <button class="mode-pill" data-quick-focus="riskMargin" type="button">Ризик маржі</button>
+                <button class="mode-pill" data-quick-focus="overdue" type="button">Є прострочка</button>
+                <button class="mode-pill" data-quick-focus="noProfit" type="button">Без PROFIT</button>
+              </div>
+            </div>
           </div>
 
           <section class="section active" id="overview"></section>
@@ -1473,13 +1494,14 @@
       const PROFIT_GROUP_NAME = 'PROFIT';
       const PROFIT_PLAN_PERCENT = 9;
       const TODO_STORAGE_KEY = 'cargotp-sales-todos-v1';
-      const COLORS = ['#f0f0f0', '#68b07f', '#d8a33d', '#d86f61', '#8f8f8f', '#d0d0d0', '#b4b4b4', '#7f7f7f'];
+      const COLORS = ['#3b82f6', '#66c187', '#f2b84b', '#ef6b63', '#8fb4ff', '#7f8ea3', '#c4ceda', '#64748b'];
       let state = {
         data: null,
         activeTab: 'overview',
         month: '',
         search: '',
         searchMode: 'code',
+        quickFocus: 'all',
         salesGroupView: 'all',
         grossPlan: 0,
         clientSuggestions: [],
@@ -1628,7 +1650,30 @@
         }
         return plans;
       }
-      const filteredSales = () => state.data.sales.filter((row) => monthOf(row.date) === state.month && matchesSearch(row));
+      function filteredSales() {
+        const baseRows = state.data.sales.filter((row) => monthOf(row.date) === state.month && matchesSearch(row));
+        if (state.quickFocus === 'all') return baseRows;
+        if (state.quickFocus === 'noProfit') {
+          const clientsWithProfit = new Set(baseRows.filter((row) => isProfitBrand(row.brand)).map(clientKey));
+          return baseRows.filter((row) => !clientsWithProfit.has(clientKey(row)));
+        }
+        if (state.quickFocus === 'overdue') {
+          const overdueClients = new Set(state.data.receivables.filter((row) => row.overdueDebt > 0).map(clientKey));
+          return baseRows.filter((row) => overdueClients.has(clientKey(row)));
+        }
+        if (state.quickFocus === 'riskMargin') {
+          const avgMarginValue = avg(baseRows, (row) => row.netMargin);
+          const avgDiscountValue = avg(baseRows, (row) => row.discountPercent);
+          const discountThreshold = Math.max(avgDiscountValue, 8);
+          const marginThreshold = avgMarginValue > 0 ? Math.min(avgMarginValue, PROFIT_PLAN_PERCENT + 3) : PROFIT_PLAN_PERCENT + 3;
+          return baseRows.filter((row) => row.discountPercent >= discountThreshold || row.netMargin <= marginThreshold);
+        }
+        if (state.quickFocus === 'lagging') {
+          const laggingClients = new Set(clientGroupShareGaps(baseRows).filter((row) => row.missingGroups > 0).map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+          return baseRows.filter((row) => laggingClients.has(clientKey(row)));
+        }
+        return baseRows;
+      }
 
       const byTop = (rows, getKey, getValue, limit = 10) => {
         const map = new Map();
@@ -2125,13 +2170,13 @@
 
         if (tabId === 'sales') {
           setHeaderStat(1, 'Оборот зрізу', money(salesTotal), `Фільтри застосовані до всіх блоків за ${state.month}`);
-          setHeaderStat(2, 'Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · клієнтів на cross-sell: ${deficitClients.length}`);
+          setHeaderStat(2, 'Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)} · клієнтів на допродаж: ${deficitClients.length}`);
           setHeaderStat(3, 'Темп', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у фільтрах');
           return;
         }
         if (tabId === 'todo') {
           setHeaderStat(1, 'Активні задачі', String(openTodoCount), `Завершено: ${doneTodoCount}`);
-          setHeaderStat(2, 'Черга cross-sell', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+          setHeaderStat(2, 'Черга допродажу', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
           setHeaderStat(3, 'Тиск дебіторки', money(overdue), 'Ризики підтягуються до задач по клієнтах');
           return;
         }
@@ -2156,7 +2201,7 @@
 
         setHeaderStat(1, 'Темп', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Задайте валовий план у фільтрах');
         setHeaderStat(2, 'Прострочка', money(overdue), `31+ у структурі: ${pct(totalDebt ? sum(receivables, (row) => row.bucket31Plus) / totalDebt * 100 : 0)}`);
-        setHeaderStat(3, 'Cross-sell резерв', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
+        setHeaderStat(3, 'Резерв допродажу', String(deficitClients.length), 'Клієнтів з незакритими плановими групами');
       }
 
       function groupTempoRows(rows) {
@@ -2410,7 +2455,7 @@
         `;
       }
 
-      function bars(rows, valueFormatter = money, color = '#f0f0f0') {
+      function bars(rows, valueFormatter = money, color = 'var(--accent)') {
         if (!rows.length) return empty();
         const max = Math.max(...rows.map((row) => row.value), 1);
         const total = sum(rows, (row) => row.value);
@@ -2427,30 +2472,25 @@
         `;
       }
 
-      function pie(rows, centerTitle) {
+      function structureBars(rows, centerTitle) {
         if (!rows.length) return empty();
         const total = sum(rows, (row) => row.value);
         if (!total) return empty();
 
         return `
-          <div class="pie-wrap">
-            <div class="pie-chart">
-              <div class="pie-stacked-bar">
-                ${rows.map((row, index) => `<span class="pie-stacked-segment" style="width:${Math.max(row.value / total * 100, 2)}%;background:${COLORS[index % COLORS.length]};"></span>`).join('')}
+          <div class="structure-bars">
+            <div class="structure-summary">
+              <div>
+                <div class="metric-label">${escapeHtml(centerTitle)}</div>
+                <div class="metric-value">${escapeHtml(money(total))}</div>
               </div>
-              <div class="pie-center">
-                <div class="pie-center-stack">
-                  <div class="pie-center-value">${escapeHtml(money(total))}</div>
-                  <div class="pie-center-divider">-</div>
-                  <div class="pie-center-label">${escapeHtml(centerTitle)}</div>
-                </div>
-              </div>
+              <div class="metric-copy">Горизонтальні bars швидше показують різницю між групами, ніж кругова діаграма.</div>
             </div>
-            <div class="legend-list">
+            <div class="bar-list">
               ${rows.map((row, index) => `
-                <div class="legend-item chart-point" ${tooltipAttrs(row.name, ['Сума::' + money(row.value), 'Частка::' + pct(total ? row.value / total * 100 : 0)])}>
-                  <span class="legend-dot" style="background:${COLORS[index % COLORS.length]}"></span>
-                  <span title="${escapeHtml(row.name)}">${escapeHtml(shortLabel(row.name, 26))}</span>
+                <div class="bar-row chart-point" ${tooltipAttrs(row.name, ['Сума::' + money(row.value), 'Частка::' + pct(total ? row.value / total * 100 : 0)])}>
+                  <div title="${escapeHtml(row.name)}">${escapeHtml(shortLabel(row.name, 28))}</div>
+                  <div class="bar-bg"><div class="bar" style="width:${Math.max(3, row.value / Math.max(...rows.map((item) => item.value), 1) * 100)}%; background:${COLORS[index % COLORS.length]};"></div></div>
                   <strong>${escapeHtml(pct(total ? row.value / total * 100 : 0))}</strong>
                 </div>
               `).join('')}
@@ -2490,9 +2530,9 @@
           <div class="card chart-shell">
             <div class="chart-title">Щоденна динаміка місяця</div>
             <div class="chart-legend">
-              <span><i class="legend-swatch" style="background:#f0f0f0"></i>Оборот</span>
-              <span><i class="legend-swatch" style="background:#78a66a"></i>Оборот для валового плану</span>
-              <span><i class="legend-swatch" style="background:#d4a04f"></i>Шини</span>
+              <span><i class="legend-swatch" style="background:#3b82f6"></i>Оборот</span>
+              <span><i class="legend-swatch" style="background:#66c187"></i>Оборот для валового плану</span>
+              <span><i class="legend-swatch" style="background:#f2b84b"></i>Шини</span>
             </div>
             <svg class="line-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
               <line x1="${paddingX}" y1="${height - paddingY}" x2="${width - paddingX}" y2="${height - paddingY}" stroke="rgba(175,167,151,0.52)" />
@@ -2501,17 +2541,17 @@
                 const x = paddingX + step * index + 3;
                 const barHeight = row.turnover / maxValue * plotHeight;
                 const y = height - paddingY - barHeight;
-                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#f0f0f0" opacity="0.78"></rect>`;
+                return `<rect class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот::' + money(row.turnover), 'Валовий план::' + money(row.grossPlanTurnover), 'Шини::' + money(row.tireTurnover), 'Клієнти::' + String(row.clients)])} x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#3b82f6" opacity="0.82"></rect>`;
               }).join('')}
-              <polyline fill="none" stroke="#78a66a" stroke-width="3" points="${grossPlanLine}"></polyline>
-              <polyline fill="none" stroke="#d4a04f" stroke-width="3" points="${tireLine}"></polyline>
+              <polyline fill="none" stroke="#66c187" stroke-width="3" points="${grossPlanLine}"></polyline>
+              <polyline fill="none" stroke="#f2b84b" stroke-width="3" points="${tireLine}"></polyline>
               ${rows.map((row, index) => {
                 const x = paddingX + step * index + barWidth / 2 + 3;
                 const grossPlanY = height - paddingY - (row.grossPlanTurnover / maxValue) * (height - paddingY * 2);
                 const tireY = height - paddingY - (row.tireTurnover / maxValue) * (height - paddingY * 2);
                 return `
-                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот для валового плану::' + money(row.grossPlanTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${grossPlanY}" r="4" fill="#78a66a"></circle>
-                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Шини::' + money(row.tireTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${tireY}" r="4" fill="#d4a04f"></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Оборот для валового плану::' + money(row.grossPlanTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${grossPlanY}" r="4" fill="#66c187"></circle>
+                  <circle class="chart-point" ${tooltipAttrs(`День ${row.label}`, ['Шини::' + money(row.tireTurnover), 'Оборот::' + money(row.turnover), 'Клієнти::' + String(row.clients)])} cx="${x}" cy="${tireY}" r="4" fill="#f2b84b"></circle>
                 `;
               }).join('')}
               ${rows.map((row, index) => {
@@ -2579,6 +2619,9 @@
         const totalDebt = sum(receivables, (row) => row.totalDebt);
         const bucket31Plus = sum(receivables, (row) => row.bucket31Plus);
         const share31Plus = totalDebt ? bucket31Plus / totalDebt * 100 : 0;
+        const profitTurnover = sum(sales.filter((row) => isProfitBrand(row.brand)), (row) => row.amountEur);
+        const profitShare = total ? profitTurnover / total * 100 : 0;
+        const profitGap = Math.max(PROFIT_PLAN_PERCENT - profitShare, 0);
         const completion = grossPlan ? planTurnover / grossPlan * 100 : 0;
         const grossPlanReady = hasGrossPlan();
         const completionTone = completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger';
@@ -2593,7 +2636,7 @@
               ? (pace.varianceToTempo >= 0
                 ? `Вище темпу. Прогноз: ${pct(pace.projectedCompletionPercent)}.`
                 : `До ритму не вистачає ${money(Math.abs(pace.varianceToTempo))}.`)
-              : 'Задайте валовий план, щоб увімкнути pace.',
+              : 'Задайте валовий план, щоб увімкнути порівняння темпу.',
             tone: grossPlanReady ? (pace.varianceToTempo >= 0 ? 'tone-success' : 'tone-warning') : 'tone-info'
           },
           {
@@ -2603,7 +2646,7 @@
             tone: topOverdueClients[0] ? 'tone-danger' : 'tone-success'
           },
           {
-            label: 'Cross-sell перший хід',
+            label: 'Перший хід допродажу',
             value: topGapClient ? pct(topGapClient.missingPlanShare) : pct(0),
             copy: topGapClient ? `${topGapClient.clientName} має найбільший резерв.` : 'Явного дефіциту по групах немає.',
             tone: topGapClient ? 'tone-info' : 'tone-success'
@@ -2626,12 +2669,12 @@
                   <div class="hero-stat">
                     <div class="hero-stat-label">Факт проти темпу</div>
                     <div class="hero-stat-value ${grossPlanReady ? (pace.varianceToTempo >= 0 ? 'tone-success' : 'tone-warning') : 'tone-info'}">${escapeHtml(grossPlanReady ? money(pace.varianceToTempo) : 'План не задано')}</div>
-                    <div class="hero-stat-copy">${grossPlanReady ? `Очікувалось на поточну дату: ${money(pace.expectedTurnoverToDate)}` : 'Без валового плану pace-порівняння не показується.'}</div>
+                    <div class="hero-stat-copy">${grossPlanReady ? `Очікувалось на поточну дату: ${money(pace.expectedTurnoverToDate)}` : 'Без валового плану порівняння темпу не показується.'}</div>
                   </div>
                   <div class="hero-stat">
                     <div class="hero-stat-label">Потрібно в день</div>
                     <div class="hero-stat-value">${escapeHtml(grossPlanReady ? money(pace.requiredPerDay) : '—')}</div>
-                    <div class="hero-stat-copy">${grossPlanReady ? `Щоб закрити валовий план ${money(grossPlan)}` : 'Після задання плану тут з’явиться добовий required run-rate.'}</div>
+                    <div class="hero-stat-copy">${grossPlanReady ? `Щоб закрити валовий план ${money(grossPlan)}` : 'Після задання плану тут з’явиться потрібний добовий темп.'}</div>
                   </div>
                   <div class="hero-stat">
                     <div class="hero-stat-label">Прогноз закриття</div>
@@ -2665,9 +2708,9 @@
             <div class="grid overview-kpis">
               ${kpi('Загальний оборот', money(total), `Валовий оборот за ${state.month}`, 'info')}
               ${kpi('Виконання валового плану', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у фільтрах', grossPlanReady ? completionTone : 'secondary')}
-              ${kpi('Темп місяця', grossPlanReady ? money(pace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (pace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
+              ${kpi('Темп місяця', grossPlanReady ? money(pace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось на зараз: ${money(pace.expectedTurnoverToDate)}` : 'Без плану не показуємо відхилення темпу', grossPlanReady ? (pace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Прострочена дебіторка', money(sum(receivables, (row) => row.overdueDebt)), `31+ днів: ${pct(share31Plus)} від усієї дебіторки`, debtTone)}
-              ${kpi('Активні клієнти', String(activeClients), `Середній день: ${money(avgDailyTurnover)}`, 'secondary')}
+              ${kpi('Частка PROFIT', pct(profitShare), profitGap > 0 ? `До цілі бракує ${pct(profitGap)}` : `Ціль ${pct(PROFIT_PLAN_PERCENT)} виконана`, profitGap > 0 ? 'warning' : 'success')}
             </div>
 
             <div class="two-up">
@@ -2686,7 +2729,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Топ клієнтів за прострочкою</div>
-                ${bars(topOverdueClients, money, '#d86f61')}
+                ${bars(topOverdueClients, money, 'var(--red)')}
               </div>
             </div>
 
@@ -2703,7 +2746,7 @@
 
             <div class="section-head">
               <h2>Клієнти, які не закривають планові групи</h2>
-              <p class="muted">Головний список для cross-sell</p>
+              <p class="muted">Головний список для допродажу</p>
             </div>
             <div class="mode-pills">
               <button class="mode-pill ${state.groupGapMode === 'all' ? 'active' : ''}" data-group-gap-mode="all" type="button">Усі клієнти</button>
@@ -2805,7 +2848,7 @@
               : 'Ціль виконана. Можна переносити фокус на інші резерви.'
           },
           {
-            title: 'Cross-sell резерв',
+            title: 'Резерв допродажу',
             value: `${deficitClients.length} клієнтів`,
             tone: deficitClients.length ? 'secondary' : 'success',
             description: deficitClients.length
@@ -2839,10 +2882,9 @@
             <div class="grid">
               ${kpi('Оборот зрізу', money(total), `Видимий оборот за ${state.month}`, 'info')}
               ${kpi('Валовий план', grossPlanReady ? pct(completion) : 'План не задано', grossPlanReady ? `Планова база: ${money(planTurnover)} з планом ${money(grossPlan)}` : 'Задайте валовий план місяця у фільтрах', grossPlanReady ? (completion >= 100 ? 'success' : completion >= 85 ? 'warning' : 'danger') : 'secondary')}
-              ${kpi('Темп місяця', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}` : 'Без плану не показуємо pace delta', grossPlanReady ? (monthPace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
-              ${kpi('Темп %', grossPlanReady ? pct(monthPace.projectedCompletionPercent) : 'План не задано', grossPlanReady ? `Потрібно в день: ${money(monthPace.requiredPerDay)}` : 'Після задання плану з’явиться прогноз ритму', grossPlanReady ? (monthPace.projectedCompletionPercent >= 100 ? 'success' : monthPace.projectedCompletionPercent >= 85 ? 'warning' : 'danger') : 'secondary')}
+              ${kpi('Темп місяця', grossPlanReady ? money(monthPace.varianceToTempo) : 'План не задано', grossPlanReady ? `Очікувалось: ${money(monthPace.expectedTurnoverToDate)}` : 'Без плану не показуємо відхилення темпу', grossPlanReady ? (monthPace.varianceToTempo >= 0 ? 'success' : 'warning') : 'secondary')}
               ${kpi('Частка PROFIT', pct(profitShare), `Ціль: ${pct(PROFIT_PLAN_PERCENT)}`, profitGap > 0 ? 'warning' : 'success')}
-              ${kpi('Середня знижка', pct(avgDiscountValue), 'Робоча база по видимих продажах', avgDiscountValue >= 8 ? 'warning' : 'secondary')}
+              ${kpi('Ризикові продажі', String(riskyRows.length), `Під тиском ${money(discountPressureTurnover)} обороту`, riskyRows.length ? 'warning' : 'success')}
             </div>
 
             <div class="three-up">
@@ -2886,11 +2928,11 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Клієнти для допродажу</div>
-                ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, '#8b8170')}
+                ${bars(deficitClients.slice(0, 8).map((row) => ({ name: row.clientName, value: row.missingPlanShare })), pct, 'var(--neutral-accent)')}
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Структура планових груп</div>
-                ${pie(planGroupBars(planGroups).slice(0, 8), 'Планова база')}
+                ${structureBars(planGroupBars(planGroups).slice(0, 8), 'Планова база')}
               </div>
             </div>
 
@@ -2949,7 +2991,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Де планові групи просідають</div>
-                ${bars(laggingPlanGroups.slice(0, 8).map((row) => ({ name: row.productGroup, value: Math.abs(row.shareDelta) })), pct, '#d86f61')}
+                ${bars(laggingPlanGroups.slice(0, 8).map((row) => ({ name: row.productGroup, value: Math.abs(row.shareDelta) })), pct, 'var(--red)')}
               </div>
             </div>
 
@@ -3015,7 +3057,7 @@
               </div>
 
               <div class="chart-shell">
-                <div class="chart-title">Середня маржа і run-rate</div>
+                <div class="chart-title">Середня маржа і добовий темп</div>
                 <div class="metric-stack">
                   <div class="metric-card">
                     <div class="metric-label">Середня маржа</div>
@@ -3095,7 +3137,7 @@
             <div class="two-up">
               <div class="chart-shell">
                 <div class="chart-title">Найбільше відставання по темпу</div>
-                ${bars(laggingRows.map((row) => ({ name: row.productGroup, value: Math.abs(row.tempoDelta) })), money, '#d86f61')}
+                ${bars(laggingRows.map((row) => ({ name: row.productGroup, value: Math.abs(row.tempoDelta) })), money, 'var(--red)')}
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Лідери виконання</div>
@@ -3325,7 +3367,7 @@
               </div>
               <div class="chart-shell">
                 <div class="chart-title">Ризик: найбільша прострочка</div>
-                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, '#d86f61')}
+                ${bars(byTop(rows.filter((row) => row.overdueDebt > 0), (row) => row.clientName, (row) => row.overdueDebt, 8), money, 'var(--red)')}
               </div>
             </div>
             ${table('receivables', rows, [
@@ -3658,6 +3700,13 @@
         button.classList.add('active');
         state.searchSuggestionsOpen = true;
         syncSearchSuggestions();
+        renderAll();
+      }));
+
+      document.querySelectorAll('[data-quick-focus]').forEach((button) => button.addEventListener('click', () => {
+        state.quickFocus = button.dataset.quickFocus || 'all';
+        document.querySelectorAll('[data-quick-focus]').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
         renderAll();
       }));
 

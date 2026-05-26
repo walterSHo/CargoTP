@@ -10,7 +10,7 @@ export default function GroupPlanPage() {
   const rows = month ? groupTempoRows(data.groupPlans, monthSales, month) : [];
   return (
     <div className="space-y-6">
-      <PageHeader description="Тут видно, які товарні групи тримають темп місяця, де факт відстає від темпу, і скільки ще потрібно добрати до плану." kicker="Group pace" title="План груп" />
+      <PageHeader description="Тут видно, які товарні групи тримають темп місяця, де факт відстає від темпу, і скільки ще потрібно добрати до плану." kicker="Темп груп" title="План груп" />
       <GroupPlanClient rows={rows} />
     </div>
   );

@@ -8,7 +8,7 @@ function iconForTitle(title: string): ReactNode {
   if (normalized.includes('дебітор')) return <WalletIcon className="h-[18px] w-[18px]" />;
   if (normalized.includes('profit') || normalized.includes('маржа')) return <PercentIcon className="h-[18px] w-[18px]" />;
   if (normalized.includes('темп') || normalized.includes('день')) return <GaugeIcon className="h-[18px] w-[18px]" />;
-  if (normalized.includes('клієнт') || normalized.includes('cross-sell')) return <NetworkIcon className="h-[18px] w-[18px]" />;
+  if (normalized.includes('клієнт') || normalized.includes('допродаж')) return <NetworkIcon className="h-[18px] w-[18px]" />;
   if (normalized.includes('план')) return <CircleAlertIcon className="h-[18px] w-[18px]" />;
   return <BarChartIcon className="h-[18px] w-[18px]" />;
 }

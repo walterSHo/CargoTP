@@ -166,7 +166,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
           <div className="metric-strip-copy">Поточний ризик оплат</div>
         </div>
         <div className="metric-strip-item">
-          <div className="metric-strip-label">Cross-sell резерв</div>
+          <div className="metric-strip-label">Резерв допродажу</div>
           <div className="metric-strip-value">{visibleGroupGaps.filter((row) => row.missingGroups > 0).length}</div>
           <div className="metric-strip-copy">Клієнтів з незакритими плановими групами</div>
         </div>
@@ -207,14 +207,14 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <div className="mt-1 text-[11px] leading-4 text-muted">
                   {money(row.turnover)} · {percent(row.turnoverShare)} · {percent(row.targetShare)}
                 </div>
-                <div className="mt-3 h-2 overflow-hidden bg-[rgba(224,216,198,0.12)]">
+                <div className="mt-3 h-2 overflow-hidden bg-[rgba(148,163,184,0.16)]">
                   <div className="h-full bg-[var(--accent)] transition-all duration-300 ease-out" style={{ width: `${Math.min(row.completionPercent, 100)}%` }} />
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <SimpleBarChart barColor="#c96b5d" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
+        <SimpleBarChart barColor="#ef6b63" data={topOverdueClients} title="Топ клієнтів за прострочкою" valueLabel="Прострочка" />
       </section>
 
       <section className="space-y-3">
@@ -266,7 +266,7 @@ export function OverviewClient({ data }: { data: ProcessedData }) {
                 <div className="text-sm text-muted">Групи, яких не вистачає:</div>
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {row.missingGroupStats.length ? row.missingGroupStats.map((item) => (
-                    <div className="border border-line bg-[rgba(199,181,138,0.08)] px-3 py-2" key={item.name}>
+                    <div className="border border-line bg-[rgba(59,130,246,0.08)] px-3 py-2" key={item.name}>
                       <div className="text-sm font-semibold text-white">{item.name}</div>
                       <div className="mt-1 text-[10px] leading-4 text-muted">{percent(item.planShare)}</div>
                     </div>

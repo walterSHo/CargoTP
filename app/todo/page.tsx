@@ -8,8 +8,8 @@ export default function TodoPage() {
     <div className="space-y-6">
       <PageHeader
         description="Класичний і компактний todo-список для продажів: швидке додавання, теги, пріоритети, фільтри та автоматичні задачі з аналітики."
-        kicker="Action list"
-        title="Todo"
+        kicker="Список дій"
+        title="Задачі"
       />
       <TodoBoardClient data={data} />
     </div>

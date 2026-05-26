@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DailySalesChart, SimpleBarChart, SimplePieChart } from './Charts';
+import { DailySalesChart, SimpleBarChart } from './Charts';
 import { DashboardFilterBar } from './DashboardFilterBar';
 import { DataTable } from './DataTable';
 import { KpiCard } from './KpiCard';
@@ -37,6 +37,16 @@ type ActionSignal = {
   tone: 'success' | 'warning' | 'danger' | 'secondary';
   description: string;
 };
+
+type QuickFocus = 'all' | 'lagging' | 'riskMargin' | 'overdue' | 'noProfit';
+
+const quickFocusOptions: Array<{ value: QuickFocus; label: string }> = [
+  { value: 'all', label: 'Усі' },
+  { value: 'lagging', label: 'Відстають' },
+  { value: 'riskMargin', label: 'Ризик маржі' },
+  { value: 'overdue', label: 'Є прострочка' },
+  { value: 'noProfit', label: 'Без PROFIT' }
+];
 
 const salesColumns: ColumnDef<SalesRecord>[] = [
   { accessorKey: 'date', header: 'Дата' },
@@ -106,7 +116,7 @@ const profitGroupColumns: ColumnDef<ProfitGroupPenetrationRow>[] = [
   { accessorKey: 'productGroup', header: 'Група' },
   { accessorKey: 'clients', header: 'Клієнтів' },
   { accessorKey: 'clientsWithProfit', header: 'З PROFIT' },
-  { accessorKey: 'penetrationPercent', header: 'Penetration %', cell: (info) => percent(Number(info.getValue())) },
+  { accessorKey: 'penetrationPercent', header: 'Покриття %', cell: (info) => percent(Number(info.getValue())) },
   { accessorKey: 'potentialTurnover', header: 'Потенціал без PROFIT', cell: (info) => money(Number(info.getValue())) },
   { accessorKey: 'turnover', header: 'Оборот групи', cell: (info) => money(Number(info.getValue())) }
 ];
@@ -157,14 +167,35 @@ export function SalesClient({ data }: { data: ProcessedData }) {
   const [month, setMonth] = useState(months[0] ?? '');
   const [searchMode, setSearchMode] = useState<DashboardSearchMode>('code');
   const [query, setQuery] = useState('');
+  const [quickFocus, setQuickFocus] = useState<QuickFocus>('all');
   const [filters, setFilters] = useState<Record<string, string[]>>({});
 
   const suggestions = useMemo(() => suggestionValues(data, searchMode), [data, searchMode]);
-  const baseSales = useMemo(
+  const searchedSales = useMemo(
     () => salesForMonth(data.sales, month).filter((row) => matchesSales(row, searchMode, query)),
     [data.sales, month, query, searchMode]
   );
-  const visibleSales = useMemo(() => applyColumnFilters(baseSales, filters), [baseSales, filters]);
+  const focusedSales = useMemo(() => {
+    if (quickFocus === 'all') return searchedSales;
+    if (quickFocus === 'noProfit') {
+      const clientsWithProfit = new Set(searchedSales.filter((row) => normalizeProductGroup(row.brand) === normalizeProductGroup(PROFIT_GROUP_NAME)).map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+      return searchedSales.filter((row) => !clientsWithProfit.has(row.clientCode || row.unifiedClientCode || row.clientName));
+    }
+    if (quickFocus === 'overdue') {
+      const overdueClients = new Set(data.receivables.filter((row) => row.overdueDebt > 0).map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+      return searchedSales.filter((row) => overdueClients.has(row.clientCode || row.unifiedClientCode || row.clientName));
+    }
+    if (quickFocus === 'riskMargin') {
+      const avgMarginValue = searchedSales.length ? searchedSales.reduce((sum, row) => sum + row.netMargin, 0) / searchedSales.length : 0;
+      const avgDiscountValue = searchedSales.length ? searchedSales.reduce((sum, row) => sum + row.discountPercent, 0) / searchedSales.length : 0;
+      const discountLimit = Math.max(avgDiscountValue, 8);
+      const marginLimit = avgMarginValue > 0 ? Math.min(avgMarginValue, PROFIT_PLAN_PERCENT + 3) : PROFIT_PLAN_PERCENT + 3;
+      return searchedSales.filter((row) => row.discountPercent >= discountLimit || row.netMargin <= marginLimit);
+    }
+    const laggingClients = new Set(clientGroupShareGaps(data.groupPlans, searchedSales).filter((row) => row.missingGroups > 0).map((row) => row.clientCode || row.unifiedClientCode || row.clientName));
+    return searchedSales.filter((row) => laggingClients.has(row.clientCode || row.unifiedClientCode || row.clientName));
+  }, [data.groupPlans, data.receivables, quickFocus, searchedSales]);
+  const visibleSales = useMemo(() => applyColumnFilters(focusedSales, filters), [focusedSales, filters]);
   const kpis = useMemo(() => dashboardKpis(visibleSales, [], data.monthlyPlans, month), [data.monthlyPlans, month, visibleSales]);
   const monthPace = useMemo(() => monthPaceSnapshot(visibleSales, data.monthlyPlans, month), [data.monthlyPlans, month, visibleSales]);
   const topClients = useMemo(() => topClientsByTurnover(visibleSales, 10), [visibleSales]);
@@ -183,7 +214,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
     }))
     .sort((a, b) => b.turnover - a.turnover || b.targetShare - a.targetShare)
     .slice(0, 6), [data.groupPlans, visibleSales]);
-  const topGroupsPie = useMemo(() => groupShareTargets.map((row) => ({ name: row.name, value: row.turnover })).filter((row) => row.value > 0), [groupShareTargets]);
+  const plannedGroupBars = useMemo(() => groupShareTargets.map((row) => ({ name: row.name, value: row.turnover })).filter((row) => row.value > 0), [groupShareTargets]);
   const tempoRows = useMemo(() => groupTempoRows(data.groupPlans, visibleSales, month), [data.groupPlans, month, visibleSales]);
   const profitClients = useMemo(() => profitClientPenetration(visibleSales, 12), [visibleSales]);
   const profitGroups = useMemo(() => profitGroupPenetration(visibleSales, 10), [visibleSales]);
@@ -213,11 +244,11 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       value: `${percent(profitShare)} / ${percent(PROFIT_PLAN_PERCENT)}`,
       tone: profitGap > 0 ? 'warning' : 'success',
       description: profitGap > 0
-        ? `Бракує ${percent(profitGap)} до цілі PROFIT. Найкраще тиснути через клієнтів і групи з низьким penetration.`
+        ? `Бракує ${percent(profitGap)} до цілі PROFIT. Найкраще тиснути через клієнтів і групи з низьким покриттям.`
         : 'Ціль PROFIT виконана. Можна утримувати частку та переносити фокус на інші резерви.'
     },
     {
-      title: 'Cross-sell резерв',
+      title: 'Резерв допродажу',
       value: `${deficitClients.length} клієнтів`,
       tone: deficitClients.length ? 'secondary' : 'success',
       description: deficitClients.length
@@ -266,6 +297,22 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         suggestions={suggestions}
       />
 
+      <section className="filter-bar motion-fade-up">
+        <div className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted">Швидкий фокус</div>
+        <div className="flex flex-wrap gap-2">
+          {quickFocusOptions.map((option) => (
+            <button
+              className={`filter-pill ${quickFocus === option.value ? 'filter-pill-active' : ''}`}
+              key={option.value}
+              onClick={() => setQuickFocus(option.value)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
       <section className="metric-strip motion-fade-up">
         <div className="metric-strip-item">
           <div className="metric-strip-label">Факт проти темпу</div>
@@ -301,13 +348,13 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       <section className="grid gap-4 xl:grid-cols-3">
         <SimpleBarChart data={topBrandsChart} title="Топ брендів" valueLabel="Оборот" />
         <SimpleBarChart data={topGroupsChart} title="Топ товарних груп" valueLabel="Оборот" />
-        <SimplePieChart data={topGroupsPie} title="Структура груп" />
+        <SimpleBarChart data={plannedGroupBars} title="Планові групи за фактом" valueLabel="Оборот" />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
         <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Робочі сигнали для росту</div>
-          <div className="text-xs text-muted">Тут зібрані показники, які найбільше впливають на план, темп, cross-sell, контроль знижок і оплат.</div>
+          <div className="text-xs text-muted">Тут зібрані показники, які найбільше впливають на план, темп, допродаж, контроль знижок і оплат.</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {actionSignals.map((signal) => (
               <div className="insight-tile interactive-lift" key={signal.title}>
@@ -361,7 +408,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
       <section className="grid gap-4 xl:grid-cols-2">
         <div className="panel-card interactive-lift p-4">
           <div className="mb-1 text-sm font-semibold text-white">Клієнти для допродажу і розширення матриці</div>
-          <div className="text-xs text-muted">Де клієнт вже купує, але не закрив усі потрібні групи. Це прямий cross-sell резерв.</div>
+          <div className="text-xs text-muted">Де клієнт вже купує, але не закрив усі потрібні групи. Це прямий резерв допродажу.</div>
           <div className="mt-4">
             <DataTable
               columns={opportunityColumns}
@@ -383,7 +430,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
                       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">Вже купує</div>
                       <div className="flex flex-wrap gap-2">
                         {row.coveredGroupStats.map((item) => (
-                          <span className="border border-line bg-[rgba(199,181,138,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
+                          <span className="border border-line bg-[rgba(59,130,246,0.12)] px-3 py-2 text-xs text-white" key={`${row.clientName}-${item.name}`}>
                             {item.name}: {money(item.amount)}
                           </span>
                         ))}
@@ -435,7 +482,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
 
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по клієнтах</div>
+          <div className="mb-1 text-sm font-semibold text-white">Покриття PROFIT по клієнтах</div>
           <div className="text-xs text-muted">Одразу видно, де PROFIT вже є, а де клієнт дає оборот, але бренд ще не заведений.</div>
           <div className="mt-4">
             <DataTable
@@ -450,7 +497,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">PROFIT penetration по групах</div>
+          <div className="mb-1 text-sm font-semibold text-white">Покриття PROFIT по групах</div>
           <div className="text-xs text-muted">Показує, в яких групах вже багато клієнтів з PROFIT, а де вищий потенціал дотягнути бренд через існуючий оборот.</div>
           <div className="mt-4">
             <DataTable
@@ -463,16 +510,16 @@ export function SalesClient({ data }: { data: ProcessedData }) {
         </div>
 
         <div className="panel-card interactive-lift p-4">
-          <div className="mb-1 text-sm font-semibold text-white">Todo-список винесено окремо</div>
+          <div className="mb-1 text-sm font-semibold text-white">Список задач винесено окремо</div>
           <div className="text-sm leading-6 text-muted">
             Для зручності todo тепер живе в окремій вкладці зі списком, тегами, пріоритетами і швидкими задачами з аналітики.
           </div>
           <div className="mt-4 space-y-3">
             <div className="soft-panel interactive-lift p-4">
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">Що всередині</div>
-              <div className="mt-2 text-sm text-muted">Окремий список `todo / doing / done`, локальне зберігання, фільтри по тегах і пріоритетах, автопідказки по cross-sell, PROFIT і дебіторці.</div>
+              <div className="mt-2 text-sm text-muted">Окремий список `до роботи / в процесі / готово`, локальне зберігання, фільтри по тегах і пріоритетах, автопідказки по допродажу, PROFIT і дебіторці.</div>
             </div>
-            <Link className="inline-flex items-center justify-center border border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:border-[rgba(199,181,138,0.6)] hover:bg-[rgba(199,181,138,0.2)]" href="/todo">
+            <Link className="inline-flex items-center justify-center border border-[rgba(59,130,246,0.42)] bg-[rgba(59,130,246,0.14)] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:border-[rgba(59,130,246,0.6)] hover:bg-[rgba(59,130,246,0.2)]" href="/todo">
               Відкрити todo-список
             </Link>
           </div>
@@ -481,7 +528,7 @@ export function SalesClient({ data }: { data: ProcessedData }) {
 
       <section className="panel-card interactive-lift p-4">
         <div className="mb-1 text-sm font-semibold text-white">Усі продажі в активному зрізі</div>
-        <div className="text-xs text-muted">Графіки, KPI і таблиця дивляться на один і той самий filtered dataset: місяць, глобальний пошук і column filters більше не розходяться.</div>
+        <div className="text-xs text-muted">Графіки, KPI і таблиця дивляться на один і той самий фільтрований набір даних: місяць, глобальний пошук і фільтри колонок більше не розходяться.</div>
         <div className="mt-4">
           <DataTable
             activeFilters={filters}

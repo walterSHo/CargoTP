@@ -99,7 +99,7 @@ function priorityBadgeClassName(priority: TodoPriority) {
 function statusBadgeClassName(status: TodoStatus) {
   if (status === 'done') return 'border-[rgba(120,166,106,0.42)] bg-[rgba(120,166,106,0.12)] text-[var(--success)]';
   if (status === 'doing') return 'border-[rgba(192,139,62,0.42)] bg-[rgba(192,139,62,0.14)] text-[var(--warning)]';
-  return 'border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] text-white';
+  return 'border-[rgba(59,130,246,0.42)] bg-[rgba(59,130,246,0.14)] text-white';
 }
 
 function matchesReceivables(row: ReceivableRecord, clientKeys: Set<string>) {
@@ -158,7 +158,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
       items.push({
         title: `Розширити матрицю для ${deficitClients[0].clientName}`,
         clientName: deficitClients[0].clientName,
-        tags: ['cross-sell', ...deficitClients[0].missingGroupNames.slice(0, 2)],
+        tags: ['допродаж', ...deficitClients[0].missingGroupNames.slice(0, 2)],
         priority: 'high'
       });
     }
@@ -168,7 +168,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
       items.push({
         title: `Запустити PROFIT у ${noProfitClient.clientName}`,
         clientName: noProfitClient.clientName,
-        tags: ['profit', 'penetration'],
+        tags: ['profit', 'покриття'],
         priority: 'high'
       });
     }
@@ -311,7 +311,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
             <div className="todo-quick-grid mt-3">
               <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))} placeholder="Назва задачі" value={draft.title} />
               <input className="filter-input" onChange={(event) => setDraft((current) => ({ ...current, clientName: event.target.value }))} placeholder="Клієнт або сегмент" value={draft.clientName} />
-              <input className="filter-input md:col-span-2" onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} placeholder="Теги через кому: profit, дебіторка, cross-sell" value={draft.tags} />
+              <input className="filter-input md:col-span-2" onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} placeholder="Теги через кому: profit, дебіторка, допродаж" value={draft.tags} />
             </div>
             <div className="mt-3 flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
               <label className="grid gap-2 md:min-w-[220px]">
@@ -320,7 +320,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                   {priorityOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
               </label>
-              <button className="border border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-[rgba(199,181,138,0.56)] hover:bg-[rgba(199,181,138,0.2)]" onClick={submitTodo} type="button">
+              <button className="border border-[rgba(59,130,246,0.42)] bg-[rgba(59,130,246,0.14)] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-[rgba(59,130,246,0.56)] hover:bg-[rgba(59,130,246,0.2)]" onClick={submitTodo} type="button">
                 Додати задачу
               </button>
             </div>
@@ -366,7 +366,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                             <div className="todo-row-meta">
                               <span className={`border px-2 py-1 text-[11px] font-semibold ${priorityBadgeClassName(todo.priority)}`}>{priorityLabels[todo.priority]}</span>
                               {todo.tags.map((tag) => (
-                                <button className={`border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] text-white' : 'border-line bg-[rgba(20,19,16,0.9)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
+                                <button className={`border px-2 py-1 text-[11px] transition ${tagFilter === tag ? 'border-[rgba(59,130,246,0.42)] bg-[rgba(59,130,246,0.14)] text-white' : 'border-line bg-[rgba(16,21,29,0.9)] text-muted hover:text-white'}`} key={`${todo.id}-${tag}`} onClick={() => setTagFilter((current) => current === tag ? 'all' : tag)} type="button">
                                   {tag}
                                 </button>
                               ))}
@@ -375,7 +375,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                         </div>
                         <div className="todo-row-actions">
                           {todo.status !== 'todo' ? (
-                            <button className="todo-action-button border-line bg-[rgba(20,19,16,0.9)] text-muted hover:text-white" onClick={() => setTodoStatus(todo.id, 'todo')} type="button">
+                            <button className="todo-action-button border-line bg-[rgba(16,21,29,0.9)] text-muted hover:text-white" onClick={() => setTodoStatus(todo.id, 'todo')} type="button">
                               До роботи
                             </button>
                           ) : null}
@@ -410,7 +410,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
             <div className="mt-1 text-xs text-muted">Додаються одним кліком без ручного набору.</div>
             <div className="mt-3 grid gap-2">
               {suggestedTodos.length ? suggestedTodos.map((todo) => (
-                <button className="border border-line bg-[rgba(20,19,16,0.9)] p-3 text-left transition hover:border-[rgba(199,181,138,0.38)] hover:bg-[rgba(199,181,138,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
+                <button className="border border-line bg-[rgba(16,21,29,0.9)] p-3 text-left transition hover:border-[rgba(59,130,246,0.38)] hover:bg-[rgba(59,130,246,0.1)]" key={`${todo.title}-${todo.clientName}`} onClick={() => addTodo(todo)} type="button">
                   <div className="text-sm font-semibold text-white">{todo.title}</div>
                   <div className="mt-1 text-xs text-muted">{todo.clientName || 'Загальна задача'} · {priorityLabels[todo.priority]}</div>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -437,7 +437,7 @@ export function TodoBoardClient({ data }: { data: ProcessedData }) {
                 <div className="mt-1 text-lg font-black text-white">{completedCount}</div>
               </div>
               <div className="soft-panel p-3">
-                <div className="text-[11px] uppercase tracking-[0.08em] text-muted">Cross-sell клієнти</div>
+                <div className="text-[11px] uppercase tracking-[0.08em] text-muted">Клієнти для допродажу</div>
                 <div className="mt-1 text-lg font-black text-white">{deficitClients.length}</div>
               </div>
             </div>

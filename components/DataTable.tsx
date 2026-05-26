@@ -186,13 +186,13 @@ export function DataTable<T>({
           <div className="flex flex-wrap gap-2">
             {activeFilterEntries.map(({ columnId, value }) => (
               <button
-                className="inline-flex items-center gap-2 border border-[rgba(199,181,138,0.42)] bg-[rgba(199,181,138,0.14)] px-3 py-2 text-xs font-semibold text-white"
+                className="inline-flex items-center gap-2 border border-[rgba(59,130,246,0.42)] bg-[rgba(59,130,246,0.14)] px-3 py-2 text-xs font-semibold text-white"
                 key={`${columnId}:${value}`}
                 onClick={() => toggleFilter(columnId, value)}
                 type="button"
               >
                 <span>{columnLabels[columnId] ?? columnId}</span>
-                <span className="text-[rgba(243,239,229,0.72)]">{value}</span>
+                <span className="text-[rgba(244,247,251,0.72)]">{value}</span>
               </button>
             ))}
           </div>
@@ -234,7 +234,7 @@ export function DataTable<T>({
                               <button
                                 className={`inline-flex items-center gap-1 border px-2 py-1 text-xs font-semibold transition ${
                                   selectedCount
-                                    ? 'border-[rgba(199,181,138,0.44)] bg-[rgba(199,181,138,0.14)] text-white'
+                                    ? 'border-[rgba(59,130,246,0.44)] bg-[rgba(59,130,246,0.14)] text-white'
                                     : 'border-line bg-[var(--panel)] text-[var(--muted)] hover:text-white'
                                 }`}
                                 onClick={(event) => {
@@ -281,7 +281,7 @@ export function DataTable<T>({
                                     {filteredOptions.length ? filteredOptions.map((option: string) => {
                                       const checked = resolvedFilters[openFilterColumn]?.includes(option) ?? false;
                                       return (
-                                        <label className="flex cursor-pointer items-start gap-3 px-2 py-2 text-sm text-[var(--ink)] transition hover:bg-[rgba(199,181,138,0.08)]" key={option}>
+                                        <label className="flex cursor-pointer items-start gap-3 px-2 py-2 text-sm text-[var(--ink)] transition hover:bg-[rgba(59,130,246,0.08)]" key={option}>
                                           <input
                                             checked={checked}
                                             className="mt-0.5"
@@ -315,7 +315,7 @@ export function DataTable<T>({
               return (
                 <Fragment key={row.id}>
                   <tr
-                    className={`border-t border-line/80 ${expandedContent ? 'cursor-pointer transition hover:bg-[rgba(199,181,138,0.06)]' : ''}`}
+                    className={`border-t border-line/80 ${expandedContent ? 'cursor-pointer transition hover:bg-[rgba(59,130,246,0.06)]' : ''}`}
                     onClick={expandedContent ? () => toggleExpanded(row.id) : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -325,7 +325,7 @@ export function DataTable<T>({
                     ))}
                   </tr>
                   {expandedContent && isExpanded ? (
-                    <tr className="border-t border-line bg-[rgba(199,181,138,0.05)]">
+                    <tr className="border-t border-line bg-[rgba(59,130,246,0.05)]">
                       <td className="px-3 py-3 text-[var(--ink)]" colSpan={row.getVisibleCells().length}>
                         {expandedContent}
                       </td>

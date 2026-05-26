@@ -4,9 +4,9 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Label, Legend, Line, Pie, PieChart, ResponsiveContainer, Sector, Tooltip, XAxis, YAxis } from 'recharts';
 import { money, percent } from '@/lib/format';
 
-const COLORS = ['#c7b58a', '#78a66a', '#c08b3e', '#c96b5d', '#9a8f7d', '#d1c4a3', '#8f6d4f', '#a97b55'];
-const CHART_GRID = 'rgba(224,216,198,0.14)';
-const CHART_AXIS = 'rgba(175,167,151,0.82)';
+const COLORS = ['#3b82f6', '#66c187', '#f2b84b', '#ef6b63', '#8fb4ff', '#7f8ea3', '#c4ceda', '#64748b'];
+const CHART_GRID = 'rgba(148,163,184,0.16)';
+const CHART_AXIS = 'rgba(154,167,184,0.86)';
 
 function shortLabel(value: string | number, limit = 16) {
   const label = String(value ?? '');
@@ -48,7 +48,7 @@ function BarChartTooltip({
         {payload.map((entry) => (
           <div className="flex items-center justify-between gap-3" key={`${entry.name}-${entry.value}`}>
             <span className="inline-flex items-center gap-2 text-muted">
-              <span className="h-2.5 w-2.5" style={{ backgroundColor: entry.color ?? '#c7b58a' }} />
+              <span className="h-2.5 w-2.5" style={{ backgroundColor: entry.color ?? '#3b82f6' }} />
               <span>{entry.name}</span>
             </span>
             <span className="text-right">
@@ -108,7 +108,7 @@ export function SimpleBarChart({
   title,
   barLabels = {},
   valueFormatter = money,
-  barColor = '#c7b58a',
+  barColor = '#3b82f6',
   valueLabel = 'Значення'
 }: {
   data: Array<Record<string, string | number>>;
@@ -142,7 +142,7 @@ export function SimpleBarChart({
               label?: string | number;
               payload?: Array<{ name?: string | number; value?: number | string; dataKey?: string | number; color?: string }>;
             }) => <BarChartTooltip {...props} totalsByKey={totalsByKey} valueFormatter={valueFormatter} />}
-            cursor={{ fill: 'rgba(199,181,138,0.08)' }}
+            cursor={{ fill: 'rgba(59,130,246,0.08)' }}
           />
           {bars.length > 1 ? <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{barLabels[String(value)] ?? String(value)}</span>} /> : null}
           {bars.map((bar, index) => (
@@ -212,7 +212,7 @@ export function SimplePieChart({ data, title }: { data: Array<{ name: string; va
                 if (!viewBox || !('cx' in viewBox) || !('cy' in viewBox)) return null;
                 return (
                   <g>
-                    <text fill="#f3efe5" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) - 16}>
+                    <text fill="#f4f7fb" fontSize="14" fontWeight="800" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) - 16}>
                       {money(total)}
                     </text>
                     <text fill={CHART_AXIS} fontSize="12" fontWeight="700" textAnchor="middle" x={viewBox.cx} y={Number(viewBox.cy ?? 0) + 2}>
@@ -274,13 +274,13 @@ export function DailySalesChart({ data, title }: { data: Array<{ label: string; 
               label?: string | number;
               payload?: Array<{ name?: string | number; value?: number | string; payload?: { clients?: number } }>;
             }) => <DailyChartTooltip {...props} turnoverTotal={turnoverTotal} />}
-            cursor={{ stroke: 'rgba(199,181,138,0.35)', strokeWidth: 1.5, strokeDasharray: '4 4' }}
+            cursor={{ stroke: 'rgba(59,130,246,0.35)', strokeWidth: 1.5, strokeDasharray: '4 4' }}
           />
           <Legend formatter={(value) => <span className="text-xs font-medium text-[var(--ink)]">{String(value)}</span>} />
-          <Bar activeBar={{ fillOpacity: 1, stroke: 'rgba(255,255,255,0.28)', strokeWidth: 1 }} animationDuration={700} dataKey="turnover" fill="#c7b58a" name="Оборот" radius={[0, 0, 0, 0]}>
+          <Bar activeBar={{ fillOpacity: 1, stroke: 'rgba(255,255,255,0.28)', strokeWidth: 1 }} animationDuration={700} dataKey="turnover" fill="#3b82f6" name="Оборот" radius={[0, 0, 0, 0]}>
             {data.map((row, rowIndex) => (
               <Cell
-                fill="#c7b58a"
+                fill="#3b82f6"
                 fillOpacity={activeIndex !== null && activeIndex !== rowIndex ? 0.42 : 1}
                 key={`${row.label}-${rowIndex}`}
                 stroke={activeIndex === rowIndex ? 'rgba(255,255,255,0.2)' : 'transparent'}
@@ -288,8 +288,8 @@ export function DailySalesChart({ data, title }: { data: Array<{ label: string; 
               />
             ))}
           </Bar>
-          <Line activeDot={{ fill: '#78a66a', r: 5, stroke: '#dce8d7', strokeWidth: 1.5 }} animationDuration={780} dataKey="grossPlanTurnover" dot={{ fill: '#78a66a', r: 0 }} name="Оборот для валового плану" stroke="#78a66a" strokeWidth={2.5} type="monotone" />
-          <Line activeDot={{ fill: '#c08b3e', r: 5, stroke: '#f3efe5', strokeWidth: 1.5 }} animationDuration={840} dataKey="tireTurnover" dot={{ fill: '#c08b3e', r: 0 }} name="Шини" stroke="#c08b3e" strokeWidth={2.5} type="monotone" />
+          <Line activeDot={{ fill: '#66c187', r: 5, stroke: '#dce8d7', strokeWidth: 1.5 }} animationDuration={780} dataKey="grossPlanTurnover" dot={{ fill: '#66c187', r: 0 }} name="Оборот для валового плану" stroke="#66c187" strokeWidth={2.5} type="monotone" />
+          <Line activeDot={{ fill: '#f2b84b', r: 5, stroke: '#f4f7fb', strokeWidth: 1.5 }} animationDuration={840} dataKey="tireTurnover" dot={{ fill: '#f2b84b', r: 0 }} name="Шини" stroke="#f2b84b" strokeWidth={2.5} type="monotone" />
         </ComposedChart>
       </ResponsiveContainer>
     </ChartShell>
