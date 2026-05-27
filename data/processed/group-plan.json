@@ -3,108 +3,108 @@
     "productGroup": "Все",
     "planPercent": 100,
     "planAmount": 163000,
-    "tempoAmount": 124539.326,
-    "factAmount": 119173.13,
-    "completionPercent": 95.6911634482429,
-    "netPercent": 15.255532769845
+    "tempoAmount": 139801.498291667,
+    "factAmount": 141593.02,
+    "completionPercent": 101.28147532767899,
+    "netPercent": 15.3717849933563
   },
   {
     "productGroup": "АВТОХІМІЯ І ОЛИВИ",
     "planPercent": 10,
     "planAmount": 16300,
-    "tempoAmount": 12453.9326,
-    "factAmount": 9712.94,
-    "completionPercent": 77.990947212931,
-    "netPercent": 14.340734113461002
+    "tempoAmount": 13980.1498291667,
+    "factAmount": 11321.39,
+    "completionPercent": 80.98189317242,
+    "netPercent": 15.3164470087154
   },
   {
     "productGroup": "АМОРТИЗАЦІЯ",
     "planPercent": 4,
     "planAmount": 6520,
-    "tempoAmount": 4981.57304,
-    "factAmount": 3088.72,
-    "completionPercent": 62.002905010100996,
-    "netPercent": 8.60471327928721
+    "tempoAmount": 5592.05993166666,
+    "factAmount": 4468.61,
+    "completionPercent": 79.9099089531426,
+    "netPercent": 7.211761599244509
   },
   {
     "productGroup": "ГАЛЬМІВНА СИСТЕМА",
     "planPercent": 10,
     "planAmount": 16300,
-    "tempoAmount": 12453.9326,
-    "factAmount": 19702.78,
-    "completionPercent": 158.205288504613,
-    "netPercent": 12.2796123186677
+    "tempoAmount": 13980.1498291667,
+    "factAmount": 22027.82,
+    "completionPercent": 157.564977980734,
+    "netPercent": 12.5135633031321
   },
   {
     "productGroup": "ДВИГУН",
     "planPercent": 10,
     "planAmount": 16300,
-    "tempoAmount": 12453.9326,
-    "factAmount": 12643.75,
-    "completionPercent": 101.524156313484,
-    "netPercent": 17.725795748887798
+    "tempoAmount": 13980.1498291667,
+    "factAmount": 14099.27,
+    "completionPercent": 100.85206648203999,
+    "netPercent": 17.2619880320045
   },
   {
     "productGroup": "ЕЛЕКТРИКА",
     "planPercent": 6,
     "planAmount": 9780,
-    "tempoAmount": 7472.35956,
-    "factAmount": 6954.77,
-    "completionPercent": 93.07327818149051,
-    "netPercent": 17.6376688229805
+    "tempoAmount": 8388.0898975,
+    "factAmount": 7479.62,
+    "completionPercent": 89.16952597550541,
+    "netPercent": 17.6433268000246
   },
   {
     "productGroup": "ОХОЛОДЖЕННЯ",
     "planPercent": 4,
     "planAmount": 6520,
-    "tempoAmount": 4981.57304,
-    "factAmount": 5404.5,
-    "completionPercent": 108.489827542507,
-    "netPercent": 16.6348968452216
+    "tempoAmount": 5592.05993166666,
+    "factAmount": 6130.73,
+    "completionPercent": 109.632766367237,
+    "netPercent": 16.322811475957998
   },
   {
     "productGroup": "ПІДВІСКА",
     "planPercent": 11,
     "planAmount": 17930,
-    "tempoAmount": 13699.32586,
-    "factAmount": 13051,
-    "completionPercent": 95.2674615771203,
-    "netPercent": 19.8838755650908
+    "tempoAmount": 15378.1648120833,
+    "factAmount": 16033.83,
+    "completionPercent": 104.26361139920598,
+    "netPercent": 19.1082579770398
   },
   {
     "productGroup": "ПНЕВМАТИКА",
     "planPercent": 9,
     "planAmount": 14670,
-    "tempoAmount": 11208.53934,
-    "factAmount": 6806.9,
-    "completionPercent": 60.729590123381804,
-    "netPercent": 12.4158265877272
+    "tempoAmount": 12582.13484625,
+    "factAmount": 8383.67,
+    "completionPercent": 66.631538307656,
+    "netPercent": 13.3829301487296
   },
   {
     "productGroup": "СИСТЕМА ЗЧЕПЛЕННЯ",
     "planPercent": 6,
     "planAmount": 9780,
-    "tempoAmount": 7472.35956,
-    "factAmount": 9913.18,
-    "completionPercent": 132.664654590042,
-    "netPercent": 11.3126817025415
+    "tempoAmount": 8388.0898975,
+    "factAmount": 10181.95,
+    "completionPercent": 121.385799680505,
+    "netPercent": 11.6146140965139
   },
   {
     "productGroup": "ТРАНСМІСІЯ",
     "planPercent": 4,
     "planAmount": 6520,
-    "tempoAmount": 4981.57304,
-    "factAmount": 1641.01,
-    "completionPercent": 32.9416027191283,
-    "netPercent": 14.441587802633702
+    "tempoAmount": 5592.05993166666,
+    "factAmount": 4813.43,
+    "completionPercent": 86.0761518799638,
+    "netPercent": 15.9359022568106
   },
   {
     "productGroup": "ФІЛЬТР",
     "planPercent": 9,
     "planAmount": 14670,
-    "tempoAmount": 11208.53934,
-    "factAmount": 12072.21,
-    "completionPercent": 107.705470211607,
-    "netPercent": 16.2230999957754
+    "tempoAmount": 12582.13484625,
+    "factAmount": 15141.3,
+    "completionPercent": 120.339673553195,
+    "netPercent": 16.3140139882309
   }
 ]
